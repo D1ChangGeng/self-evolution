@@ -138,7 +138,7 @@ When modifying this codebase, update knowledge **in the same commit**:
 - New convention → add to the relevant `domains/*.md` file (NOT to this file)
 - Significant architecture change → update `domains/*.md` scope sections
 
-After init, refine these rules to name the SPECIFIC files for your project (e.g., `reference/request-lifecycle.md`, `domains/security-auth.md`). Generic wildcards work but specific targets prevent sync misses.
+After init, refine these rules to name the SPECIFIC files for your project (e.g., `reference/code-map.md`, `domains/database.md`). Generic wildcards work but specific targets prevent sync misses.
 
 **Single Source of Truth:** Each rule has exactly one canonical home in `.agents/knowledge/domains/`. This file contains summaries with pointers. When updating a rule, update the domain file only.
 

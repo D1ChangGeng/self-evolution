@@ -133,7 +133,7 @@ Raw capture goes here first, usually in monthly files. Use it for observations t
 
 ### `domains/`
 
-Working knowledge lives here, organized by task area. Each domain file merges conventions, anti-patterns, and operational notes for a focused area such as authentication, deployment, UI patterns, or security. One domain file per concern prevents hunting across multiple files.
+Working knowledge lives here, organized by task area. Each domain file merges conventions, anti-patterns, and operational notes for a focused area of the project. One domain file per concern prevents hunting across multiple files.
 
 ### `reference/`
 
@@ -534,7 +534,7 @@ When modifying this codebase, update knowledge **in the same commit**:
 - New convention → add to the relevant `domains/*.md` file (NOT to this file)
 - Significant architecture change → update `domains/*.md` scope sections
 
-As the project grows, refine these rules to name SPECIFIC files (e.g., `reference/api-routes.md`, `domains/auth.md`). Specific targets prevent sync misses.
+As the project grows, refine these rules to name SPECIFIC files (e.g., `reference/code-map.md`, `domains/database.md`). Specific targets prevent sync misses.
 
 **Single Source of Truth:** Each rule has exactly one canonical home in `.agents/knowledge/domains/`. This file contains summaries with pointers. When updating a rule, update the domain file only.
 

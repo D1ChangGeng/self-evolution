@@ -46,7 +46,7 @@ Project knowledge includes at least twelve distinct types, each with different l
 | Type | Example | Verification | Lifetime |
 |------|---------|-------------|----------|
 | Facts | "The API runs on port 8317" | Check code/config | Until changed |
-| Decisions | "We chose JWT over sessions" | Check with decision-makers | Until superseded |
+| Decisions | "We chose event sourcing over CRUD" | Check with decision-makers | Until superseded |
 | Conventions | "Use kebab-case for config keys" | Check codebase consistency | Until explicitly changed |
 | Patterns | "Error handlers follow X structure" | Check multiple instances | Until refactored |
 | Warnings | "Never use == for token comparison" | Check incident history | Long-lived |

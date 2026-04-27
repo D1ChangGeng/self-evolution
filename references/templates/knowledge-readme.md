@@ -27,7 +27,7 @@ Raw capture goes here first, usually in monthly files. Use it for observations t
 
 ### `domains/`
 
-Working knowledge lives here, organized by task area. Each domain file merges conventions, anti-patterns, and operational notes for a focused area such as authentication, deployment, UI patterns, or security. One domain file per concern prevents hunting across multiple files.
+Working knowledge lives here, organized by task area. Each domain file merges conventions, anti-patterns, and operational notes for a focused area of the project. One domain file per concern prevents hunting across multiple files.
 
 ### `reference/`
 

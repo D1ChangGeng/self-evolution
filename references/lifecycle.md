@@ -86,7 +86,7 @@ See the Crystallization Detection section below.
 
 The primary detection method: when the AI touches files in a scope, it should check related knowledge files.
 
-Example: While working on `src/auth/`, the AI should check if `domains/auth.md` exists and whether its claims still hold.
+Example: While working on `src/payments/`, the AI should check if `domains/payments.md` exists and whether its claims still hold.
 
 ### Heuristic Signals
 

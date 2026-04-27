@@ -15,7 +15,7 @@ This file extends the global self-evolution skill with project-specific behavior
 
 <!-- Describe the project type in 1-2 lines. This helps future sessions understand
      why certain specializations exist and whether they apply to similar projects.
-     Example: "Rust async web service with OAuth integration, distributed as Docker image" -->
+     Example: "Python data pipeline with PostgreSQL, deployed via Kubernetes" -->
 
 ## Active Overrides
 

@@ -53,7 +53,7 @@ Things that need verification or are not yet documented.
 
 <!--
 During init, compare what documentation/README claims about this area against what the code actually does.
-Record divergences explicitly — e.g., "README says X uses REST, but code shows gRPC".
+Record divergences explicitly — e.g., "README says X uses protocol A, but code shows protocol B".
 These divergences are the highest-value findings from a scan — they reveal where knowledge has drifted.
 -->
 
