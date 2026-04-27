@@ -143,6 +143,21 @@ If a dimension's `last_reviewed` exceeds 60 days AND you have reason to believe 
 
 ---
 
+### 9. Project-Local Specialization
+<!-- anchor: project-local-specialization -->
+
+**Current choice**: SKILL-LOCAL.md overlay pattern — project-local skill wraps global skill, specializations accumulate as explicit overrides (additional capture conditions, health thresholds, promotion criteria). Candidates discovered during Mode 4, promoted during Mode 7. Architectural invariants (lifecycle, confidence model, filesystem contract) cannot be overridden.
+
+**Rationale**: Like LLM fine-tuning — base model stays general, per-project data shapes domain-specific behavior. Overlay pattern prevents forking while enabling meaningful adaptation. Evidence-gated promotion prevents over-specialization.
+
+**Change trigger**: Project-local specializations prove insufficient (need deeper structural changes), OR portable specialization packs become needed across multiple same-type projects.
+
+**Deep reference**: [SKILL.md — §Project-Local Specialization](../SKILL.md), [templates/skill-local-template.md](templates/skill-local-template.md)
+
+**Last reviewed**: 2026-04-27
+
+---
+
 ## Known Improvement Backlog
 
 Items identified but not yet implemented. Evaluate during pre-validation — if your current capabilities can address any of these, propose the improvement.
@@ -184,6 +199,10 @@ When any of these files change, the relevant dimension in this spec MUST be upda
 ---
 
 ## Review Log
+
+### v1.4 — 2026-04-27
+- Added §9 Project-Local Specialization dimension for SKILL-LOCAL.md overlay pattern.
+- Expanded from 8 to 9 dimensions.
 
 ### v1.3 — 2026-04-27
 - Added Skill Feedback Capture protocol (SKILL-FIX/SKILL-IDEA/SKILL-COMPAT tags).

@@ -499,6 +499,8 @@ Before starting, verify manifest.json:
 
    **Application tracking**: When a pattern is referenced or used to guide a decision during normal work, increment its `application_count` and update `last_applied` in frontmatter. Patterns with high `application_count` + recent `last_applied` are strong promotion candidates. Patterns with `application_count: 0` after 90 days are retirement candidates.
 
+   **Specialization detection** (only if project-local): When a pattern appears project-specific (applies only to this project type, not universally), add it as a candidate to `SKILL-LOCAL.md` Candidate Specializations instead of promoting to AGENTS.md. Mode 7 will review and promote.
+
    **Concrete example** (illustrative):
    A naming convention (e.g., "all config keys use kebab-case") verified across 3+ files and 2+ sessions → promote from domain to pattern with evidence links.
 
@@ -682,9 +684,14 @@ Explicit maintenance session for the skill itself. Triggered only by user reques
 
    **Skill-focused search**: Use `find-skills` to search for skills that address captured `[SKILL-IDEA]` or `[SKILL-COMPAT]` items. Write candidates to `manifest.json` `skills.pending_review` immediately — do not stop to ask the user mid-search. Present the full pending list at the end of maintenance for batch confirmation. Confirmed installs move to `skills.installed`.
 
-6. **Update EVOLUTION-SPEC.md** — promoted items go to Improvement Backlog or become dimension updates. Rejected items noted with reason.
-7. **Version the change** — update Review Log in EVOLUTION-SPEC.md
-8. **Report** — what was fixed, what was deferred, what was rejected, what capability candidates were found
+6. **Specialization review** (only if project-local, i.e., `SKILL-LOCAL.md` exists):
+   - Check `SKILL-LOCAL.md` Candidate Specializations for items ready to promote
+   - For each candidate with sufficient evidence: promote to Active Overrides
+   - For candidates without evidence after 90 days: remove
+   - Check if any active override has become generic (applies to unrelated projects) → suggest merge to global skill
+7. **Update EVOLUTION-SPEC.md** — promoted items go to Improvement Backlog or become dimension updates. Rejected items noted with reason.
+8. **Version the change** — update Review Log in EVOLUTION-SPEC.md
+9. **Report** — what was fixed, what was deferred, what was rejected, what capability candidates were found, what specializations were promoted or retired
 
 ### Guardrails
 
@@ -693,6 +700,71 @@ Explicit maintenance session for the skill itself. Triggered only by user reques
 - **Every change maps to a captured issue** — no speculative improvements
 - **Stability fixes before capability expansion** — always
 - **Rollback path** — commit/snapshot before maintenance changes
+
+---
+
+## Project-Local Specialization
+
+When this skill is installed at project level (`.agents/skills/self-evolution/`) rather than globally (`~/.agents/skills/self-evolution/`), it can gradually specialize for the project type — like fine-tuning a base model with domain-specific data.
+
+### Detection
+
+The skill is project-local if `SKILL-LOCAL.md` exists beside the invoked SKILL.md. If no `SKILL-LOCAL.md` is found, run as the global base skill with no specialization.
+
+### Architecture
+
+```
+Global skill (base behavior)     →  always read first
+  +
+SKILL-LOCAL.md (overlay)         →  higher priority for this project
+  ↑
+patterns/ + crystallized/        →  training evidence for specialization
+```
+
+The local SKILL.md should be a thin wrapper (~20 lines) that says: read the global skill first, then apply SKILL-LOCAL.md as project-specific policy.
+
+### Specialization Lifecycle
+
+```
+Project work produces inbox observations
+  → Mode 4 (Evolve) detects project-specific patterns
+  → Pattern repeats 3+ times across sessions
+  → Mode 4 writes candidate to SKILL-LOCAL.md "Candidate Specializations"
+  → Mode 7 (Skill Maintenance) reviews candidates
+  → Promoted candidates become "Active Overrides" in SKILL-LOCAL.md
+  → Active overrides modify skill behavior for this project only
+```
+
+### What Can Be Specialized
+
+| Aspect | Override mechanism |
+|--------|-------------------|
+| Additional capture conditions | `SKILL-LOCAL.md` → Active Overrides → Capture Conditions |
+| Staleness thresholds per domain | `SKILL-LOCAL.md` → Active Overrides → Health Threshold Overrides |
+| Promotion criteria | `SKILL-LOCAL.md` → Active Overrides → Promotion Criteria Overrides |
+| Domain template sections | `SKILL-LOCAL.md` → Active Overrides (additional sections for specific domain types) |
+
+### What Cannot Be Specialized
+
+- Core lifecycle stages (capture → compress → verify → promote → crystallize → retire)
+- Confidence model (observed → verified → canonical)
+- AGENTS.md governance structure
+- Anti-overconfidence rules
+- Filesystem contract
+
+These are architectural invariants — changing them creates a fork, not a specialization.
+
+### Drift Prevention
+
+- **Never edit the local base SKILL.md beyond the wrapper** — all project behavior goes in SKILL-LOCAL.md
+- **Separate candidates from active rules** — candidates do not affect behavior until promoted in Mode 7
+- **Require evidence for promotion** — repeated across 2+ tasks, tied to an incident, or explicitly requested by user
+- **Review metadata on each rule** — `added`, `reason`, `confidence`
+- **Merge back when generic** — if a rule applies across unrelated projects, it belongs in the global skill
+
+### Template
+
+Use `references/templates/skill-local-template.md` to create a new SKILL-LOCAL.md.
 
 ---
 
@@ -955,6 +1027,7 @@ All templates are in `references/templates/`. Use them as starting points, not r
 | `decision-template.md` | .agents/knowledge/decisions/*.md | Any time a decision is recorded |
 | `pattern-template.md` | .agents/knowledge/patterns/*.md | Evolution (promotion) |
 | `crystallized-template.md` | .agents/knowledge/crystallized/*.md | Crystallization |
+| `skill-local-template.md` | .agents/skills/self-evolution/SKILL-LOCAL.md | Project-local specialization |
 | `manifest-schema.json` | .agents/knowledge/manifest.json | Both init modes, Evolution |
 | `EVOLUTION-SPEC.md` | Pre-validation checkpoint | Step 0 in Mode 1 and Mode 2 |
 | `scripts/init-scaffold.sh` | Deterministic scaffold creation | Mode 1 step 2, Mode 2 scaffold setup |
