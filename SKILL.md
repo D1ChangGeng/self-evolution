@@ -67,6 +67,70 @@ Every initialization creates this exact structure. No exceptions.
 
 ---
 
+## Initialization Quality Contract
+
+These rules apply to ALL initialization modes (1, 2, 2B). They enforce deep, evidence-based work and prevent shallow output. Bias toward thoroughness during initialization — this is a one-time investment that shapes every future session.
+
+### Read-Before-Write Rule
+
+Before writing any knowledge file, you MUST have read the source files you will cite. If you cannot cite a claim to a specific file and line, the claim is either an Open Question or must not be written as a Verified Fact. No exceptions.
+
+Prepare an internal evidence ledger before generating each domain file:
+- Domain name and scope
+- Files read (list paths)
+- Claims to include (with source citations)
+- Open questions (things you couldn't verify)
+
+### Minimum Substantive Content Rule
+
+| File type | Minimum requirement |
+|---|---|
+| Domain file | Substantive content in at least 3 sections + at least 3 source citations + at least 5 project-specific facts |
+| AGENTS.md invariant | Must cite a specific file, symbol, route, or config key |
+| AGENTS.md anti-pattern | Must describe a concrete failure mode (not a vague principle) |
+| AGENTS.md "Where to Look" row | Must point to an existing file or directory |
+| AGENTS.md commands | Must come from package manifests, Makefiles, CI configs, or direct project evidence |
+| Inbox observation | Must include: what was observed, why it matters, source citation |
+
+### Placeholder Rejection Rule
+
+No section may contain only `-`, `TODO`, `TBD`, `placeholder`, `to be filled`, or generic boilerplate. If a section genuinely has no content, write a cited explanation of why (e.g., "No test patterns found — project has no test directory [source: directory scan]").
+
+### Concurrent Exploration Rule
+
+For existing projects, fire background exploration agents BEFORE reading individual files. Scale agent count to project size:
+
+| Factor | Threshold | Additional agents |
+|---|---|---|
+| Total files | >100 | +1 per 100 files |
+| Total lines | >10k | +1 per 10k lines |
+| Directory depth | ≥4 | +2 for deep exploration |
+| Large files (>500 lines) | >10 | +1 for complexity hotspots |
+| Multiple languages | >1 | +1 per language |
+
+For small projects (<100 files), the base 6 exploration agents are sufficient.
+
+### Verification Rule
+
+Before reporting initialization complete:
+1. **Structural check**: Every generated file has required sections populated, citations present, no placeholders
+2. **Semantic self-review**: For each generated file, answer: "Could this content have been written without reading this project?" If yes, the file needs more project-specific detail.
+3. **Path validation**: Every file path in "Where to Look" and source citations points to an existing file
+4. **Completeness check**: All items in the Completion Criteria for the active mode are satisfied
+
+### Anti-Shallow-Work Patterns
+
+These patterns indicate the agent is not doing deep work. If caught, stop and redo:
+
+- Generating domain files with section headers but no substantive bullets
+- Writing invariants without source citations
+- Copying README content verbatim instead of analyzing code
+- Generating generic best-practice advice instead of project-specific observations
+- Skipping the evidence ledger and writing claims from memory
+- Declaring initialization complete without running verification checks
+
+---
+
 ## Mode 1: Initialize — Empty Project
 
 Create the knowledge base skeleton. Read `references/templates/root-agents-empty.md` and use it as the base for AGENTS.md.
@@ -92,10 +156,17 @@ Create the knowledge base skeleton. Read `references/templates/root-agents-empty
 4. Generate scope-triggered rules (see Scope-Triggered Rules Generation section)
 5. Report completion: list created files and explain what to do next
 
+### Mode 1 Quality Gate
+- All required files exist (AGENTS.md, README.md, manifest.json, knowledge-protocol.md, hook scripts)
+- AGENTS.md contains no unresolved `{{PLACEHOLDER}}` variables
+- manifest.json is valid JSON with correct project name
+- Hook scripts are executable
+
 ### Completion Criteria
 - AGENTS.md exists at project root with CODING DISCIPLINE, POST-TASK CHECKLIST and SELF-EVOLUTION RULES
 - .agents/knowledge/ exists with README.md, manifest.json, and 7 subdirectories
 - .agents/rules/ exists with at least knowledge-protocol.md
+- .agents/hooks/ exists with session-end.sh, stop.sh, compact-recovery.sh
 - No knowledge content generated (the project is empty — knowledge accumulates through use)
 
 ---
@@ -342,6 +413,13 @@ If the project already has an AGENTS.md:
 6. **Post-decomposition verification**: If an existing AGENTS.md was decomposed into domain files, verify that every substantive bullet from the original is present in at least one knowledge file. Scan the original line by line — any bullet not accounted for goes into `inbox/` as a captured observation rather than being silently dropped.
 7. Note in the report which sections were imported vs augmented, and any items placed in inbox as uncategorized
 
+### Mode 2 Quality Gate (in addition to Initialization Quality Contract)
+- Each domain file has substantive content in at least 3 sections
+- Each domain file includes at least 3 source citations (`[source: file:line]`)
+- Each domain file includes at least 5 project-specific facts (not generic advice)
+- AGENTS.md invariants cite specific files; anti-patterns describe concrete failure modes
+- "Where to Look" entries point to existing files/directories
+
 ### Completion Criteria
 - AGENTS.md exists (created or augmented) with CODING DISCIPLINE, POST-TASK CHECKLIST and SELF-EVOLUTION RULES
 - .agents/knowledge/ exists with README.md, manifest.json, and all 7 subdirectories (inbox, domains, reference, decisions, patterns, crystallized, archive)
@@ -349,6 +427,7 @@ If the project already has an AGENTS.md:
 - All generated files have sources listing actual files read
 - inbox/ has initial observations from scan
 - .agents/rules/ exists with scope-triggered rules matching generated domains
+- .agents/hooks/ exists with session-end.sh, stop.sh, compact-recovery.sh
 
 ---
 
@@ -587,6 +666,10 @@ Each entry is self-contained (header + bullets + source), so interleaved writes 
 - Information already well-documented in the knowledge base
 - Sensitive data (secrets, credentials, personal information)
 - Temporary debugging observations (unless they reveal a persistent gotcha)
+
+### Recording Architecture Decisions
+
+When a significant technical decision is made (framework choice, data model, API architecture, infrastructure), create an ADR in `.agents/knowledge/decisions/` using `references/templates/decision-template.md`. Decisions skip the inbox — they go directly to `decisions/` with `confidence: observed` and the context that drove the choice.
 
 ---
 
