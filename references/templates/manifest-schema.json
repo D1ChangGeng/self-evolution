@@ -1,0 +1,34 @@
+{
+  "_note": "Content also embedded in references/scripts/init-scaffold.sh. Keep both in sync when editing.",
+  "schema_version": "1.0",
+  "created_at": "{{TIMESTAMP}}",
+  "last_evolved_at": null,
+  "last_health_check": null,
+  "project": {
+    "name": "{{PROJECT_NAME}}",
+    "initialized_from": "{{INIT_MODE}}"
+  },
+  "inventory": [],
+  "health": {
+    "total_files": 0,
+    "by_type": {
+      "domain": 0,
+      "reference": 0,
+      "decision": 0,
+      "pattern": 0,
+      "crystallized": 0,
+      "inbox": 0,
+      "archived": 0
+    },
+    "by_confidence": {
+      "observed": 0,
+      "verified": 0,
+      "canonical": 0
+    },
+    "inbox_count": 0,
+    "inbox_oldest_unprocessed": null,
+    "stale_candidates": [],
+    "conflicts": [],
+    "days_since_evolution": null
+  }
+}
