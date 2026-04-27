@@ -1,200 +1,194 @@
 # Hooks Guide
 
-This guide covers hook setup, tool compatibility, and how to adapt the shipped scripts for the self-evolution skill.
+This guide explains the lifecycle hooks shipped with the self-evolution skill, how to install them, and how each supported tool maps hook events to the same project-local shell scripts.
 
-## What Are Hooks
+Hooks are deterministic runtime behavior. `AGENTS.md` rules are advisory because the model chooses whether to follow them. A hook runs because the host tool starts a shell command.
 
-Hooks are shell scripts that run at specific lifecycle events, such as task completion, session end, or context compaction.
+The shipped hooks are intentionally safe by default. They always exit `0`, don't make network calls, and don't edit canonical knowledge directly.
 
-They are deterministic. They execute because the host tool starts a shell process, regardless of what the LLM remembers or chooses to follow.
+## Why Hooks Matter
 
-The key distinction:
+Prompt-only rules get weaker in long sessions.
 
-- `AGENTS.md` rules are advisory. The LLM decides whether to follow them.
-- Hooks are mandatory. The shell executes them when the configured event fires.
+- HumanLayer reports that system prompt attention can degrade to about 1% after 50K+ tokens.
+- LIFBench, ACL 2025, reports up to 61.8% performance variance from behavioral constraints.
+- Issue reports #26160 and #33603 describe rules being effectively lost after compaction.
+- AGENTS.md rules are advisory. Hooks can be mandatory when a tool treats exit `2` or another nonzero exit as a blocking signal.
+- AGENTS.md spec proposal #167 discusses native lifecycle commands, which matches this adapter plus script design.
 
-Hooks turn critical reminders into runtime behavior instead of prompt text.
+This skill uses hooks for reminders and recovery, not hard enforcement.
 
-## Why Hooks Matter for Knowledge Management
+## Files Installed
 
-Long sessions are a poor place to rely on prompt-only rules.
-
-Research and field testing show that:
-
-- System prompt attention can degrade to about 1% after 50K+ tokens.
-- Behavioral constraints can show up to 61.8% performance variance.
-- After context compaction, rules are often effectively lost.
-
-Hooks solve this by enforcing checks at the moments that matter most: session end, task completion, and post-compaction recovery.
-
-They don't replace `AGENTS.md`. They backstop it with deterministic enforcement.
-
-## The Three Hooks
-
-### `session-end.sh`
-
-**When:** Session terminates.
-
-**What:** Appends a capture reminder to the knowledge inbox.
-
-**Why:** Ensures the next session checks for missed knowledge, even if the previous session ended abruptly or skipped capture.
-
-**How it works:** Reads session JSON from `stdin`, computes the current month, and writes to:
+The installer copies the shipped scripts into the target project:
 
 ```text
-.agents/knowledge/inbox/{YYYY-MM}.md
+.agents/hooks/session-end.sh
+.agents/hooks/stop.sh
+.agents/hooks/compact-recovery.sh
 ```
 
-### `stop.sh`
+## Hook 1: `session-end.sh`
 
-**When:** Agent completes a task.
+**Event:** `SessionEnd`
 
-**What:** Checks `.agents/knowledge/manifest.json` for `inbox_count` and `days_since_evolution`.
+**Action:** Appends a capture reminder to `.agents/knowledge/inbox/{YYYY-MM}.md`.
 
-**Why:** Gives a deterministic nudge without relying on the LLM to remember `SESSION START`.
+**Design:** Reads session JSON from `stdin`, is tool-agnostic, and always exits `0`.
 
-**How it works:** Uses `grep` and `sed` to extract JSON values, then prints warnings to `stderr` when inbox or evolution thresholds are exceeded.
+## Hook 2: `stop.sh`
 
-### `compact-recovery.sh`
+**Event:** `Stop`
 
-**When:** Context is compacted, usually configured as `SessionStart` with matcher `compact`.
+**Action:** Checks `.agents/knowledge/manifest.json` for maintenance thresholds.
 
-**What:** Injects a directive telling the agent to re-read `AGENTS.md`.
+It warns when:
 
-**Why:** Prevents post-compaction rule amnesia.
+- `inbox_count > 10`
+- `days_since_evolution > 14`
 
-**How it works:** Outputs directive text to `stdout`. Tools that support context injection add that output back into the agent context.
+**Design:** Parses JSON with `grep` and `sed`, prints warnings to `stderr`, and always exits `0`.
 
-## Tool Compatibility Table
+If the manifest is missing, the hook exits quietly.
+
+## Hook 3: `compact-recovery.sh`
+
+**Event:** `SessionStart`
+
+**Matcher:** `compact`
+
+**Action:** Outputs this directive to `stdout`:
+
+```text
+CONTEXT WAS COMPACTED. Re-read AGENTS.md...
+```
+
+**Design:** Always exits `0`, has 12 lines, and has zero dependencies.
+
+This hook only fires after context compaction, when prompt rules are most likely to be missing or weakened.
+
+## Updated Adapter Format
+
+```json
+{
+  "hooks": {
+    "SessionStart": [{
+      "matcher": "compact",
+      "hooks": [{"type": "command", "command": "sh .agents/hooks/compact-recovery.sh", "timeout": 5000}]
+    }],
+    "Stop": [{
+      "matcher": "",
+      "hooks": [{"type": "command", "command": "sh .agents/hooks/stop.sh", "timeout": 5000}]
+    }],
+    "SessionEnd": [{
+      "matcher": "",
+      "hooks": [{"type": "command", "command": "sh .agents/hooks/session-end.sh", "timeout": 5000}]
+    }]
+  }
+}
+```
+
+Keep the `SessionStart` matcher as `compact`. If it is empty, the recovery directive may run at every session start.
+
+## Tool Compatibility
 
 | Tool | Hook Support | Config Format | Adapter |
 |------|-------------|---------------|---------|
-| Claude Code | Full (27+ events) | `settings.json` | `adapters/claude-code.json` |
+| Claude Code | Full (27+ events) | `.claude/settings.json` | `adapters/claude-code.json` |
 | Cursor | Full (CC compatible) | `.cursor/hooks.json` | `adapters/cursor.json` |
 | OpenCode | Full (plugin system) | `.opencode/hooks.json` | `adapters/opencode.json` |
 | Augment Code | Full (CC compatible) | `settings.json` | `adapters/augment.json` |
-| Gemini CLI | Partial | `.gemini/settings.json` | Not shipped yet |
-| Codex CLI | Partial (expanding) | `hooks.json` | Not shipped yet |
-| Windsurf | No | N/A | N/A |
-| Cline/Roo | No | N/A | N/A |
-| Aider | No | N/A | N/A |
-
-All shipped adapters use the Claude Code JSON shape.
+| Gemini CLI | Partial | `.gemini/settings.json` | Not shipped |
+| Codex CLI | Partial (expanding) | `hooks.json` | Not shipped |
+| Windsurf | No | — | — |
+| Cline/Roo | No | — | — |
 
 ## Installation
 
 Run the installer from the self-evolution skill directory.
 
-### Auto-detect
-
 ```bash
 sh references/hooks/install-hooks.sh --project-root /path/to/project
 ```
 
-### Specify tool
+Or specify the tool:
 
 ```bash
 sh references/hooks/install-hooks.sh --project-root /path/to/project --tool claude-code
 ```
 
-Supported `--tool` values are `claude-code`, `cursor`, `opencode`, and `augment`.
+Installer steps:
 
-### What the installer does
+1. Detects or uses the selected tool.
+2. Creates `.agents/hooks/` if needed.
+3. Copies `session-end.sh`, `stop.sh`, and `compact-recovery.sh`.
+4. Marks the scripts executable.
+5. Installs the matching adapter config.
 
-1. Detects the tool by checking for `.claude/`, `.cursor/`, `.opencode/`, or `augment` in `PATH`.
-2. Copies `session-end.sh`, `stop.sh`, and `compact-recovery.sh` to `.agents/hooks/`.
-3. Makes the copied scripts executable.
-4. Installs the matching adapter JSON config.
+Commit `.agents/hooks/` and any shared hook config file.
 
-Keep `.agents/hooks/` under version control if you want every contributor and agent session to share the same lifecycle behavior.
+## Manual Installation
 
-## Adding Custom Hooks
+```bash
+mkdir -p .agents/hooks
+cp references/hooks/scripts/session-end.sh .agents/hooks/session-end.sh
+cp references/hooks/scripts/stop.sh .agents/hooks/stop.sh
+cp references/hooks/scripts/compact-recovery.sh .agents/hooks/compact-recovery.sh
+chmod +x .agents/hooks/session-end.sh .agents/hooks/stop.sh .agents/hooks/compact-recovery.sh
+```
 
-Add custom hooks by editing the adapter JSON for your tool and adding another entry under the relevant event.
-
-Example: auto-format after file edits in a Claude Code compatible config.
+## Custom Hooks
 
 ```json
 {
   "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|MultiEdit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "sh .agents/hooks/format-after-edit.sh"
-          }
-        ]
-      }
-    ]
+    "PostToolUse": [{
+      "matcher": "Edit|MultiEdit|Write",
+      "hooks": [{"type": "command", "command": "sh .agents/hooks/format-after-edit.sh", "timeout": 5000}]
+    }]
   }
 }
 ```
 
-Recommended patterns:
-
-- Keep hooks fast. Aim for under one second.
-- Keep hooks non-blocking. Warn instead of stopping work.
-- Exit `0` unless failure must block the event.
-- Write diagnostics to `stderr`.
-- Prefer wrapper scripts over long inline commands.
-
-## Disabling Hooks
-
-### Option 1: Remove hook entries from tool config
-
-Edit the tool config and remove entries that call `.agents/hooks/` scripts.
-
-### Option 2: Remove execute permission
-
-```bash
-chmod -x .agents/hooks/session-end.sh
-chmod -x .agents/hooks/stop.sh
-chmod -x .agents/hooks/compact-recovery.sh
-```
-
-## Forward Compatibility
-
-AGENTS.md spec proposal #167 discusses lifecycle commands, including bootstrap and post-chat events.
-
-The shipped hooks align with that direction:
-
-- `compact-recovery.sh` maps to bootstrap or session start recovery.
-- `stop.sh` maps to post-chat or task completion checks.
-- `session-end.sh` maps to session close or transcript finalization.
-
-If native lifecycle command support becomes common, these scripts remain useful as command payloads. The adapter layer may change, but the shell scripts can stay small and portable.
+- Avoid network calls.
+- Use `stderr` for warnings.
+- Use `stdout` only for text that should enter model context.
+- Exit `0` unless you intentionally want the tool to block work.
 
 ## Troubleshooting
 
-### Hook not firing?
+### Hook doesn't fire
 
-Check that the config is in the location your tool reads:
-
-- Claude Code: `settings.json`
+- Claude Code: `.claude/settings.json`
 - Cursor: `.cursor/hooks.json`
 - OpenCode: `.opencode/hooks.json`
 - Augment Code: `settings.json`
 
-Also confirm the script path in the adapter matches your project layout.
-
-### Hook errors appear in output?
-
-The shipped scripts always exit `0`. Check `stderr` for warnings or path problems. You can test a script manually from the project root:
+Then test from the project root:
 
 ```bash
 sh .agents/hooks/stop.sh
 ```
 
-### Adapter format wrong?
+### Compact recovery runs too often
 
-All adapters use the Claude Code JSON shape. If your tool expects another schema, keep the scripts and write a thin adapter that maps your tool's events to the same commands.
+Check the adapter. `SessionStart` must use matcher `compact`. An empty matcher can make `compact-recovery.sh` run on every session start.
 
-### Inbox warning never appears?
+### Compact recovery text isn't visible to the agent
 
-Check that `.agents/knowledge/manifest.json` exists and contains `inbox_count` and `days_since_evolution`.
+Your tool may run hooks without injecting `stdout` into model context.
 
-### Compact recovery text not injected?
+### Adapter JSON is rejected
 
-Confirm your tool supports injecting hook `stdout` into context. Some tools can run hooks but don't add output back into the model context.
+Validate the top-level `hooks` object, commas, brackets, and string quoting.
+
+## Safe Defaults
+
+The default setup is conservative:
+
+- No shipped hook blocks work.
+- No shipped hook sends data over the network.
+- No shipped hook needs external dependencies.
+- `compact-recovery.sh` only fires for `SessionStart` with matcher `compact`.
+
+These defaults keep the hook layer portable while protecting the self-evolution workflow at session end, task stop, and post-compaction recovery.

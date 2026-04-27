@@ -1,169 +1,164 @@
 # Self-Evolution Skill
 
-A production-grade AI agent skill that creates and governs living project knowledge bases. Designed for any AI coding tool that supports the [Agent Skills](https://skills.sh/) ecosystem.
+An agent skill for creating and maintaining a project-local knowledge base under `.agents/knowledge/`.
 
 ## What This Does
 
-When an AI coding agent uses this skill, it gains the ability to:
+Self-Evolution gives coding agents a persistent memory system for a repository. It initializes project knowledge, captures lessons during work, evolves raw notes into structured documentation, checks knowledge health, and crystallizes repeated workflows into reusable skill material.
 
-- **Initialize** a hierarchical knowledge system for any project (empty or existing)
-- **Capture** learnings automatically during normal development work
-- **Evolve** accumulated knowledge through compression, verification, and promotion
-- **Assess** knowledge health with quantitative metrics
-- **Crystallize** repeated workflows into reusable executable documents
-
-The knowledge base persists across sessions in `.agents/knowledge/`, giving every future session access to what previous sessions learned.
+The current skill has a 1046-line `SKILL.md` with 7 explicit modes plus 1 ambient mode, 28 skill files, 3 lifecycle hooks, 4 tool adapters, 2 POSIX scripts, and 10 templates.
 
 ## Why This Exists
 
-AI coding agents lose context between sessions. Every new session starts from scratch, re-discovering conventions, re-learning gotchas, and re-making mistakes that were already solved. Static documentation (README, comments) helps but doesn't evolve with the project.
-
-This skill addresses three gaps:
-
-| Gap | Problem | Solution |
+| Gap | Problem | Response |
 |-----|---------|----------|
-| **Reality** | Documentation lags behind code | Zero-friction capture during normal work |
-| **Access** | Knowledge exists but can't be found at the right time | Layered routing (AGENTS.md → scope rules → domain files) |
-| **Trust** | All text looks equally authoritative | Confidence ladder (observed → verified → canonical) |
+| Reality gap | The code changes faster than the docs. | Capture observations during real work, then evolve them into domain files. |
+| Access gap | Useful knowledge exists but isn't loaded when needed. | Route from `AGENTS.md` to scope rules, domain files, references, and local overlays. |
+| Trust gap | Old guesses and proven facts can look the same. | Track confidence as `observed`, `verified`, or `canonical`, with cited sources. |
 
 ## Quick Start
 
-### Install the skill
+Install the skill:
 
 ```bash
 npx skills add D1ChangGeng/self-evolution-skill --skill self-evolution -g -y
 ```
 
-### Initialize a project
+Initialize a project by telling your agent:
 
-Tell your AI agent:
-
-```
+```text
 Initialize the knowledge base for this project.
 ```
 
-The skill auto-detects whether the project is empty or existing and runs the appropriate initialization flow:
+The skill auto-detects project state:
 
-- **Empty project**: Creates AGENTS.md + knowledge directory skeleton
-- **Existing project**: Scans codebase, generates domain files, builds AGENTS.md with project-specific content
+- Empty project: creates a skeleton knowledge system.
+- Existing project: scans the codebase, records detected technologies, creates initial domain knowledge, and writes `AGENTS.md`.
 
-### What gets created
+## What Gets Created
 
-```
+```text
 your-project/
-├── AGENTS.md                        # Thin router — project identity + navigation
+├── AGENTS.md
 └── .agents/
     ├── knowledge/
-    │   ├── README.md                # System self-description
-    │   ├── manifest.json            # Health dashboard
-    │   ├── inbox/                   # Raw observations (zero-friction capture)
-    │   ├── domains/                 # Organized knowledge by area
-    │   ├── reference/               # Stable reference docs
-    │   ├── decisions/               # Architecture Decision Records
-    │   ├── patterns/                # Verified reusable conventions
-    │   ├── crystallized/            # Executable workflows
-    │   └── archive/                 # Retired knowledge
-    ├── rules/                       # Scope-triggered knowledge discovery
-    └── hooks/                       # Lifecycle automation scripts
+    │   ├── README.md
+    │   ├── manifest.json
+    │   ├── SKILL-LOCAL.md
+    │   ├── inbox/
+    │   ├── domains/
+    │   ├── reference/
+    │   ├── decisions/
+    │   ├── patterns/
+    │   ├── crystallized/
+    │   └── archive/
+    ├── rules/
+    └── hooks/
         ├── session-end.sh
         ├── stop.sh
         └── compact-recovery.sh
 ```
 
+`SKILL-LOCAL.md` is a project-local specialization overlay. It acts like fine-tuning for this skill inside one repository without changing the distributed skill.
+
 ## Modes
 
 | User says | Mode | What happens |
-|-----------|------|-------------|
-| "initialize", "set up knowledge base" | **Initialize** | Creates full knowledge system |
-| "evolve", "compress inbox", "promote" | **Evolve** | Processes inbox → compresses → verifies → promotes |
-| "check health", "KB status" | **Health Check** | Reports metrics and priority actions |
-| "crystallize", "formalize this process" | **Crystallize** | Turns repeated workflows into executable docs |
-| *(after completing work)* | **Capture** | Automatically captures learnings to inbox |
+|-----------|------|--------------|
+| "initialize", "init", "set up knowledge base" | Initialize | Auto-detects empty vs existing project, then creates the knowledge system. |
+| "evolve", "update knowledge", "compress inbox" | Evolve | Processes inbox notes, fixes tagged domain corrections, promotes stable knowledge, and updates health metadata. |
+| "check health", "KB health" | Health Check | Reports inbox load, staleness, source quality, routing quality, and priority actions. |
+| "crystallize", "turn this into a workflow" | Crystallize | Converts repeated workflows into reusable executable documentation or skill material. |
+| "improve the skill", "skill maintenance" | Skill Maintenance | Runs Capability Radar with 3 searches, up to 5 candidates, and a 30 minute budget. |
+| Explicit project knowledge correction | Targeted Correction | Updates the right knowledge file while preserving source evidence and confidence state. |
+| Explicit local specialization request | Project-Local Specialization | Updates `.agents/knowledge/SKILL-LOCAL.md` for repository-specific behavior. |
+| Completing a non-trivial task | Capture (ambient) | Writes useful lessons to inbox before reporting the capture decision. |
 
 ## Key Features
 
-### Deterministic Scaffold Scripts
+### Knowledge Management
 
-Two POSIX shell scripts eliminate boilerplate generation overhead:
+- Write-first capture protocol: write the inbox entry now, then state `Capture:` after the write.
+- `[DOMAIN-FIX: domains/X.md]` tags mark corrections that should be applied at a natural task boundary.
+- Confidence ladder keeps raw observations separate from verified and canonical knowledge.
+- `skills.pending_review` stores skill-discovery candidates as a write-ahead record during immersive work.
 
-- `init-scaffold.sh` — Creates all directories + boilerplate files in one shot
-- `scan-project.sh` — Collects structural metadata before the LLM reads any code
+### Execution Quality
 
-### Lifecycle Hooks
+- Context Familiarity rule: if the agent cannot cite the file and line that govern the behavior, it doesn't know enough yet.
+- The rule fires on domain transitions, not trivial local edits.
+- Activation sentence: bias toward caution over speed, for trivial, local tasks, use judgment.
+- `scan-project.sh` outputs tech stack facts and repository structure, not skill recommendations.
 
-Tool-agnostic shell scripts that provide deterministic automation:
+### Self-Improvement
 
-| Hook | Event | Action |
-|------|-------|--------|
-| `session-end.sh` | Session terminates | Appends capture reminder to inbox |
-| `stop.sh` | Agent completes task | Checks manifest health, warns if overdue |
-| `compact-recovery.sh` | Context compacted | Injects "re-read AGENTS.md" directive |
+- Skill Feedback tags route improvements back into the skill: `[SKILL-FIX]`, `[SKILL-IDEA]`, and `[SKILL-COMPAT]`.
+- Mode 7, Skill Maintenance, includes Capability Radar with 3 searches, 5 candidates, and a 30 minute budget.
+- Meta-skills only: `find-skills` for discovery and `skill-creator` for creation. No concrete implementation skill names are referenced.
+- EVOLUTION-SPEC covers 9 dimensions for checking whether the skill design still fits current agent practice.
 
-Supported tools: **Claude Code**, **Cursor**, **OpenCode**, **Augment Code**
+### Automation
 
-### Meta-Evolution (Step 0)
+- 3 lifecycle hooks: `session-end.sh`, `stop.sh`, and `compact-recovery.sh`.
+- `compact-recovery.sh` provides a post-compaction re-read directive so the agent reloads project routing after context compression.
+- 4 tool adapters: Claude Code, Cursor, OpenCode, and Augment Code.
+- 2 POSIX scripts: `init-scaffold.sh` and `scan-project.sh`.
+- EVOLUTION-SPEC uses a dual-file architecture: a 130-line root template for distribution and a 228-line `references/` runtime version that is user-local and gitignored when installed into projects.
 
-Before every initialization, the skill evaluates its own design against 8 dimensions in `EVOLUTION-SPEC.md`. This prevents the skill itself from becoming stale as the industry advances.
-
-### Knowledge Confidence Model
-
-All AI-generated knowledge starts as `observed`. Promotion requires evidence:
-
-```
-observed (seen once) → verified (2+ sources) → canonical (human-approved)
-```
-
-### Write-Ahead Capture Protocol
-
-Knowledge capture uses a write-first pattern to prevent declaration-without-execution:
-
-```
-1. Write inbox entry NOW (3 lines)
-2. Tag domain corrections as [DOMAIN-FIX: domains/X.md]
-3. State capture decision: "Capture: inbox (hidden assumption in auth)"
-4. Apply domain corrections at natural task boundaries
-```
-
-## Documentation
+## Documentation Links
 
 | Document | What it covers |
-|----------|---------------|
-| [Architecture](docs/ARCHITECTURE.md) | System design, file roles, data flow |
-| [Usage Guide](docs/USAGE-GUIDE.md) | Mode-by-mode instructions with examples |
-| [Hooks Guide](docs/HOOKS-GUIDE.md) | Hook setup, tool compatibility, custom hooks |
+|----------|----------------|
+| [Architecture](docs/ARCHITECTURE.md) | Skill structure, data flow, lifecycle, and extension points. |
+| [Usage Guide](docs/USAGE-GUIDE.md) | Mode-by-mode usage and examples. |
+| [Hooks Guide](docs/HOOKS-GUIDE.md) | Hook installation, adapters, and automation behavior. |
+| [Philosophy](references/philosophy.md) | The three gaps, failure modes, and design rationale. |
+| [Lifecycle](references/lifecycle.md) | Capture, organize, verify, promote, compress, and retire flow. |
+| [Health Check](references/health-check.md) | Knowledge base metrics and scoring. |
+| [Evolution Spec](EVOLUTION-SPEC.md) | Distributable 9-dimension template. |
+| [Runtime Evolution Spec](references/EVOLUTION-SPEC.md) | Runtime 9-dimension spec used during skill operation. |
 
 ## Skill File Reference
 
-| File | Lines | Role |
-|------|-------|------|
-| `SKILL.md` | 895 | Operating manual — 6 modes, all instructions |
-| `references/EVOLUTION-SPEC.md` | 188 | Meta-evolution checkpoint (8 dimensions) |
-| `references/philosophy.md` | 146 | Design rationale (3 gaps, 8 failure modes, 8 principles) |
-| `references/lifecycle.md` | 269 | Detailed evolution mechanics |
-| `references/health-check.md` | 171 | Health metrics and scoring |
-| `references/init-deep-reference.md` | 147 | Scanning methodology reference |
-| `references/scripts/init-scaffold.sh` | 571 | Deterministic scaffold creation |
-| `references/scripts/scan-project.sh` | 291 | Project pre-scanner |
-| `references/hooks/*` | 5 files | Lifecycle hook system |
-| `references/templates/*` | 9 files | File templates for all knowledge types |
+| File | Role |
+|------|------|
+| `SKILL.md` | 1046-line operating manual with 7 explicit modes plus 1 ambient mode. |
+| `EVOLUTION-SPEC.md` | 130-line distributable template for the 9-dimension evolution check. |
+| `references/EVOLUTION-SPEC.md` | 228-line runtime evolution spec for user-local skill operation. |
+| `references/philosophy.md` | Rationale for the knowledge system and its trust model. |
+| `references/lifecycle.md` | Detailed lifecycle rules for capture through retirement. |
+| `references/health-check.md` | Health metrics, thresholds, and reporting format. |
+| `references/init-deep-reference.md` | Deep initialization and project scanning reference. |
+| `references/scripts/init-scaffold.sh` | POSIX scaffold generator for directories and boilerplate files. |
+| `references/scripts/scan-project.sh` | POSIX project scanner that reports tech facts and structure. |
+| `references/hooks/README.md` | Hook system overview. |
+| `references/hooks/install-hooks.sh` | Hook installer. |
+| `references/hooks/session-end.sh` | Session-end capture reminder hook. |
+| `references/hooks/stop.sh` | Stop hook for health and capture checks. |
+| `references/hooks/compact-recovery.sh` | Compaction recovery hook with re-read directive. |
+| `references/hooks/adapters/claude-code.json` | Claude Code hook adapter. |
+| `references/hooks/adapters/cursor.json` | Cursor hook adapter. |
+| `references/hooks/adapters/opencode.json` | OpenCode hook adapter. |
+| `references/hooks/adapters/augment.json` | Augment Code hook adapter. |
+| `references/templates/root-agents-empty.md` | `AGENTS.md` template for empty projects. |
+| `references/templates/root-agents-existing.md` | `AGENTS.md` template for existing projects. |
+| `references/templates/knowledge-readme.md` | Knowledge base README template. |
+| `references/templates/manifest-schema.json` | Manifest schema template. |
+| `references/templates/topic-template.md` | Domain topic template. |
+| `references/templates/reference-template.md` | Stable reference template. |
+| `references/templates/decision-template.md` | Decision record template. |
+| `references/templates/pattern-template.md` | Reusable pattern template. |
+| `references/templates/crystallized-template.md` | Crystallized workflow template. |
+| `references/templates/skill-local-template.md` | Project-local specialization template. |
 
 ## Design Principles
 
-1. **Low friction over perfect structure** — A messy inbox entry beats a perfectly structured doc that was never written
-2. **Delayed structuring** — Let knowledge accumulate, then organize when patterns emerge
-3. **Summaries must trace to details** — Every claim needs a `[source: file:line]` citation
-4. **Confidence must be visible** — `observed` vs `verified` vs `canonical` is structural, not optional
-5. **Structure serves retrieval** — Knowledge organized for finding, not for display
-6. **Knowledge must be allowed to die** — Archive retires stale content without deleting history
-
-## Competitive Analysis
-
-This skill was developed through analysis of 8 competitor skills (25.7K+ installs combined), 10 web sources, 4 research papers, and validated against 15+ industry tools. Key differentiators:
-
-- **Only skill with full knowledge lifecycle management** (capture → compress → verify → promote → crystallize → retire)
-- **Only skill with confidence tracking** across all knowledge
-- **Only skill with deterministic hooks** for capture enforcement
-- **Only skill with meta-evolution** (skill evaluates its own design before each use)
+1. Write useful notes before structuring them.
+2. Keep project memory local to the repository.
+3. Make confidence visible and evidence-based.
+4. Route agents to the smallest relevant knowledge file.
+5. Treat skill improvement as normal knowledge work.
+6. Automate reminders, not judgment.
 
 ## License
 

@@ -1,32 +1,22 @@
 # Self-Evolution Skill Usage Guide
 
-Practical how-to guide for the `self-evolution` skill. This file is about usage. Design rationale belongs in `docs/philosophy.md`.
+Practical guide for using the `self-evolution` skill. It covers seven explicit modes plus ambient capture.
 
-## 1. Installation
+Use from the project root.
 
-```bash
-npx skills add D1ChangGeng/self-evolution-skill --skill self-evolution -g -y
-```
+## Mode map
 
-Use the skill from the project root.
+| Mode | Name | Use when |
+|---|---|---|
+| 1 | Initialize empty project | No real code exists yet |
+| 2 | Initialize existing project | Code, docs, config, or tests already exist |
+| 3 | Capture, ambient | Work reveals knowledge worth keeping |
+| 4 | Evolve | Inbox knowledge needs sorting and promotion |
+| 5 | Health Check | You need status and priorities |
+| 6 | Crystallize | A repeated workflow should become executable knowledge |
+| 7 | Skill Maintenance | The skill itself needs repair or improvement |
 
-## 2. Mode 1: Initialize, Empty Project
-
-### When to use
-
-Use this for a new project with no source code yet.
-
-### What to say
-
-```text
-Initialize the knowledge base.
-```
-
-### What happens
-
-The skill creates the scaffold and writes `AGENTS.md` with safe defaults. It does not invent project specific facts.
-
-### What you get
+## Files created
 
 ```text
 AGENTS.md
@@ -34,6 +24,7 @@ AGENTS.md
 ├── knowledge/
 │   ├── README.md
 │   ├── manifest.json
+│   ├── SKILL-LOCAL.md
 │   ├── inbox/
 │   ├── domains/
 │   ├── reference/
@@ -48,152 +39,180 @@ AGENTS.md
     └── compact-recovery.sh
 ```
 
-### Example output
+`SKILL-LOCAL.md` appears when the project has enough evidence for local specialization.
 
-```text
-Initialized self-evolution knowledge base for an empty project.
-Created AGENTS.md and .agents/knowledge/ scaffold.
-Capture: none, initialization only.
-```
-
-## 3. Mode 2: Initialize, Existing Project
-
-### When to use
-
-Use this when the project already has code, tests, config, docs, deployment files, or an existing `AGENTS.md`.
+## Mode 1, Initialize empty project
 
 ### What to say
 
 ```text
-Set up knowledge base for this project.
+Initialize the knowledge base.
+```
+
+```text
+Set up self-evolution for this new project.
 ```
 
 ### What happens
 
-1. Step 0 pre-validation runs.
-2. Scaffold is created.
-3. Project structure is scanned.
-4. Key files are read.
-5. Domain files are written.
-6. Reference files are written.
-7. `AGENTS.md` is created or augmented.
-8. `manifest.json` is updated.
+1. Step 0 runs before setup.
+2. The skill reads `references/EVOLUTION-SPEC.md`.
+3. If `references/EVOLUTION-SPEC.md` doesn't exist, it copies the root `EVOLUTION-SPEC.md` template into `references/`.
+4. It evaluates 9 dimensions: knowledge topology, trust model, AGENTS boundary, artifact contracts, initialization strategy, lifecycle, health cadence, hooks, and project-local specialization.
+5. If a change trigger fires, it pauses and reports what needs review.
+6. If Step 0 passes, it runs `init-scaffold.sh`.
+7. The script creates directories, boilerplate, starter rules, and hooks.
+8. It runs `scan-project.sh` to record metadata and detected technologies.
+9. It uses detected technologies with `find-skills`.
+10. It writes candidates to `manifest.json` under `skills.pending_review`.
+11. It creates starter domain files, reference files, and `AGENTS.md` without inventing project facts.
+12. It presents the pending review list for batch confirmation.
 
-### The scanning process
-
-**Pass 1, structural:** package manifests, build files, source directories, tests, routes, commands, config, deployment files, docs.
-
-**Pass 2, targeted reads:** entry points, top modules, auth, API routes, migrations, deploy scripts, test helpers, existing agent docs.
-
-The goal is useful navigation, not a complete code encyclopedia.
-
-### Example domain file output
-
-```markdown
-# Backend Domain
-
-confidence: observed
-sources:
-  - src/server.ts
-  - src/routes/users.ts
-  - tests/api/users.test.ts
-
-## Purpose
-
-Handles HTTP routing, validation, and response formatting.
-
-## Where to Start
-
-| Task | Start Here |
-|------|------------|
-| Add endpoint | src/server.ts |
-| Change user routes | src/routes/users.ts |
-
-## Invariants
-
-- Route handlers return typed response objects. [source: src/routes/users.ts]
-- API tests use the shared request helper. [source: tests/api/users.test.ts]
-
-## Open Questions
-
-- Which validation rules are public API guarantees?
-```
-
-### Handling existing AGENTS.md
-
-Existing `AGENTS.md` is augmented, not overwritten. The skill should preserve current instructions, add knowledge routing, keep human rules, and report conflicts.
+### Example report
 
 ```text
-Found existing AGENTS.md.
-Preserved current instructions and added knowledge routing.
-No conflicting rules detected.
+Initialized self-evolution knowledge base.
+Step 0: passed 9 dimensions.
+Scaffold: created.
+Scan: completed.
+Pending skill review: none found.
+Capture: none, initialization only.
 ```
 
-## 4. Mode 3: Capture, Ambient
+If candidates exist:
 
-Capture is not a mode you trigger. It happens automatically after meaningful work.
+```text
+Pending skill review:
+- vue-best-practices, detected Vue files
+- vue-testing-best-practices, detected Vitest config
 
-### The 5 capture conditions
+Reply with approved skills, or say "skip skill candidates".
+```
+
+## Mode 2, Initialize existing project
+
+### What to say
+
+```text
+Initialize the knowledge base for this existing project.
+```
+
+```text
+Set up project memory here.
+```
+
+### What happens
+
+1. Step 0 pre-validation runs first.
+2. The skill reads `references/EVOLUTION-SPEC.md`, or copies it from the root template if missing.
+3. It evaluates the same 9 dimensions and pauses if a design trigger fires.
+4. It runs `init-scaffold.sh` to create directories, boilerplate, hooks, and starter rules.
+5. It runs `scan-project.sh` to collect metadata, languages, frameworks, package managers, tests, commands, routes, config files, docs, and deployment files.
+6. It uses detected technologies with `find-skills`.
+7. It writes discovered candidates to `manifest.json` under `skills.pending_review`.
+8. It reads targeted files, usually entry points, manifests, route files, auth, config, migrations, test helpers, deployment files, and existing agent docs.
+9. It generates domain files in `.agents/knowledge/domains/`.
+10. It generates reference files in `.agents/knowledge/reference/`.
+11. It creates or augments `AGENTS.md`.
+12. It presents `skills.pending_review` at the end for user batch confirmation.
+
+### Existing AGENTS.md
+
+Existing `AGENTS.md` is augmented, not overwritten. Preserve human instructions, add knowledge routing, and report conflicts instead of hiding them.
+
+### Example report
+
+```text
+Initialized existing project knowledge base.
+Step 0: passed 9 dimensions.
+Scan: Rust, Axum, SQLite, Docker detected.
+Generated: 6 domain files, 3 reference files, AGENTS.md routing.
+
+Pending skill review:
+- rust-testing, detected Cargo tests
+- docker-deployment, detected Dockerfile
+
+Capture: none, initialization only.
+```
+
+## Mode 3, Capture, ambient
+
+Capture is automatic during normal work. The agent writes the inbox entry first, then reports the capture decision.
+
+### What to say
+
+```text
+Capture what we just learned.
+```
+
+```text
+That belongs in project knowledge. Save it.
+```
+
+### Capture conditions
 
 Capture when:
 
 1. You discovered non-obvious behavior.
 2. You fixed a bug that revealed a hidden assumption.
 3. You made a decision that constrains future work.
-4. You noticed a pattern across files.
+4. You noticed a pattern across multiple files.
 5. You found existing knowledge was wrong or incomplete.
+6. You found a flaw, missed step, unclear instruction, or compatibility issue in the self-evolution skill.
+
+### Tags
+
+```text
+[DOMAIN-FIX: domains/X.md]
+[SKILL-FIX:self-evolution]
+[SKILL-IDEA:self-evolution]
+[SKILL-COMPAT:self-evolution]
+```
+
+Use `[DOMAIN-FIX: domains/X.md]` when a domain correction should be batched at task end. Use `[SKILL-FIX:self-evolution]` when the skill itself needs repair.
 
 ### Write-first protocol
 
-The agent must write first, then report.
-
 1. Write to `.agents/knowledge/inbox/YYYY-MM.md` now.
 2. Include date, context, observation, and source.
-3. Add `[DOMAIN-FIX: domains/name.md]` when a domain file needs later correction.
-4. State `Capture:` after writing.
+3. Add tags when needed.
+4. Then state one capture line.
+5. Before final completion, scan this session's inbox entries for `[DOMAIN-FIX]` and apply those domain corrections.
 
-```markdown
-## 2026-04-27 14:20, auth refresh retry behavior
-
-- Token refresh retries only happen after a 401 from upstream, not before every request.
-- [source: src/accounts/manager.rs:214]
-```
+### Capture lines
 
 ```text
+Capture: none
 Capture: inbox (auth refresh retry behavior)
+Capture: inbox + [DOMAIN-FIX: domains/deployment.md] (restart rule was wrong)
 ```
 
-### [DOMAIN-FIX] tagging
-
-Use `[DOMAIN-FIX]` when the current task should finish before editing domain knowledge.
+### Example
 
 ```markdown
-## 2026-04-27 15:05, deployment restart rule
+## 2026-04-27 14:20, payment test mock ordering
 
-- Service restarts must use systemctl because systemd owns process lifecycle.
-- [DOMAIN-FIX: domains/deployment.md]
-- [source: deploy/runbook.md:32]
+- Payment client mocks must be registered before importing checkout.ts because the module reads the client at import time.
+- [source: tests/checkout.test.ts:18]
 ```
-
-Before final completion, the agent should apply this session's `[DOMAIN-FIX]` entries.
-
-### Example capture interaction
 
 ```text
-User: I fixed the test by moving the mock setup before importing the module.
-
-Agent: Wrote .agents/knowledge/inbox/2026-04.md:
-- Test mocks for the payment client must be registered before importing checkout.ts.
-- [source: tests/checkout.test.ts:18]
-
-Capture: inbox (payment client import time mock requirement)
+Capture: inbox (payment client import-time mock requirement)
 ```
 
-## 5. Mode 4: Evolve
+### Skill feedback example
 
-### When to use
+```markdown
+## 2026-04-27 16:10, skill missed pending review
 
-Use this when the inbox is accumulating or knowledge feels scattered.
+- Initialization detected Vue files but didn't add Vue skills to `manifest.json` `skills.pending_review`.
+- [SKILL-FIX:self-evolution]
+- [source: .agents/knowledge/manifest.json]
+```
+
+Examples are illustrative. Adapt file names and sources to the project.
+
+## Mode 4, Evolve
 
 ### What to say
 
@@ -201,90 +220,112 @@ Use this when the inbox is accumulating or knowledge feels scattered.
 Evolve the knowledge base.
 ```
 
-### The 9-step process
+```text
+Compress the inbox and promote stable knowledge.
+```
 
-1. Read `manifest.json` and inbox files.
-2. Group related entries.
-3. Merge duplicates while preserving sources.
-4. Verify claims against code or docs.
-5. Promote stable knowledge to domain, reference, pattern, or decision files.
-6. Archive stale entries.
-7. Apply `[DOMAIN-FIX]` corrections.
+### When to use
+
+Use this when the inbox has more than 10 entries, when the last evolution was more than 14 days ago, when domain files feel stale, or when repeated observations are piling up.
+
+### 9-step process
+
+1. Process inbox entries into clusters.
+2. Compress clusters while preserving sources.
+3. Verify spot-checks against source files, docs, tests, or commands.
+4. Detect staleness in domains, reference files, patterns, and decisions.
+5. Resolve conflicts by keeping both sides visible until evidence decides.
+6. Evaluate promotions from observed to verified, or verified to canonical when human approval exists.
+7. Run specialization detection. If `.agents/knowledge/SKILL-LOCAL.md` exists, read it.
 8. Update `manifest.json`.
-9. Report changes and review needs.
+9. Report processed entries, promotions, conflicts, stale items, and review needs.
 
-### What to expect in the report
+### Application tracking
+
+When a pattern is applied or confirmed, increment its counters:
+
+```text
+application_count: 4
+last_applied: 2026-04-27
+```
+
+This helps Mode 6 find workflows worth crystallizing and Mode 7 find local specializations.
+
+### Specialization detection
+
+Project-specific patterns become candidates in `.agents/knowledge/SKILL-LOCAL.md`, not separate skills.
+
+```markdown
+## Candidate Specializations
+
+### UI page assembly rule
+
+- Evidence: 4 inbox entries, 3 domain references
+- Candidate: Always edit `ui/src/pages/*.html`, never generated `ui/dist/` files.
+- Status: candidate
+```
+
+### Example report
 
 ```text
 Evolution complete.
-Processed: 18 inbox entries, 5 duplicates merged, 6 claims promoted.
-Archived: 2 stale entries.
-Confidence changes: observed to verified, 4. Verified to canonical, 0.
-Needs review: API timeout behavior has one source only.
+Processed: 18 inbox entries.
+Compressed: 6 clusters.
+Verified: 4 claims by spot-check.
+Promoted: 3 observed to verified, 0 verified to canonical.
+Conflicts: 1 kept for review.
+Specialization candidates: 1 added to SKILL-LOCAL.md.
+Manifest updated.
+Capture: none, evolution only.
 ```
 
-### How often to run
+## Mode 5, Health Check
 
-Session start should suggest evolution when `inbox_count > 10` or `days_since_evolution > 14`.
-
-## 6. Mode 5: Health Check
-
-### Quick vs deep health checks
-
-Quick:
+### What to say, quick
 
 ```text
 Check knowledge base health.
 ```
 
-Deep:
+### What to say, deep
 
 ```text
 Run a deep knowledge base health check.
 ```
 
-Quick checks read `manifest.json` and counts. Deep checks sample domain files, citations, links, stale claims, and promotion candidates.
+### Quick check
 
-### The 8 metrics
-
-1. **Inbox count:** Raw entries waiting for evolution.
-2. **Days since evolution:** How stale organized knowledge may be.
-3. **Domain coverage:** Major areas with domain files.
-4. **Citation coverage:** Claims with source evidence.
-5. **Confidence mix:** Observed, verified, and canonical ratios.
-6. **Staleness risk:** Claims likely out of date.
-7. **Duplication:** Repeated entries to merge.
-8. **Crystallization candidates:** Repeated workflows worth formalizing.
-
-### Example health report output
+Quick checks read indicators only: `manifest.json`, inbox count, last evolution date, pending skill review, and obvious stale markers.
 
 ```text
-Knowledge health: needs attention
+Knowledge health: needs attention.
 - inbox_count: 23, high
 - days_since_evolution: 19, overdue
-- domain_coverage: 7 of 9 major areas covered
-- citation_coverage: 68%, needs improvement
-- confidence_mix: 41 observed, 16 verified, 3 canonical
-- staleness_risk: medium
-- duplication: 6 likely duplicates
-- crystallization_candidates: 2
+- pending_skill_review: 3
 Recommended next action: Evolve the knowledge base.
 ```
 
-### Triage priority order
+### Deep check
 
-1. Wrong knowledge that could cause bad actions.
-2. Missing deployment, security, or data loss rules.
-3. Large inbox backlog.
-4. Domain files with weak citations.
-5. Repeated workflows ready for crystallization.
-6. Cosmetic cleanup.
+Deep checks calculate a full numeric score from 8 weighted metrics.
 
-## 7. Mode 6: Crystallize
+| Metric | Weight | Checks |
+|---|---:|---|
+| Inbox load | 15 | Entries waiting for evolution |
+| Evolution freshness | 15 | Days since last evolution |
+| Domain coverage | 15 | Major areas with domain files |
+| Citation coverage | 15 | Claims with source evidence |
+| Confidence mix | 10 | Observed, verified, canonical balance |
+| Staleness risk | 10 | Old claims likely to be wrong |
+| Duplication and conflicts | 10 | Repeated or contradictory entries |
+| Reuse pipeline | 10 | Crystallization and specialization candidates |
 
-### When workflows should be crystallized
+```text
+Knowledge health score: 72/100, fair.
+Priority: run Mode 4, then crystallize the release workflow.
+```
 
-Crystallize a workflow when it has been refined three or more times, or when the same mistakes keep recurring.
+## Mode 6, Crystallize
 
 ### What to say
 
@@ -292,128 +333,201 @@ Crystallize a workflow when it has been refined three or more times, or when the
 Crystallize this workflow.
 ```
 
-Or:
-
 ```text
-Crystallize the release workflow into a reusable checklist.
+Turn the release process into a reusable checklist.
 ```
 
-### The refinement process
+### What happens
 
-1. Gather examples from inbox, docs, commits, and current work.
-2. Name the trigger.
+1. Gather examples from inbox, patterns, domain files, commands, and recent work.
+2. Name the trigger phrase.
 3. Extract mandatory steps.
 4. Separate optional checks.
 5. Add verification points.
 6. Add common failure cases.
-7. Save under `.agents/knowledge/crystallized/`.
-8. Link it where future agents will find it.
+7. Save the workflow under `.agents/knowledge/crystallized/`.
+8. Link it from the relevant domain file or AGENTS.md only if future sessions need it.
+9. Update `manifest.json` and application tracking.
 
-### Skill graduation path
+### Refinement and graduation
 
-A workflow can graduate to a standalone skill when it is reused across projects, stable after real runs, executable without extra context, and valuable outside the original repo.
+Refine the crystallized doc after real use. Graduate it through `skill-creator` only when it is stable, useful outside this repo, executable without hidden context, and tested through repeated use.
 
-## 8. AGENTS.md Governance
+```text
+Crystallized: .agents/knowledge/crystallized/release-checklist.md
+Application tracking: release workflow application_count 5, last_applied 2026-04-27.
+Graduation: not ready, still project-specific.
+Capture: none, crystallization only.
+```
+
+## Mode 7, Skill Maintenance
+
+### What to say
+
+```text
+Improve the self-evolution skill.
+```
+
+```text
+Process skill feedback from the inbox.
+```
+
+### Trigger
+
+Run this mode when asked, or when Mode 4 detects 3 or more skill feedback tags: `[SKILL-FIX:self-evolution]`, `[SKILL-IDEA:self-evolution]`, or `[SKILL-COMPAT:self-evolution]`.
+
+### What happens
+
+1. Collect `[SKILL-FIX]`, `[SKILL-IDEA]`, and `[SKILL-COMPAT]` entries from inbox files.
+2. Deduplicate overlapping reports.
+3. Classify each item as repair, backlog, reject, or needs-evidence.
+4. Apply safe, evidenced repairs.
+5. Run Capability Radar.
+6. Review specialization if `.agents/knowledge/SKILL-LOCAL.md` exists.
+7. Update `EVOLUTION-SPEC.md` and `references/EVOLUTION-SPEC.md` when a design dimension changes.
+8. Update touched docs, templates, scripts, or skill instructions.
+9. Report repairs, backlog, rejected items, evidence gaps, and changed files.
+
+### Capability Radar
+
+Capability Radar is bounded research:
+
+1. Run 3 focused searches.
+2. Keep at most 5 candidate improvements.
+3. Stop at 30 minutes.
+4. Prefer fixes for observed failures.
+5. Record rejected ideas briefly.
+
+### Example classification
+
+```text
+repair: Mode 1 forgot to copy EVOLUTION-SPEC.md when references/ was missing.
+backlog: Add another editor hook after more evidence.
+reject: Replace inbox files with a database, conflicts with low-friction capture.
+needs-evidence: Health score feels wrong, but no examples were provided.
+```
+
+### Example report
+
+```text
+Skill maintenance complete.
+Collected: 7 skill feedback entries.
+Deduplicated: 4 unique items.
+Applied repairs: 2.
+Backlog: 1.
+Rejected: 1.
+Needs evidence: 0.
+Capability Radar: 3 searches, 5 candidates, 1 accepted.
+Specialization review: 2 candidates promoted in SKILL-LOCAL.md.
+Updated: EVOLUTION-SPEC.md, docs/USAGE-GUIDE.md.
+Capture: inbox ([SKILL-FIX:self-evolution], maintenance results recorded)
+```
+
+## Coding discipline
+
+Activation sentence:
+
+```text
+bias toward caution over speed, for trivial, local tasks, use judgment
+```
+
+Rules:
+
+1. **Think before coding.** State assumptions when risk or ambiguity exists. If multiple interpretations exist, ask or present the tradeoff.
+2. **Simplicity first.** Choose the minimum change that solves the task. Don't add speculative configuration, abstraction, or future-proofing.
+3. **Surgical changes.** Touch only what the request requires. Match existing style. Mention unrelated issues instead of folding them into the patch.
+4. **Goal-driven execution.** Turn the request into a verifiable goal. For a bug, reproduce then fix. For a feature, define expected behavior and verify it.
+5. **Context familiarity.** This fires only on domain transitions. If you cannot cite the file/line that governs the behavior, you don't know enough.
+
+## AGENTS.md governance
 
 `AGENTS.md` is the front door, not the whole knowledge base.
 
-### The 80% rule
+### Knowledge Writing Rules
 
-Put something in `AGENTS.md` only if removing it would hurt 80% or more of sessions.
+All AI-generated knowledge starts as `observed`, can become `verified` with 2 or more sources, and becomes `canonical` only after human approval. Every non-trivial claim needs evidence, usually `[source: file:line]`, and should use the narrowest true scope. Full writing rules live in `.agents/knowledge/README.md`.
 
-| AGENTS.md | Knowledge system |
-|-----------|------------------|
-| Project identity | Module notes |
-| Build and test commands | Rare debugging flows |
-| Top invariants | Full domain rules |
-| Top anti-patterns | Incident notes |
-| Where to start table | Full file inventory |
+### POST-TASK CHECKLIST
 
-### Coding discipline rules and activation
+At task end, check the six capture conditions: non-obvious behavior, hidden assumption from a bug, constraining decision, cross-file pattern, wrong or incomplete knowledge, and skill flaw detection. If any condition fires, write the inbox entry first, then state `Capture:`. Apply current-session `[DOMAIN-FIX]` corrections before final completion.
 
-| Rule | Activates when |
-|------|----------------|
-| Think before coding | The request has ambiguity or risk |
-| Simplicity first | The solution starts growing branches |
-| Surgical changes | Editing existing code |
-| Goal driven execution | Fixing bugs or adding features |
-| Context familiarity | Entering a new subsystem |
-| Infrastructure verification | Touching external systems |
+### SELF-EVOLUTION RULES
 
-### The activation sentence
+Keep project knowledge synced with code changes.
 
-```text
-If you cannot cite the specific file or line that governs the behavior you're about to change, you don't know enough yet.
-```
+| Change | Sync target |
+|---|---|
+| New endpoint | request lifecycle reference and related domain file |
+| New config key | config docs, example config, domain file |
+| New deployment step | deployment domain and release checklist |
+| New security rule | security domain and scope rule |
+| New repeated workflow | pattern file or crystallized workflow |
+| New project convention | candidate in `SKILL-LOCAL.md` |
 
-Daily meaning: read the relevant domain file or source before editing.
+Use project-specific sync targets from `AGENTS.md` when present.
 
-## 9. Knowledge Writing Rules
+## Project-local specialization
 
-### Confidence requirements
+`SKILL-LOCAL.md` lives in `.agents/knowledge/`. It is read by the global skill when present. It is not a separate skill.
 
-All AI generated knowledge starts as `observed`.
+### Active Overrides
 
-```text
-observed: seen once
-verified: supported by two or more sources
-canonical: stable and human approved
-```
-
-### Evidence requirements
-
-Every non-trivial claim needs a source.
+Active overrides can tune capture conditions, health thresholds, promotion criteria, routing hints, and project-specific sync targets.
 
 ```markdown
-- API tokens use constant time comparison. [source: src/auth/token.rs:88]
+## Active Overrides
+
+### Capture Conditions
+- Always capture production deployment incidents.
+
+### Health Thresholds
+- Suggest evolution when inbox_count > 6.
+
+### Promotion Criteria
+- Deployment rules need one code source and one runbook source before verified.
 ```
 
-Avoid unsupported claims like `The auth system is secure.`
+### Candidate Specializations
 
-### Scope requirements
-
-Write the narrowest true claim. Prefer `this module`, `this route`, or `this workflow` unless the whole project was checked.
-
-### Open Questions requirement
-
-Domain and reference files need open questions.
+Candidates collect evidence until Mode 7 promotes or rejects them.
 
 ```markdown
-## Open Questions
+## Candidate Specializations
 
-- Is the retry limit public API behavior or an implementation detail?
+### API route documentation sync
+- Evidence: 5 captured endpoint changes required docs updates.
+- Proposed override: New endpoint changes update `reference/request-lifecycle.md`.
+- Status: candidate
 ```
 
-## 10. Common Scenarios
+Architectural invariants cannot be overridden. Local specialization can't remove evidence requirements, skip write-first capture, bypass confidence levels, or replace the lifecycle.
+
+## Common scenarios
 
 ### I fixed a bug and learned something
 
-Write an inbox entry, cite the source, then state `Capture: inbox (...)`.
+Write the inbox entry first, cite the source, then state `Capture: inbox (...)`.
 
-### I'm working in a module I've never touched
+### I'm working in an unfamiliar module
 
-Read `AGENTS.md`, read the domain file, read the governing source, then edit.
+Use Context Familiarity. Read `AGENTS.md`, the relevant domain file, and the governing source. If you can't cite the file or line, you don't know enough yet.
 
 ### The inbox has 20 entries
 
-Say:
+Say `Evolve the knowledge base.` Expect clustering, compression, verification, promotions, stale entry handling, specialization detection, and a manifest update.
 
-```text
-Evolve the knowledge base.
-```
+### The skill missed a step
 
-Expect grouping, promotion, archiving, manifest updates, and unresolved questions.
+Capture it with `[SKILL-FIX:self-evolution]`. When 3 or more skill feedback tags accumulate, run Mode 7.
 
-### A convention is used in 5+ files
+### I keep doing the same workflow
 
-Capture the pattern, verify it in at least two files, promote it during evolution, and add it to `AGENTS.md` only if most sessions need it.
+Say `Crystallize this workflow.` The result should become a checklist in `.agents/knowledge/crystallized/`, then graduate through `skill-creator` only after repeated successful use.
 
-### I keep doing the same 6-step process
+### I found a useful skill while working
 
-Say:
+Add it to `manifest.json` under `skills.pending_review` with the reason. Present the list at task end for batch confirmation instead of installing silently.
 
-```text
-Crystallize this workflow.
-```
+### This project has unique conventions
 
-The result should become a checklist under `.agents/knowledge/crystallized/`, then graduate to a skill only after repeated successful use.
+Capture examples first. During Mode 4, add a candidate to `SKILL-LOCAL.md`. During Mode 7, promote it if evidence is strong and it doesn't violate architectural invariants.
