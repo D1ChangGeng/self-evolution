@@ -245,6 +245,7 @@ Rules:
 |---|---:|---|
 | `init-scaffold.sh` | 571 lines | Creates directories, boilerplate, hooks, and `AGENTS.md` |
 | `scan-project.sh` | 325 lines | Collects structural metadata and detected technologies |
+| `audit-agents.sh` | 229 lines | AGENTS.md quality audit for Mode 2B |
 
 `init-scaffold.sh` creates:
 
@@ -317,3 +318,31 @@ Self-Evolution skill
 | `references/EVOLUTION-SPEC.md` is local and may gain logs | EVOLUTION-SPEC |
 | Active overrides can't change architectural invariants | Specialization |
 | Hooks stay deterministic and LLM-independent | Hook architecture |
+| Initialization follows Quality Contract with 6 rules | Initialization |
+| CODING DISCIPLINE includes 7 rules including infrastructure verification and no partial delivery | Execution quality |
+
+## 15. Initialization Quality Contract
+
+Initialization must produce usable project knowledge, not placeholders.
+
+| Rule | Requirement |
+|---|---|
+| Read-Before-Write | Read 15 to 20 files before writing knowledge. |
+| Placeholder Rejection | Reject TODO, TBD, placeholder, skeleton, or demo content. |
+| Concurrent Exploration | Scale exploration to project size before synthesis. |
+| Verification | Run structure checks and semantic self-audit before reporting completion. |
+| Anti-Shallow-Work Patterns | Do not ship shallow, generic, or placeholder versions. |
+| Minimum Content Thresholds | Domain files need at least 3 sections, 3 citations, and 5 project facts. |
+
+## 16. Mode 2B Deep Brownfield Onboarding
+
+Mode 2B handles projects with extensive existing `AGENTS.md` or knowledge artifacts. It is resumable through `onboarding-state.json`.
+
+Pipeline:
+
+1. Audit Existing AGENTS.md.
+2. Inventory All Knowledge Artifacts.
+3. Extract Implicit Project Knowledge.
+4. Migrate Existing Knowledge.
+5. Restructure AGENTS.md.
+6. Discover Skills and Report.

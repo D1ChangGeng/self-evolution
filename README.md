@@ -6,7 +6,7 @@ An agent skill for creating and maintaining a project-local knowledge base under
 
 Self-Evolution gives coding agents a persistent memory system for a repository. It initializes project knowledge, captures lessons during work, evolves raw notes into structured documentation, checks knowledge health, and crystallizes repeated workflows into reusable skill material.
 
-The current skill has a 1046-line `SKILL.md` with 7 explicit modes plus 1 ambient mode, 28 skill files, 3 lifecycle hooks, 4 tool adapters, 2 POSIX scripts, and 10 templates.
+The current skill has a 1301-line `SKILL.md` with 7 explicit modes plus 1 ambient mode, 29 skill files, 3 lifecycle hooks, 4 tool adapters, 3 POSIX scripts, and 10 templates.
 
 ## Why This Exists
 
@@ -66,6 +66,7 @@ your-project/
 | User says | Mode | What happens |
 |-----------|------|--------------|
 | "initialize", "init", "set up knowledge base" | Initialize | Auto-detects empty vs existing project, then creates the knowledge system. |
+| "deep init", "brownfield onboarding" | Deep Brownfield Init | 6-phase audit-extract-migrate-restructure for projects with extensive existing `AGENTS.md` or knowledge. |
 | "evolve", "update knowledge", "compress inbox" | Evolve | Processes inbox notes, fixes tagged domain corrections, promotes stable knowledge, and updates health metadata. |
 | "check health", "KB health" | Health Check | Reports inbox load, staleness, source quality, routing quality, and priority actions. |
 | "crystallize", "turn this into a workflow" | Crystallize | Converts repeated workflows into reusable executable documentation or skill material. |
@@ -88,6 +89,9 @@ your-project/
 - Context Familiarity rule: if the agent cannot cite the file and line that govern the behavior, it doesn't know enough yet.
 - The rule fires on domain transitions, not trivial local edits.
 - Activation sentence: bias toward caution over speed, for trivial, local tasks, use judgment.
+- Infrastructure verification rule: before external-system operations, verify the domain file, target, version consistency, planned action, and result.
+- No partial delivery rule: complete every requested step before final response unless blocked or explicitly asked for incremental work.
+- Initialization Quality Contract enforces Read-Before-Write, Placeholder Rejection, Concurrent Exploration, Verification, Anti-Shallow-Work patterns, and minimum content thresholds.
 - `scan-project.sh` outputs tech stack facts and repository structure, not skill recommendations.
 
 ### Self-Improvement
@@ -102,7 +106,7 @@ your-project/
 - 3 lifecycle hooks: `session-end.sh`, `stop.sh`, and `compact-recovery.sh`.
 - `compact-recovery.sh` provides a post-compaction re-read directive so the agent reloads project routing after context compression.
 - 4 tool adapters: Claude Code, Cursor, OpenCode, and Augment Code.
-- 2 POSIX scripts: `init-scaffold.sh` and `scan-project.sh`.
+- 3 POSIX scripts: `init-scaffold.sh`, `scan-project.sh`, and `audit-agents.sh`.
 - EVOLUTION-SPEC uses a dual-file architecture: a 130-line root template for distribution and a 228-line `references/` runtime version that is user-local and gitignored when installed into projects.
 
 ## Documentation Links
@@ -122,7 +126,7 @@ your-project/
 
 | File | Role |
 |------|------|
-| `SKILL.md` | 1046-line operating manual with 7 explicit modes plus 1 ambient mode. |
+| `SKILL.md` | 1301-line operating manual with 7 explicit modes plus 1 ambient mode. |
 | `EVOLUTION-SPEC.md` | 130-line distributable template for the 9-dimension evolution check. |
 | `references/EVOLUTION-SPEC.md` | 228-line runtime evolution spec for user-local skill operation. |
 | `references/philosophy.md` | Rationale for the knowledge system and its trust model. |
@@ -131,6 +135,7 @@ your-project/
 | `references/init-deep-reference.md` | Deep initialization and project scanning reference. |
 | `references/scripts/init-scaffold.sh` | POSIX scaffold generator for directories and boilerplate files. |
 | `references/scripts/scan-project.sh` | POSIX project scanner that reports tech facts and structure. |
+| `references/scripts/audit-agents.sh` | AGENTS.md quality audit for brownfield onboarding. |
 | `references/hooks/README.md` | Hook system overview. |
 | `references/hooks/install-hooks.sh` | Hook installer. |
 | `references/hooks/session-end.sh` | Session-end capture reminder hook. |
@@ -159,6 +164,8 @@ your-project/
 4. Route agents to the smallest relevant knowledge file.
 5. Treat skill improvement as normal knowledge work.
 6. Automate reminders, not judgment.
+7. Enforce deep work quality at initialization boundaries.
+8. Use technology-neutral examples in all templates.
 
 ## License
 

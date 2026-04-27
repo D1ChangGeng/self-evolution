@@ -10,6 +10,7 @@ Use from the project root.
 |---|---|---|
 | 1 | Initialize empty project | No real code exists yet |
 | 2 | Initialize existing project | Code, docs, config, or tests already exist |
+| 2B | Deep Brownfield Init | Existing `AGENTS.md` or knowledge artifacts need audit, migration, and restructuring |
 | 3 | Capture, ambient | Work reveals knowledge worth keeping |
 | 4 | Evolve | Inbox knowledge needs sorting and promotion |
 | 5 | Health Check | You need status and priorities |
@@ -133,6 +134,44 @@ Pending skill review:
 - docker-deployment, detected Dockerfile
 
 Capture: none, initialization only.
+```
+
+## Mode 2B, Deep Brownfield Init
+
+### What to say
+
+```text
+Deep init this project.
+```
+
+```text
+Run brownfield onboarding.
+```
+
+### What happens
+
+Mode 2B runs a 6-phase onboarding pipeline for projects with extensive existing `AGENTS.md` or knowledge:
+
+1. Audit Existing AGENTS.md.
+2. Inventory All Knowledge Artifacts.
+3. Extract Implicit Project Knowledge.
+4. Migrate Existing Knowledge.
+5. Restructure AGENTS.md.
+6. Discover Skills and Report.
+
+Progress is resumable through `onboarding-state.json`. If onboarding stops mid-run, resume from the recorded phase instead of restarting.
+
+### Example report
+
+```text
+Deep brownfield onboarding complete.
+Audit: AGENTS.md passed 8 of 10 structure checks, signal density acceptable.
+Inventory: 14 knowledge artifacts found.
+Extracted: 9 project facts, 4 conventions, 2 open questions.
+Migrated: 5 domain files, 2 reference files.
+Restructured: AGENTS.md now routes to focused knowledge files.
+Pending skill review: 2 candidates.
+Capture: none, onboarding only.
 ```
 
 ## Mode 3, Capture, ambient
@@ -438,6 +477,19 @@ Rules:
 3. **Surgical changes.** Touch only what the request requires. Match existing style. Mention unrelated issues instead of folding them into the patch.
 4. **Goal-driven execution.** Turn the request into a verifiable goal. For a bug, reproduce then fix. For a feature, define expected behavior and verify it.
 5. **Context familiarity.** This fires only on domain transitions. If you cannot cite the file/line that governs the behavior, you don't know enough.
+6. **Verify before acting on infrastructure.** Before external-system operations, read the relevant domain file, verify the target, verify version consistency, state the planned action, and verify the result.
+7. **No partial delivery.** Complete the full requested scope before final response unless blocked or explicitly asked for incremental delivery.
+
+### Initialization Quality Contract
+
+Initialization must pass 6 enforcement rules:
+
+1. **Read-Before-Write.** Read 15 to 20 files before writing project knowledge.
+2. **Placeholder Rejection.** Reject TODO, TBD, placeholder, skeleton, or demo content.
+3. **Concurrent Exploration.** Scale exploration to project size before synthesis.
+4. **Verification.** Run structure checks and semantic self-audit before reporting completion.
+5. **Anti-Shallow-Work Patterns.** Do not ship shallow, generic, or placeholder versions.
+6. **Minimum Content Thresholds.** Domain files need at least 3 sections, 3 citations, and 5 project facts.
 
 ## AGENTS.md governance
 
