@@ -73,7 +73,7 @@ Create the knowledge base skeleton. Read `references/templates/root-agents-empty
 ### Steps
 
 0. **Pre-Validation (Skill Self-Check)**:
-   Read `references/EVOLUTION-SPEC.md`. For each of the 7 design dimensions, evaluate:
+   Read `references/EVOLUTION-SPEC.md`. If this file does not exist yet (first use after installation), copy it from the skill package's `references/EVOLUTION-SPEC.md` to the skill's local references directory. For each of the 9 design dimensions, evaluate:
    - "Based on my current knowledge, does this choice still represent best practice?"
    - "Does this specific project have needs that challenge this choice?"
    If all dimensions pass, proceed. If any dimension's change trigger fires, read the linked deep reference, propose improvement to user, and update the spec before continuing. If a dimension's `last_reviewed` exceeds 60 days, force a deep review.
@@ -107,8 +107,8 @@ Scan the project, generate initial knowledge, and create the structure. This mod
 
 Before scanning, evaluate the skill's own design:
 
-1. Read `references/EVOLUTION-SPEC.md`
-2. For each of the 7 design dimensions, evaluate:
+1. Read `references/EVOLUTION-SPEC.md` (if it does not exist, copy from skill package template — first use creates the user's local copy)
+2. For each of the 9 design dimensions, evaluate:
    - "Based on my current knowledge, does this choice still represent best practice?"
    - "Does this specific project have needs that challenge this choice?"
 3. If ALL dimensions pass → proceed to Pre-Scan
@@ -705,23 +705,25 @@ Explicit maintenance session for the skill itself. Triggered only by user reques
 
 ## Project-Local Specialization
 
-When this skill is installed at project level (`.agents/skills/self-evolution/`) rather than globally (`~/.agents/skills/self-evolution/`), it can gradually specialize for the project type — like fine-tuning a base model with domain-specific data.
+This skill can gradually specialize for a project type — like fine-tuning a base model with domain-specific data.
+
+### How It Works
+
+`SKILL-LOCAL.md` is NOT a separate skill — it is a configuration file that the global self-evolution skill reads when it exists in the project. This avoids same-name skill conflicts entirely.
+
+```
+Global skill triggered by user
+  → reads own SKILL.md (base behavior)
+  → checks: does .agents/knowledge/SKILL-LOCAL.md exist in this project?
+  → if yes: reads it as higher-priority overlay
+  → if no: runs with default behavior only
+```
+
+The file lives at `.agents/knowledge/SKILL-LOCAL.md` (inside the knowledge directory, not as a separate skill). It is project-specific content, versioned with the project, and managed alongside other knowledge files.
 
 ### Detection
 
-The skill is project-local if `SKILL-LOCAL.md` exists beside the invoked SKILL.md. If no `SKILL-LOCAL.md` is found, run as the global base skill with no specialization.
-
-### Architecture
-
-```
-Global skill (base behavior)     →  always read first
-  +
-SKILL-LOCAL.md (overlay)         →  higher priority for this project
-  ↑
-patterns/ + crystallized/        →  training evidence for specialization
-```
-
-The local SKILL.md should be a thin wrapper (~20 lines) that says: read the global skill first, then apply SKILL-LOCAL.md as project-specific policy.
+Check for `.agents/knowledge/SKILL-LOCAL.md` in the project root. If found, read it after SKILL.md and apply its overrides. If not found, no specialization — use defaults.
 
 ### Specialization Lifecycle
 
@@ -756,7 +758,7 @@ These are architectural invariants — changing them creates a fork, not a speci
 
 ### Drift Prevention
 
-- **Never edit the local base SKILL.md beyond the wrapper** — all project behavior goes in SKILL-LOCAL.md
+- **SKILL-LOCAL.md is a knowledge file, not a skill file** — it lives in `.agents/knowledge/`, not `.agents/skills/`
 - **Separate candidates from active rules** — candidates do not affect behavior until promoted in Mode 7
 - **Require evidence for promotion** — repeated across 2+ tasks, tied to an incident, or explicitly requested by user
 - **Review metadata on each rule** — `added`, `reason`, `confidence`
