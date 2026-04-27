@@ -287,5 +287,39 @@ status_path config.json config.json >> "$tmp_file"
 status_path config.toml config.toml >> "$tmp_file"
 status_glob 'config.example.*' 'config.example.*' >> "$tmp_file"
 
+# --- Section 9: Skill Recommendations ---
+printf '\n--- SKILL RECOMMENDATIONS ---\n' >> "$tmp_file"
+printf 'Based on detected tech stack:\n' >> "$tmp_file"
+
+# Language/framework → skill mapping
+[ -f "$PROJECT_ROOT/Cargo.toml" ] && printf '[RECOMMEND] rust-best-practices (Cargo.toml detected)\n' >> "$tmp_file"
+[ -f "$PROJECT_ROOT/package.json" ] && {
+  if grep -q '"vue"' "$PROJECT_ROOT/package.json" 2>/dev/null; then
+    printf '[RECOMMEND] vue-best-practices (Vue detected in package.json)\n' >> "$tmp_file"
+    printf '[RECOMMEND] vue-testing-best-practices\n' >> "$tmp_file"
+  fi
+  if grep -q '"react"' "$PROJECT_ROOT/package.json" 2>/dev/null; then
+    printf '[RECOMMEND] vercel-react-best-practices (React detected in package.json)\n' >> "$tmp_file"
+  fi
+  if grep -q '"next"' "$PROJECT_ROOT/package.json" 2>/dev/null; then
+    printf '[RECOMMEND] next-best-practices (Next.js detected in package.json)\n' >> "$tmp_file"
+  fi
+  if grep -q '"typescript"' "$PROJECT_ROOT/package.json" 2>/dev/null; then
+    printf '[RECOMMEND] typescript-best-practices (TypeScript detected)\n' >> "$tmp_file"
+  fi
+  if grep -q '"tailwindcss"' "$PROJECT_ROOT/package.json" 2>/dev/null; then
+    printf '[RECOMMEND] tailwindcss-best-practices (Tailwind CSS detected)\n' >> "$tmp_file"
+  fi
+}
+[ -f "$PROJECT_ROOT/go.mod" ] && printf '[RECOMMEND] go-best-practices (go.mod detected)\n' >> "$tmp_file"
+[ -f "$PROJECT_ROOT/pyproject.toml" ] || [ -f "$PROJECT_ROOT/requirements.txt" ] && printf '[RECOMMEND] python-best-practices (Python project detected)\n' >> "$tmp_file"
+[ -d "$PROJECT_ROOT/.github/workflows" ] && printf '[RECOMMEND] ci-cd-patterns (GitHub Actions detected)\n' >> "$tmp_file"
+[ -f "$PROJECT_ROOT/Dockerfile" ] && printf '[RECOMMEND] docker-best-practices (Dockerfile detected)\n' >> "$tmp_file"
+[ -f "$PROJECT_ROOT/docker-compose.yml" ] || [ -f "$PROJECT_ROOT/docker-compose.yaml" ] && printf '[RECOMMEND] docker-compose-patterns\n' >> "$tmp_file"
+# Check if any recommendations were made
+if ! grep -q '\[RECOMMEND\]' "$tmp_file" 2>/dev/null; then
+  printf '(No specific skill recommendations — use npx skills find to search manually)\n' >> "$tmp_file"
+fi
+
 mv "$tmp_file" "$OUTPUT_PATH" || exit 1
 printf 'Wrote project scan to %s\n' "$OUTPUT_PATH"

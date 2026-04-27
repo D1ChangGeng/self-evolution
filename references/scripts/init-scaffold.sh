@@ -308,6 +308,10 @@ else
     "stale_candidates": [],
     "conflicts": [],
     "days_since_evolution": null
+  },
+  "skills": {
+    "installed": [],
+    "recommended": []
   }
 }
 EOF

@@ -192,7 +192,9 @@ sh "references/scripts/scan-project.sh" \
   --output "$PROJECT_ROOT/.agents/knowledge/reference/.project-scan.txt"
 ```
 
-This produces a deterministic report of file counts, language detection, manifest presence, CI/CD config, and testing infrastructure — saving ~500 tokens of LLM tool-use overhead during Pass 1.
+This produces a deterministic report of file counts, language detection, manifest presence, CI/CD config, testing infrastructure, and **skill recommendations** based on detected tech stack — saving ~500 tokens of LLM tool-use overhead during Pass 1.
+
+Use the `SKILL RECOMMENDATIONS` section of the scan output to populate the `Recommended skills` field in each domain file's Related section and the `skills.recommended` array in `manifest.json`.
 
 1. Generate **domain files** under `.agents/knowledge/domains/`. Use template `references/templates/topic-template.md`:
 
@@ -677,6 +679,8 @@ Explicit maintenance session for the skill itself. Triggered only by user reques
    - Each candidate: adopt / defer / reject with 1-line reason
    - No adoption unless tied to a captured failure, eval gap, or explicit user goal
    ```
+
+   **Skill-focused search**: Prioritize searching for skills that cover the project's domain files. Check `manifest.json` `skills.recommended` for unfulfilled recommendations. For each adopted skill, update `manifest.json` `skills.installed` and the relevant domain file's `Recommended skills` field.
 
 6. **Update EVOLUTION-SPEC.md** — promoted items go to Improvement Backlog or become dimension updates. Rejected items noted with reason.
 7. **Version the change** — update Review Log in EVOLUTION-SPEC.md
