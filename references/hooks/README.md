@@ -13,18 +13,20 @@ The hooks are intentionally conservative. They are reminders, not blockers, and 
 
 - Claude Code
 - Cursor
-- OpenCode
+- OpenCode (native plugin — all 3 hooks supported)
 - Augment Code
 - Gemini CLI partial support only for now; no adapter file is shipped yet
 
-Claude Code is the reference format. Cursor, OpenCode, and Augment currently accept the same hooks shape, so this package keeps separate adapter files for clarity and future divergence.
+Claude Code is the reference format. Cursor and Augment use the same hooks.json shape. OpenCode uses a native ESM plugin (`opencode-plugin.mjs`) that subscribes to OpenCode's plugin event system directly, which provides full coverage of all 3 lifecycle events.
 
 ## Files
 
 - `session-end.sh` — appends a session-end reminder to `.agents/knowledge/inbox/{YYYY-MM}.md`
 - `stop.sh` — checks `manifest.json` and warns when the inbox or evolution cadence looks unhealthy
+- `compact-recovery.sh` — outputs a re-read directive after context compaction
 - `install-hooks.sh` — detects the current tool and installs the matching adapter
-- `adapters/*.json` — tool-specific hook payloads
+- `adapters/*.json` — tool-specific hook payloads (Claude Code, Cursor, Augment)
+- `adapters/opencode-plugin.mjs` — OpenCode native ESM plugin (replaces hooks.json for OpenCode)
 
 ## Install
 
@@ -88,7 +90,27 @@ The installer copies the scripts into the target project's `.agents/hooks/` dire
 
 For Claude Code and Augment, the installer merges a `hooks` key into `settings.json` when that key does not already exist. If hooks already exist, it warns and leaves the file unchanged rather than risking corruption.
 
-For Cursor and OpenCode, the installer copies `hooks.json` if it does not already exist. If the target file differs, it warns and skips.
+For Cursor, the installer copies `hooks.json` if it does not already exist. If the target file differs, it warns and skips.
+
+For OpenCode, the installer copies `opencode-plugin.mjs` into `.agents/hooks/` and prints registration instructions. The plugin must be added to your `opencode.json` plugin array:
+
+```json
+{
+  "plugin": [
+    "file://<project-root>/.agents/hooks/opencode-plugin.mjs"
+  ]
+}
+```
+
+The native plugin subscribes directly to OpenCode's event system, mapping:
+
+| OpenCode event | Hook script | Equivalent Claude Code event |
+|---|---|---|
+| `session.idle` | `stop.sh` | `Stop` |
+| `session.deleted` | `session-end.sh` | `SessionEnd` |
+| `experimental.session.compacting` | `compact-recovery.sh` | `SessionStart` + `compact` matcher |
+
+This replaces the previous `hooks.json` approach for OpenCode, which did not reliably trigger `SessionStart` or `SessionEnd` events.
 
 ## Add custom hooks
 

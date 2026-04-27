@@ -157,7 +157,8 @@ your-project/
 | `references/hooks/compact-recovery.sh` | Compaction recovery hook with re-read directive. |
 | `references/hooks/adapters/claude-code.json` | Claude Code hook adapter. |
 | `references/hooks/adapters/cursor.json` | Cursor hook adapter. |
-| `references/hooks/adapters/opencode.json` | OpenCode hook adapter. |
+| `references/hooks/adapters/opencode.json` | OpenCode hook adapter (legacy hooks.json format). |
+| `references/hooks/adapters/opencode-plugin.mjs` | OpenCode native ESM plugin (recommended — all 3 hooks supported). |
 | `references/hooks/adapters/augment.json` | Augment Code hook adapter. |
 | `references/templates/root-agents-empty.md` | `AGENTS.md` template for empty projects. |
 | `references/templates/root-agents-existing.md` | `AGENTS.md` template for existing projects. |

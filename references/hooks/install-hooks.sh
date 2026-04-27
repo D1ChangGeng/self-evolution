@@ -239,7 +239,19 @@ case "$tool" in
     ;;
   opencode)
     mkdir -p "$project_root/.opencode" || exit 1
-    copy_file_if_safe "$script_dir/adapters/opencode.json" "$project_root/.opencode/hooks.json" 'OpenCode hooks configuration'
+    copy_file_if_safe "$script_dir/adapters/opencode-plugin.mjs" "$hooks_dir/opencode-plugin.mjs" 'OpenCode native plugin'
+    plugin_uri="file://$project_root/.agents/hooks/opencode-plugin.mjs"
+    opencode_config="$project_root/.opencode/opencode.json"
+    if [ -f "$opencode_config" ]; then
+      if grep -q 'opencode-plugin\.mjs' "$opencode_config" 2>/dev/null; then
+        say "OpenCode config already references the plugin; skipping"
+      else
+        warn "Add this to your opencode.json plugin array: \"$plugin_uri\""
+      fi
+    else
+      say "note: register the plugin by running: opencode plugin \"$plugin_uri\""
+      say "  or add to your opencode.json: { \"plugin\": [\"$plugin_uri\"] }"
+    fi
     ;;
   augment)
     mkdir -p "$project_root/.augment" || exit 1
