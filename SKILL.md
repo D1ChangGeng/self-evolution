@@ -19,6 +19,7 @@ Determine the operating mode from context:
 | "evolve", "update knowledge", "compress inbox", "promote" | **Evolve** |
 | "check health", "KB health", "knowledge base status" | **Health Check** |
 | "crystallize", "turn this into a workflow", "formalize this process" | **Crystallize** |
+| "improve the skill", "skill maintenance", "fix the skill" | **Skill Maintenance** |
 | (completing a non-trivial task, no explicit request) | **Capture** (ambient) |
 
 For Initialize mode, the skill automatically detects project state and follows the appropriate path:
@@ -617,6 +618,77 @@ npx skills add <owner/repo> --skill <skill-name> -g -y
 Once `find-skills` is installed, the AI can discover skills conversationally — ask "is there a skill for X?" and it will search and offer installation.
 
 Browse available skills at: https://skills.sh/
+
+---
+
+## Skill Feedback Capture
+
+When use of this skill reveals a flaw in the skill itself — a missing step, a confusing instruction, a broken assumption, or a better approach seen elsewhere — record it as a lightweight project-local inbox entry. Do NOT modify the skill during normal work.
+
+### Tags
+
+| Tag | When to use | Example |
+|-----|-------------|---------|
+| `[SKILL-FIX:self-evolution]` | Concrete failure in current behavior | "Capture declaration was not executed" |
+| `[SKILL-IDEA:self-evolution]` | Possible capability expansion | "Could detect unused domain files automatically" |
+| `[SKILL-COMPAT:self-evolution/<other-skill>]` | Technique observed in another skill | "learn-eval skill has quality gates on pattern extraction" |
+
+### Format
+
+Same as regular inbox capture — append to `.agents/knowledge/inbox/{YYYY-MM}.md`:
+
+```
+## {date} {time} — self-evolution skill feedback
+- [SKILL-FIX:self-evolution] Agent declared `Capture: inbox` but did not actually write the entry.
+- Impact: false completion signal; user had to catch it manually.
+- Suggested repair: require write-before-declare in capture protocol.
+```
+
+### Rules
+
+- **Zero overhead on normal work** — same 3-line cost as regular capture
+- **Do not modify the installed skill** during project work — side effects cross projects
+- **Stability fixes (`[SKILL-FIX]`) outrank capability ideas (`[SKILL-IDEA]`)** — always
+- **`[SKILL-IDEA]` needs 2+ independent observations** before promotion — prevents wishlist landfill
+
+---
+
+## Mode 7: Skill Maintenance
+
+Explicit maintenance session for the skill itself. Triggered only by user request ("improve the skill", "skill maintenance") or when evolve mode detects 3+ tagged skill feedback entries and asks the user.
+
+### Process
+
+1. **Collect** all `[SKILL-FIX]`, `[SKILL-IDEA]`, and `[SKILL-COMPAT]` entries from inbox
+2. **Deduplicate** by root cause — multiple symptoms may point to one flaw
+3. **Classify** each as:
+   - `repair` — clear fix, bounded scope, apply now
+   - `backlog` — valid but needs more evidence or design work
+   - `reject` — not worth the complexity, with documented reason
+   - `needs-evidence` — plausible but unverified, leave in inbox
+4. **Apply repairs** — modify SKILL.md, templates, scripts, or hooks. Each change must cite the captured issue.
+5. **Capability Radar** (only if `[SKILL-IDEA]` or `[SKILL-COMPAT]` items exist):
+
+   ```
+   Budget:
+   - Max 3 external skill searches (npx skills find)
+   - Max 5 candidate techniques evaluated
+   - Max 30 minutes total
+   - Each candidate: adopt / defer / reject with 1-line reason
+   - No adoption unless tied to a captured failure, eval gap, or explicit user goal
+   ```
+
+6. **Update EVOLUTION-SPEC.md** — promoted items go to Improvement Backlog or become dimension updates. Rejected items noted with reason.
+7. **Version the change** — update Review Log in EVOLUTION-SPEC.md
+8. **Report** — what was fixed, what was deferred, what was rejected, what capability candidates were found
+
+### Guardrails
+
+- **No self-edits during normal work** — maintenance is a dedicated mode
+- **No unreviewed promotion** — observation → triage → explicit approval → change
+- **Every change maps to a captured issue** — no speculative improvements
+- **Stability fixes before capability expansion** — always
+- **Rollback path** — commit/snapshot before maintenance changes
 
 ---
 

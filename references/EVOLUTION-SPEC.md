@@ -147,7 +147,22 @@ If a dimension's `last_reviewed` exceeds 60 days AND you have reason to believe 
 
 Items identified but not yet implemented. Evaluate during pre-validation — if your current capabilities can address any of these, propose the improvement.
 
-- (none yet — this section fills as the skill is used across projects)
+**Intake protocol**: Items enter this backlog only through Skill Maintenance Mode (Mode 7). Raw observations stay in project inboxes until triaged.
+
+**Classification**:
+- `repair` — concrete fix, bounded scope, prioritize
+- `backlog` — valid but needs design work or more evidence
+- `reject` — decided against, with documented reason
+
+**Capability Radar budget** (when evaluating `[SKILL-IDEA]` or `[SKILL-COMPAT]` items):
+- Max 3 external skill searches
+- Max 5 candidate techniques evaluated
+- Max 30 minutes total
+- Each candidate: adopt / defer / reject with 1-line reason
+- No adoption unless tied to a captured failure, eval gap, or explicit user goal
+
+**Current backlog**:
+- (none yet — this section fills as Mode 7 processes skill feedback from project inboxes)
 
 ---
 
@@ -169,6 +184,12 @@ When any of these files change, the relevant dimension in this spec MUST be upda
 ---
 
 ## Review Log
+
+### v1.3 — 2026-04-27
+- Added Skill Feedback Capture protocol (SKILL-FIX/SKILL-IDEA/SKILL-COMPAT tags).
+- Added Mode 7: Skill Maintenance with Capability Radar budget.
+- Added intake protocol and classification rules to Improvement Backlog.
+- Added skill feedback capture condition to POST-TASK CHECKLIST templates.
 
 ### v1.2 — 2026-04-25
 - Added §8 Hooks & Deterministic Automation dimension for lifecycle hook system.

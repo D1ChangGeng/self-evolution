@@ -84,6 +84,7 @@ After completing any non-trivial task:
    - Made a decision that constrains future implementation choices
    - Noticed a pattern that spans multiple files, modules, or workflows
    - Found that existing knowledge was wrong, incomplete, or outdated
+   - Found that the self-evolution skill itself had a flaw (tag as `[SKILL-FIX:self-evolution]`)
 3. If any condition is met, **write the inbox entry NOW** — append to `.agents/knowledge/inbox/{YYYY-MM}.md` before reporting completion:
    ```
    ## {date} {time} — {context}
