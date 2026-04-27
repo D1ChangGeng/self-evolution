@@ -162,4 +162,4 @@ your-project/
 
 ## License
 
-Private. Not for redistribution.
+[Business Source License 1.1](LICENSE) — Free for personal use, open-source, education, and small teams (<10 employees). Commercial use by organizations with 10+ employees requires a [commercial license](mailto:D1ChangGeng@users.noreply.github.com). Converts to Apache 2.0 on 2030-04-27.
