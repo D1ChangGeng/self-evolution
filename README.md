@@ -6,7 +6,7 @@ An agent skill for creating and maintaining a project-local knowledge base under
 
 Self-Evolution gives coding agents a persistent memory system for a repository. It initializes project knowledge, captures lessons during work, evolves raw notes into structured documentation, checks knowledge health, and crystallizes repeated workflows into reusable skill material.
 
-The current skill has a 1301-line `SKILL.md` with 7 explicit modes plus 1 ambient mode, 29 skill files, 3 lifecycle hooks, 4 tool adapters, 3 POSIX scripts, and 10 templates.
+The current skill has a 1360-line `SKILL.md` with 7 explicit modes plus 1 ambient mode, 29 skill files, 3 lifecycle hooks, 4 tool adapters, 3 POSIX scripts, and 10 templates.
 
 ## Why This Exists
 
@@ -23,6 +23,14 @@ Install the skill:
 ```bash
 npx skills add D1ChangGeng/self-evolution-skill --skill self-evolution -g -y
 ```
+
+Update an existing installation to the latest version:
+
+```bash
+npx skills add D1ChangGeng/self-evolution-skill --skill self-evolution -g -y
+```
+
+The install command is also the update command — it overwrites the skill files with the latest version. Project knowledge under `.agents/knowledge/` is never affected because the skill and project data live in separate directories.
 
 Initialize a project by telling your agent:
 
@@ -83,6 +91,9 @@ your-project/
 - `[DOMAIN-FIX: domains/X.md]` tags mark corrections that should be applied at a natural task boundary.
 - Confidence ladder keeps raw observations separate from verified and canonical knowledge.
 - `skills.pending_review` stores skill-discovery candidates as a write-ahead record during immersive work.
+- Optional capture channel markers: `[ERROR]`, `[DECISION]`, `[INCIDENT]` prefixes when the entry type is obvious. Never required.
+- Security default: all knowledge is internal by default. Public-facing documents require explicit review before including knowledge content.
+- Recurring theme detection during evolve: themes appearing 3+ times across sessions are reported as promotion or crystallization signals.
 
 ### Execution Quality
 
@@ -93,6 +104,8 @@ your-project/
 - No partial delivery rule: complete every requested step before final response unless blocked or explicitly asked for incremental work.
 - Initialization Quality Contract enforces Read-Before-Write, Placeholder Rejection, Concurrent Exploration, Verification, Anti-Shallow-Work patterns, and minimum content thresholds.
 - `scan-project.sh` outputs tech stack facts and repository structure, not skill recommendations.
+- Script Adaptation Protocol: scripts output HEURISTIC GAPS sections listing what they could not detect, guiding the LLM to fill gaps manually and feed improvements back via `[SKILL-IDEA]`.
+- Metadata Discipline rule: no global-consistency metadata unless script-generated. Classification happens during evolve, not during capture.
 
 ### Self-Improvement
 
@@ -105,6 +118,7 @@ your-project/
 
 - 3 lifecycle hooks: `session-end.sh`, `stop.sh`, and `compact-recovery.sh`.
 - `compact-recovery.sh` provides a post-compaction re-read directive so the agent reloads project routing after context compression.
+- `init-scaffold.sh` copies hook scripts from `references/hooks/` instead of embedding them, ensuring hooks stay in sync with the skill package.
 - 4 tool adapters: Claude Code, Cursor, OpenCode, and Augment Code.
 - 3 POSIX scripts: `init-scaffold.sh`, `scan-project.sh`, and `audit-agents.sh`.
 - EVOLUTION-SPEC uses a dual-file architecture: a 130-line root template for distribution and a 228-line `references/` runtime version that is user-local and gitignored when installed into projects.
@@ -126,7 +140,7 @@ your-project/
 
 | File | Role |
 |------|------|
-| `SKILL.md` | 1301-line operating manual with 7 explicit modes plus 1 ambient mode. |
+| `SKILL.md` | 1360-line operating manual with 7 explicit modes plus 1 ambient mode. |
 | `EVOLUTION-SPEC.md` | 130-line distributable template for the 9-dimension evolution check. |
 | `references/EVOLUTION-SPEC.md` | 228-line runtime evolution spec for user-local skill operation. |
 | `references/philosophy.md` | Rationale for the knowledge system and its trust model. |

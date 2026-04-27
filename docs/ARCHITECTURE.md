@@ -243,9 +243,9 @@ Rules:
 
 | Script | Current size | Role |
 |---|---:|---|
-| `init-scaffold.sh` | 571 lines | Creates directories, boilerplate, hooks, and `AGENTS.md` |
-| `scan-project.sh` | 325 lines | Collects structural metadata and detected technologies |
-| `audit-agents.sh` | 229 lines | AGENTS.md quality audit for Mode 2B |
+| `init-scaffold.sh` | 555 lines | Creates directories, boilerplate, hooks (copied from `references/hooks/`), and `AGENTS.md` |
+| `scan-project.sh` | 334 lines | Collects structural metadata, detected technologies, and heuristic gap analysis |
+| `audit-agents.sh` | 242 lines | AGENTS.md quality audit for Mode 2B, with audit limitations section |
 
 `init-scaffold.sh` creates:
 
@@ -264,7 +264,9 @@ Rules:
 AGENTS.md
 ```
 
-`scan-project.sh` collects project name, repository metadata, language signals, framework signals, manifest files, tests, docs, CI, build signals, directory summaries, extension counts, and detected technologies for Layer 2.
+`scan-project.sh` collects project name, repository metadata, language signals, framework signals, manifest files, tests, docs, CI, build signals, directory summaries, extension counts, and detected technologies for Layer 2. It also outputs a `HEURISTIC GAPS` section listing what the scanner could not detect, guiding the LLM to fill gaps manually.
+
+`init-scaffold.sh` copies hook scripts from `references/hooks/` instead of embedding them, ensuring hooks stay in sync with the skill package. It outputs `POST-SCAFFOLD HINTS` guiding the LLM to adapt generic content to the project.
 
 ## 12. Hook Architecture
 
@@ -320,6 +322,10 @@ Self-Evolution skill
 | Hooks stay deterministic and LLM-independent | Hook architecture |
 | Initialization follows Quality Contract with 6 rules | Initialization |
 | CODING DISCIPLINE includes 7 rules including infrastructure verification and no partial delivery | Execution quality |
+| Metadata requiring global consistency must be script-generated or omitted | Capture protocol |
+| All knowledge is internal by default; public docs require explicit review | Security |
+| Capture channel markers are optional, never required | Capture protocol |
+| Hook scripts are copied from skill package, not embedded in scaffold | Hook architecture |
 
 ## 15. Initialization Quality Contract
 
