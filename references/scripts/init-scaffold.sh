@@ -553,3 +553,11 @@ EOF
 fi
 
 printf 'init-scaffold complete for %s (%s)\n' "$PROJECT_ROOT" "$mode"
+printf '\n'
+printf 'POST-SCAFFOLD HINTS:\n'
+printf '- The generated files use generic templates. Replace placeholder sections with project-specific content.\n'
+printf '- If this project uses a non-standard structure (monorepo, polyglot, embedded), adapt domain\n'
+printf '  files and AGENTS.md routing beyond what the scaffold provides.\n'
+printf '- Run scan-project.sh next and check its HEURISTIC GAPS section for uncovered technologies.\n'
+printf '- Record any adaptation you make as an inbox entry tagged [SKILL-IDEA:self-evolution] so the\n'
+printf '  scaffold can be improved for similar projects in the future.\n'

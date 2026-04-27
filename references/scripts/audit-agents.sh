@@ -223,7 +223,20 @@ fi
 
 printf '## Assessment\n\n' >> "$tmp_file"
 printf 'Rating: %s\n' "$rating" >> "$tmp_file"
-printf 'Recommendation: %s\n' "$recommendation" >> "$tmp_file"
+printf 'Recommendation: %s\n\n' "$recommendation" >> "$tmp_file"
+
+printf '## Audit Limitations\n\n' >> "$tmp_file"
+printf 'This audit checks structural patterns and keyword density. It cannot assess:\n' >> "$tmp_file"
+printf '%s\n' '- Whether claims in AGENTS.md are factually correct (verify against source code)' >> "$tmp_file"
+printf '%s\n' '- Whether the routing table covers all active project areas' >> "$tmp_file"
+printf '%s\n' '- Whether invariants and anti-patterns reflect real project constraints vs generic advice' >> "$tmp_file"
+printf '%s\n' '- Whether the AGENTS.md structure fits this specific project type' >> "$tmp_file"
+printf '\n' >> "$tmp_file"
+printf 'LLM action after reading this audit:\n' >> "$tmp_file"
+printf '1. Spot-check 2-3 claims from AGENTS.md against actual source files\n' >> "$tmp_file"
+printf '2. Verify that WHERE TO LOOK paths exist and point to current files\n' >> "$tmp_file"
+printf '3. If this project has unusual structure (monorepo, multi-language, etc.),\n' >> "$tmp_file"
+printf '   check whether the audit missed important structural signals\n' >> "$tmp_file"
 
 mv "$tmp_file" "$OUTPUT_PATH" || exit 1
 printf 'Wrote audit report: %s\n' "$OUTPUT_PATH"

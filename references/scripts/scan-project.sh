@@ -314,5 +314,21 @@ if ! grep -q '\[DETECTED\]' "$tmp_file" 2>/dev/null; then
   printf '(No specific technologies detected)\n' >> "$tmp_file"
 fi
 
+printf '\n--- HEURISTIC GAPS ---\n' >> "$tmp_file"
+printf 'This scanner uses static file-presence checks. It cannot detect:\n' >> "$tmp_file"
+printf '%s\n' '- Technologies loaded via workspace/monorepo indirection (e.g., packages/*/package.json)' >> "$tmp_file"
+printf '%s\n' '- Runtime-only frameworks not declared in manifests (e.g., loaded via CDN, vendor/)' >> "$tmp_file"
+printf '%s\n' '- Custom build systems without standard manifest files' >> "$tmp_file"
+printf '%s\n' '- Language versions, feature flags, or conditional compilation targets' >> "$tmp_file"
+printf '%s\n' '- Service dependencies (databases, message queues, external APIs)' >> "$tmp_file"
+printf '%s\n' '- Deployment targets not expressed as Dockerfile/CI config (e.g., serverless, PaaS)' >> "$tmp_file"
+printf '\n' >> "$tmp_file"
+printf 'LLM action after reading this scan:\n' >> "$tmp_file"
+printf '1. Check if the project has patterns not covered above (monorepo, polyglot, embedded, etc.)\n' >> "$tmp_file"
+printf '2. Read manifests and imports to find technologies the scanner missed\n' >> "$tmp_file"
+printf '3. Add [DETECTED] lines to domain files for anything discovered manually\n' >> "$tmp_file"
+printf '4. If this project type would benefit from additional scanner checks, record a\n' >> "$tmp_file"
+printf '   [SKILL-IDEA:self-evolution] entry: "scan-project.sh should detect X via Y"\n' >> "$tmp_file"
+
 mv "$tmp_file" "$OUTPUT_PATH" || exit 1
 printf 'Wrote project scan to %s\n' "$OUTPUT_PATH"

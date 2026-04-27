@@ -135,6 +135,29 @@ These patterns indicate the agent is not doing deep work. If caught, stop and re
 
 **Path convention**: All `references/...` paths in this skill (scripts, templates, hooks, specs) are relative to the installed skill directory, NOT the project root. Resolve them from wherever your tool installed this skill (e.g., `~/.agents/skills/self-evolution/references/...` or the equivalent on your platform).
 
+### Script Adaptation Protocol
+
+The bundled scripts (`scan-project.sh`, `init-scaffold.sh`, `audit-agents.sh`) cover common project structures but cannot anticipate every project type. They are starting points, not ceilings.
+
+**After running any script, check its output for gaps:**
+
+1. **Read the `HEURISTIC GAPS` section** at the end of scan output. It lists what the scanner cannot detect.
+2. **Supplement with manual discovery**: read manifests, imports, configs, and directory structures that the script missed. Add `[DETECTED]` findings to domain files.
+3. **Adapt generated content**: if the script produced AGENTS.md or domain files with overly generic sections, replace them with project-specific content based on what you read.
+4. **Feed improvements back**: if a project type would benefit from a scanner check that doesn't exist, write an inbox entry tagged `[SKILL-IDEA:self-evolution]` describing the detection rule (e.g., "scan-project.sh should detect Bazel via BUILD files").
+
+**When to adapt vs when to report:**
+
+| Situation | Action |
+|-----------|--------|
+| Script missed a technology that manifests/imports reveal | Add to domain files now, feed back via `[SKILL-IDEA]` |
+| Script output section is wrong for this project type | Correct in generated files now, feed back via `[SKILL-FIX]` |
+| Project uses a build system the script doesn't recognize | Read build files manually, document in `domains/development.md` |
+| Monorepo / polyglot / embedded / unconventional structure | Expand directory scan beyond script output, document findings |
+| Script works but output is shallow for a large project | Increase read budget, run deeper exploration agents |
+
+This protocol ensures every project gets adequate coverage while building a feedback loop that improves the scripts over time.
+
 ## Mode 1: Initialize — Empty Project
 
 Create the knowledge base skeleton. The scaffold script (`init-scaffold.sh`) generates AGENTS.md from its embedded content — the template file `references/templates/root-agents-empty.md` serves as documentation of the intended structure but the script output is authoritative. Read the template to understand the target structure, then run the script.
