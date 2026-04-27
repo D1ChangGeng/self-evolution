@@ -192,9 +192,9 @@ sh "references/scripts/scan-project.sh" \
   --output "$PROJECT_ROOT/.agents/knowledge/reference/.project-scan.txt"
 ```
 
-This produces a deterministic report of file counts, language detection, manifest presence, CI/CD config, testing infrastructure, and **skill recommendations** based on detected tech stack — saving ~500 tokens of LLM tool-use overhead during Pass 1.
+This produces a deterministic report of file counts, language detection, manifest presence, CI/CD config, testing infrastructure, and **detected technologies** — saving ~500 tokens of LLM tool-use overhead during Pass 1.
 
-Use the `SKILL RECOMMENDATIONS` section of the scan output to populate the `Recommended skills` field in each domain file's Related section and the `skills.recommended` array in `manifest.json`.
+Use the `SKILL RECOMMENDATIONS` section of the scan output to identify detected technologies. Search for relevant skills with `npx skills find "<technology>"` and populate the `Recommended skills` field in each domain file's Related section and the `skills.recommended` array in `manifest.json`.
 
 1. Generate **domain files** under `.agents/knowledge/domains/`. Use template `references/templates/topic-template.md`:
 

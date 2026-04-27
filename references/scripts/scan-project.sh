@@ -289,37 +289,32 @@ status_glob 'config.example.*' 'config.example.*' >> "$tmp_file"
 
 # --- Section 9: Skill Recommendations ---
 printf '\n--- SKILL RECOMMENDATIONS ---\n' >> "$tmp_file"
-printf 'Based on detected tech stack:\n' >> "$tmp_file"
+printf 'Detected technologies (use these as search terms with npx skills find):\n' >> "$tmp_file"
 
-# Language/framework → skill mapping
-[ -f "$PROJECT_ROOT/Cargo.toml" ] && printf '[RECOMMEND] rust-best-practices (Cargo.toml detected)\n' >> "$tmp_file"
+[ -f "$PROJECT_ROOT/Cargo.toml" ] && printf '[DETECTED] Rust (Cargo.toml)\n' >> "$tmp_file"
 [ -f "$PROJECT_ROOT/package.json" ] && {
-  if grep -q '"vue"' "$PROJECT_ROOT/package.json" 2>/dev/null; then
-    printf '[RECOMMEND] vue-best-practices (Vue detected in package.json)\n' >> "$tmp_file"
-    printf '[RECOMMEND] vue-testing-best-practices\n' >> "$tmp_file"
-  fi
-  if grep -q '"react"' "$PROJECT_ROOT/package.json" 2>/dev/null; then
-    printf '[RECOMMEND] vercel-react-best-practices (React detected in package.json)\n' >> "$tmp_file"
-  fi
-  if grep -q '"next"' "$PROJECT_ROOT/package.json" 2>/dev/null; then
-    printf '[RECOMMEND] next-best-practices (Next.js detected in package.json)\n' >> "$tmp_file"
-  fi
-  if grep -q '"typescript"' "$PROJECT_ROOT/package.json" 2>/dev/null; then
-    printf '[RECOMMEND] typescript-best-practices (TypeScript detected)\n' >> "$tmp_file"
-  fi
-  if grep -q '"tailwindcss"' "$PROJECT_ROOT/package.json" 2>/dev/null; then
-    printf '[RECOMMEND] tailwindcss-best-practices (Tailwind CSS detected)\n' >> "$tmp_file"
-  fi
+  printf '[DETECTED] Node.js (package.json)\n' >> "$tmp_file"
+  grep -q '"vue"' "$PROJECT_ROOT/package.json" 2>/dev/null && printf '[DETECTED] Vue (package.json dependency)\n' >> "$tmp_file"
+  grep -q '"react"' "$PROJECT_ROOT/package.json" 2>/dev/null && printf '[DETECTED] React (package.json dependency)\n' >> "$tmp_file"
+  grep -q '"next"' "$PROJECT_ROOT/package.json" 2>/dev/null && printf '[DETECTED] Next.js (package.json dependency)\n' >> "$tmp_file"
+  grep -q '"svelte"' "$PROJECT_ROOT/package.json" 2>/dev/null && printf '[DETECTED] Svelte (package.json dependency)\n' >> "$tmp_file"
+  grep -q '"angular"' "$PROJECT_ROOT/package.json" 2>/dev/null && printf '[DETECTED] Angular (package.json dependency)\n' >> "$tmp_file"
+  grep -q '"typescript"' "$PROJECT_ROOT/package.json" 2>/dev/null && printf '[DETECTED] TypeScript (package.json dependency)\n' >> "$tmp_file"
+  grep -q '"tailwindcss"' "$PROJECT_ROOT/package.json" 2>/dev/null && printf '[DETECTED] Tailwind CSS (package.json dependency)\n' >> "$tmp_file"
 }
-[ -f "$PROJECT_ROOT/go.mod" ] && printf '[RECOMMEND] go-best-practices (go.mod detected)\n' >> "$tmp_file"
-[ -f "$PROJECT_ROOT/pyproject.toml" ] || [ -f "$PROJECT_ROOT/requirements.txt" ] && printf '[RECOMMEND] python-best-practices (Python project detected)\n' >> "$tmp_file"
-[ -d "$PROJECT_ROOT/.github/workflows" ] && printf '[RECOMMEND] ci-cd-patterns (GitHub Actions detected)\n' >> "$tmp_file"
-[ -f "$PROJECT_ROOT/Dockerfile" ] && printf '[RECOMMEND] docker-best-practices (Dockerfile detected)\n' >> "$tmp_file"
-[ -f "$PROJECT_ROOT/docker-compose.yml" ] || [ -f "$PROJECT_ROOT/docker-compose.yaml" ] && printf '[RECOMMEND] docker-compose-patterns\n' >> "$tmp_file"
-# Check if any recommendations were made
-if ! grep -q '\[RECOMMEND\]' "$tmp_file" 2>/dev/null; then
-  printf '(No specific skill recommendations — use npx skills find to search manually)\n' >> "$tmp_file"
+[ -f "$PROJECT_ROOT/go.mod" ] && printf '[DETECTED] Go (go.mod)\n' >> "$tmp_file"
+[ -f "$PROJECT_ROOT/pyproject.toml" ] || [ -f "$PROJECT_ROOT/requirements.txt" ] && printf '[DETECTED] Python (manifest detected)\n' >> "$tmp_file"
+[ -f "$PROJECT_ROOT/pom.xml" ] || [ -f "$PROJECT_ROOT/build.gradle" ] && printf '[DETECTED] Java/Kotlin (build manifest detected)\n' >> "$tmp_file"
+[ -f "$PROJECT_ROOT/Gemfile" ] && printf '[DETECTED] Ruby (Gemfile)\n' >> "$tmp_file"
+[ -f "$PROJECT_ROOT/composer.json" ] && printf '[DETECTED] PHP (composer.json)\n' >> "$tmp_file"
+[ -d "$PROJECT_ROOT/.github/workflows" ] && printf '[DETECTED] GitHub Actions CI/CD\n' >> "$tmp_file"
+[ -f "$PROJECT_ROOT/.gitlab-ci.yml" ] && printf '[DETECTED] GitLab CI/CD\n' >> "$tmp_file"
+[ -f "$PROJECT_ROOT/Dockerfile" ] && printf '[DETECTED] Docker (Dockerfile)\n' >> "$tmp_file"
+[ -f "$PROJECT_ROOT/docker-compose.yml" ] || [ -f "$PROJECT_ROOT/docker-compose.yaml" ] && printf '[DETECTED] Docker Compose\n' >> "$tmp_file"
+if ! grep -q '\[DETECTED\]' "$tmp_file" 2>/dev/null; then
+  printf '(No specific technologies detected)\n' >> "$tmp_file"
 fi
+printf '\nTo find relevant skills: npx skills find "<technology name>"\n' >> "$tmp_file"
 
 mv "$tmp_file" "$OUTPUT_PATH" || exit 1
 printf 'Wrote project scan to %s\n' "$OUTPUT_PATH"

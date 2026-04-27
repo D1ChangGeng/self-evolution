@@ -108,10 +108,10 @@ After completing any non-trivial task:
    ```
    If existing knowledge needs correction, tag the inbox entry with `[DOMAIN-FIX: domains/X.md]` so the fix is discoverable at the next natural boundary.
 4. Domain-level corrections (updating `domains/*.md`, adding to Correction History) can be batched at task end. Before reporting final completion of a multi-step task, scan inbox for any `[DOMAIN-FIX]` entries from this session and apply them.
-5. **State your capture decision in one line** after acting:
+5. **State your capture decision in one line** after acting (examples illustrative — adapt to your project):
    - `Capture: none` — no conditions met
-   - `Capture: inbox (hidden assumption in auth refresh)` — appended to inbox
-   - `Capture: inbox + [DOMAIN-FIX: domains/auth.md] (token expiry wrong)` — appended, will fix at task end
+   - `Capture: inbox (hidden assumption in X)` — appended to inbox
+   - `Capture: inbox + [DOMAIN-FIX: domains/X.md] (Y was wrong)` — appended, will fix at task end
 
 ### Skill Ecosystem
 
