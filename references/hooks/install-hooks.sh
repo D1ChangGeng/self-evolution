@@ -225,7 +225,8 @@ hooks_dir=$project_root/.agents/hooks
 mkdir -p "$hooks_dir" || exit 1
 copy_file_if_safe "$script_dir/session-end.sh" "$hooks_dir/session-end.sh" 'session-end hook script'
 copy_file_if_safe "$script_dir/stop.sh" "$hooks_dir/stop.sh" 'stop hook script'
-chmod +x "$hooks_dir/session-end.sh" "$hooks_dir/stop.sh" 2>/dev/null || true
+copy_file_if_safe "$script_dir/compact-recovery.sh" "$hooks_dir/compact-recovery.sh" 'compact-recovery hook script'
+chmod +x "$hooks_dir/session-end.sh" "$hooks_dir/stop.sh" "$hooks_dir/compact-recovery.sh" 2>/dev/null || true
 
 case "$tool" in
   claude-code)
