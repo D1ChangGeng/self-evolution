@@ -73,7 +73,7 @@ Create the knowledge base skeleton. Read `references/templates/root-agents-empty
 ### Steps
 
 0. **Pre-Validation (Skill Self-Check)**:
-   Read `references/EVOLUTION-SPEC.md`. If this file does not exist yet (first use after installation), copy it from the skill package's `references/EVOLUTION-SPEC.md` to the skill's local references directory. For each of the 9 design dimensions, evaluate:
+   Read `references/EVOLUTION-SPEC.md`. If this file does not exist yet (first use after installation), copy it from the root `EVOLUTION-SPEC.md` template and add empty `Known Improvement Backlog` and `Review Log` sections. For each of the 9 design dimensions, evaluate:
    - "Based on my current knowledge, does this choice still represent best practice?"
    - "Does this specific project have needs that challenge this choice?"
    If all dimensions pass, proceed. If any dimension's change trigger fires, read the linked deep reference, propose improvement to user, and update the spec before continuing. If a dimension's `last_reviewed` exceeds 60 days, force a deep review.
@@ -107,7 +107,7 @@ Scan the project, generate initial knowledge, and create the structure. This mod
 
 Before scanning, evaluate the skill's own design:
 
-1. Read `references/EVOLUTION-SPEC.md` (if it does not exist, copy from skill package template — first use creates the user's local copy)
+1. Read `references/EVOLUTION-SPEC.md` (if it does not exist, copy from root `EVOLUTION-SPEC.md` template and add empty Backlog + Review Log sections)
 2. For each of the 9 design dimensions, evaluate:
    - "Based on my current knowledge, does this choice still represent best practice?"
    - "Does this specific project have needs that challenge this choice?"
