@@ -194,7 +194,7 @@ sh "references/scripts/scan-project.sh" \
 
 This produces a deterministic report of file counts, language detection, manifest presence, CI/CD config, testing infrastructure, and **detected technologies** — saving ~500 tokens of LLM tool-use overhead during Pass 1.
 
-Use the `SKILL RECOMMENDATIONS` section of the scan output to identify detected technologies. Search for relevant skills with `npx skills find "<technology>"` and populate the `Recommended skills` field in each domain file's Related section and the `skills.recommended` array in `manifest.json`.
+Use the `DETECTED TECHNOLOGIES` section of the scan output as input for `find-skills` (see Skill Ecosystem in AGENTS.md) to discover relevant best-practice skills for the project. Record any installed skills in `manifest.json` `skills.installed`.
 
 1. Generate **domain files** under `.agents/knowledge/domains/`. Use template `references/templates/topic-template.md`:
 
@@ -680,7 +680,7 @@ Explicit maintenance session for the skill itself. Triggered only by user reques
    - No adoption unless tied to a captured failure, eval gap, or explicit user goal
    ```
 
-   **Skill-focused search**: Prioritize searching for skills that cover the project's domain files. Check `manifest.json` `skills.recommended` for unfulfilled recommendations. For each adopted skill, update `manifest.json` `skills.installed` and the relevant domain file's `Recommended skills` field.
+   **Skill-focused search**: Use `find-skills` to search for skills that address captured `[SKILL-IDEA]` or `[SKILL-COMPAT]` items. For each adopted skill, update `manifest.json` `skills.installed`.
 
 6. **Update EVOLUTION-SPEC.md** — promoted items go to Improvement Backlog or become dimension updates. Rejected items noted with reason.
 7. **Version the change** — update Review Log in EVOLUTION-SPEC.md

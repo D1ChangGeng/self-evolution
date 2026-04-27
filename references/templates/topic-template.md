@@ -86,8 +86,7 @@ Link to other knowledge files, source files, or decisions that help situate this
 
 <!-- GUIDANCE: Put relative-path cross-references here to related knowledge, source files, and ADRs.
 Include the source files this domain covers so readers can inspect primary evidence.
-Include recommended skills for this domain (from scan results or manual discovery).
-Format: **Recommended skills**: `skill-name-1`, `skill-name-2`
+If relevant skills have been discovered (via find-skills), list them here.
 Do not put summaries or claims here; this section is for navigation only. -->
 
 - 

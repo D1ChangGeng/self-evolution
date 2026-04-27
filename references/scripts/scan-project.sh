@@ -288,8 +288,7 @@ status_path config.toml config.toml >> "$tmp_file"
 status_glob 'config.example.*' 'config.example.*' >> "$tmp_file"
 
 # --- Section 9: Skill Recommendations ---
-printf '\n--- SKILL RECOMMENDATIONS ---\n' >> "$tmp_file"
-printf 'Detected technologies (use these as search terms with npx skills find):\n' >> "$tmp_file"
+printf '\n--- DETECTED TECHNOLOGIES ---\n' >> "$tmp_file"
 
 [ -f "$PROJECT_ROOT/Cargo.toml" ] && printf '[DETECTED] Rust (Cargo.toml)\n' >> "$tmp_file"
 [ -f "$PROJECT_ROOT/package.json" ] && {
@@ -314,7 +313,6 @@ printf 'Detected technologies (use these as search terms with npx skills find):\
 if ! grep -q '\[DETECTED\]' "$tmp_file" 2>/dev/null; then
   printf '(No specific technologies detected)\n' >> "$tmp_file"
 fi
-printf '\nTo find relevant skills: npx skills find "<technology name>"\n' >> "$tmp_file"
 
 mv "$tmp_file" "$OUTPUT_PATH" || exit 1
 printf 'Wrote project scan to %s\n' "$OUTPUT_PATH"
