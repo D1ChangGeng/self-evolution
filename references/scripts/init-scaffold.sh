@@ -310,7 +310,8 @@ else
     "days_since_evolution": null
   },
   "skills": {
-    "installed": []
+    "installed": [],
+    "pending_review": []
   }
 }
 EOF

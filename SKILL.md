@@ -194,7 +194,7 @@ sh "references/scripts/scan-project.sh" \
 
 This produces a deterministic report of file counts, language detection, manifest presence, CI/CD config, testing infrastructure, and **detected technologies** — saving ~500 tokens of LLM tool-use overhead during Pass 1.
 
-Use the `DETECTED TECHNOLOGIES` section of the scan output as input for `find-skills` (see Skill Ecosystem in AGENTS.md) to discover relevant best-practice skills for the project. Record any installed skills in `manifest.json` `skills.installed`.
+Use the `DETECTED TECHNOLOGIES` section of the scan output as input for `find-skills` (see Skill Ecosystem in AGENTS.md) to discover relevant best-practice skills for the project. When candidates are found, write them to `manifest.json` `skills.pending_review` immediately — do not interrupt the user for confirmation during init. At the end of initialization, present the pending list for user review. Installed skills go to `skills.installed`.
 
 1. Generate **domain files** under `.agents/knowledge/domains/`. Use template `references/templates/topic-template.md`:
 
@@ -680,7 +680,7 @@ Explicit maintenance session for the skill itself. Triggered only by user reques
    - No adoption unless tied to a captured failure, eval gap, or explicit user goal
    ```
 
-   **Skill-focused search**: Use `find-skills` to search for skills that address captured `[SKILL-IDEA]` or `[SKILL-COMPAT]` items. For each adopted skill, update `manifest.json` `skills.installed`.
+   **Skill-focused search**: Use `find-skills` to search for skills that address captured `[SKILL-IDEA]` or `[SKILL-COMPAT]` items. Write candidates to `manifest.json` `skills.pending_review` immediately — do not stop to ask the user mid-search. Present the full pending list at the end of maintenance for batch confirmation. Confirmed installs move to `skills.installed`.
 
 6. **Update EVOLUTION-SPEC.md** — promoted items go to Improvement Backlog or become dimension updates. Rejected items noted with reason.
 7. **Version the change** — update Review Log in EVOLUTION-SPEC.md
