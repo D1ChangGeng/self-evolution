@@ -82,6 +82,11 @@ else
 fi
 
 TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+# Derive skill directory from this script's location
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SKILL_DIR=$(cd "$SCRIPT_DIR/../.." && pwd)
+HOOKS_SRC_DIR=$SKILL_DIR/references/hooks
 PROJECT_NAME_JSON=$(printf '%s' "$project_name" | sed 's/\\/\\\\/g; s/"/\\"/g')
 PROJECT_NAME_SED=$(printf '%s' "$project_name" | sed 's/[\\&/]/\\&/g')
 
@@ -343,65 +348,34 @@ fi
 SESSION_END_FILE=$HOOKS_DIR/session-end.sh
 if [ -f "$SESSION_END_FILE" ]; then
   printf 'skipped file %s\n' "$SESSION_END_FILE"
-else
-  cat << 'EOF' > "$SESSION_END_FILE"
-#!/bin/sh
-# Hook: session-end — append a session marker to inbox for knowledge capture reminder
-# Always exits 0 — never blocks session termination.
-set -u
-INBOX_DIR=".agents/knowledge/inbox"
-[ -d "$INBOX_DIR" ] || exit 0
-MONTH_FILE="$INBOX_DIR/$(date -u +%Y-%m).md"
-DATE_STR=$(date -u +%Y-%m-%d)
-TIME_STR=$(date -u +%H:%M)
-printf '\n## %s %s — Session ended\n\n- Session completed. Review POST-TASK CHECKLIST for any uncaptured knowledge.\n- [source: hooks/session-end.sh]\n' "$DATE_STR" "$TIME_STR" >> "$MONTH_FILE"
-exit 0
-EOF
+elif [ -f "$HOOKS_SRC_DIR/session-end.sh" ]; then
+  cp "$HOOKS_SRC_DIR/session-end.sh" "$SESSION_END_FILE"
   chmod +x "$SESSION_END_FILE"
   printf 'created file %s\n' "$SESSION_END_FILE"
+else
+  printf 'warning: source hook not found: %s\n' "$HOOKS_SRC_DIR/session-end.sh" >&2
 fi
 
 STOP_FILE=$HOOKS_DIR/stop.sh
 if [ -f "$STOP_FILE" ]; then
   printf 'skipped file %s\n' "$STOP_FILE"
-else
-  cat << 'EOF' > "$STOP_FILE"
-#!/bin/sh
-# Hook: stop — check manifest for inbox pressure and suggest evolve
-# Always exits 0 — never blocks the stop event.
-set -u
-MANIFEST=".agents/knowledge/manifest.json"
-[ -f "$MANIFEST" ] || exit 0
-inbox_count=$(grep '"inbox_count"' "$MANIFEST" 2>/dev/null | grep -o '[0-9]*' | head -1)
-days_since=$(grep '"days_since_evolution"' "$MANIFEST" 2>/dev/null | grep -o '[0-9]*' | head -1)
-inbox_count=${inbox_count:-0}
-days_since=${days_since:-0}
-if [ "$inbox_count" -gt 10 ] 2>/dev/null || [ "$days_since" -gt 14 ] 2>/dev/null; then
-  printf '[knowledge] inbox_count=%s, days_since_evolution=%s. Consider running evolve.\n' "$inbox_count" "$days_since" >&2
-fi
-exit 0
-EOF
+elif [ -f "$HOOKS_SRC_DIR/stop.sh" ]; then
+  cp "$HOOKS_SRC_DIR/stop.sh" "$STOP_FILE"
   chmod +x "$STOP_FILE"
   printf 'created file %s\n' "$STOP_FILE"
+else
+  printf 'warning: source hook not found: %s\n' "$HOOKS_SRC_DIR/stop.sh" >&2
 fi
 
 COMPACT_FILE=$HOOKS_DIR/compact-recovery.sh
 if [ -f "$COMPACT_FILE" ]; then
   printf 'skipped file %s\n' "$COMPACT_FILE"
-else
-  cat << 'EOF' > "$COMPACT_FILE"
-#!/bin/sh
-set -u
-cat << 'DIRECTIVE'
-CONTEXT WAS COMPACTED. Before continuing:
-1. Re-read AGENTS.md — focus on CORE INVARIANTS and CRITICAL ANTI-PATTERNS
-2. Re-read the domain file for your current task area (check WHERE TO LOOK table)
-3. State which invariants and anti-patterns apply to your current work before proceeding
-DIRECTIVE
-exit 0
-EOF
+elif [ -f "$HOOKS_SRC_DIR/compact-recovery.sh" ]; then
+  cp "$HOOKS_SRC_DIR/compact-recovery.sh" "$COMPACT_FILE"
   chmod +x "$COMPACT_FILE"
   printf 'created file %s\n' "$COMPACT_FILE"
+else
+  printf 'warning: source hook not found: %s\n' "$HOOKS_SRC_DIR/compact-recovery.sh" >&2
 fi
 
 if [ "$mode" = "empty" ]; then

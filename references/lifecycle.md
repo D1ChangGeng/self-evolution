@@ -22,7 +22,7 @@ Compress inbox material when any of these conditions are met:
    b. If yes: merge new observations into the existing topic file's appropriate section (Verified Facts if confirmed, Working Understanding if interpretive, Open Questions if uncertain)
    c. If no: create a new topic file from `references/templates/topic-template.md`
 4. Preserve unique details — if an observation contains a specific edge case or unusual finding that doesn't fit the main theme, put it in the topic's "Open Questions" section rather than discarding it
-5. After merging, remove the compressed entries from inbox (or move the entire monthly file to archive if fully processed)
+5. After merging, mark each processed entry with `<!-- absorbed into domains/X.md on {date} -->`. If every entry in a monthly inbox file has been absorbed, move the entire file to `archive/`. Do not delete inbox entries — traceability is more important than tidiness.
 
 ### Output
 

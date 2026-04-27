@@ -88,7 +88,7 @@ run_find() {
 scan_tree() {
   base=$1
   shift
-  run_find "$base" \( -name .git -o -name node_modules -o -name __pycache__ -o -name .venv -o -name venv -o -name dist -o -name build -o -name target -o -name .next -o -name .nuxt \) -prune -o "$@"
+  run_find "$base" \( -name .git -o -name .agents -o -name node_modules -o -name __pycache__ -o -name .venv -o -name venv -o -name dist -o -name build -o -name target -o -name .next -o -name .nuxt \) -prune -o "$@"
 }
 
 trim_count() {
@@ -186,7 +186,7 @@ else
 fi
 
 printf '%s\n' '--- DIRECTORY STRUCTURE ---' >> "$tmp_file"
-top_level=$(run_find "$PROJECT_ROOT" -mindepth 1 -maxdepth 1 \( -name .git -o -name node_modules -o -name __pycache__ -o -name .venv -o -name venv -o -name dist -o -name build -o -name target -o -name .next -o -name .nuxt \) -prune -o -print 2>/dev/null | sort | head -n "$TOP_LEVEL_LIMIT" || true)
+top_level=$(run_find "$PROJECT_ROOT" -mindepth 1 -maxdepth 1 \( -name .git -o -name .agents -o -name node_modules -o -name __pycache__ -o -name .venv -o -name venv -o -name dist -o -name build -o -name target -o -name .next -o -name .nuxt \) -prune -o -print 2>/dev/null | sort | head -n "$TOP_LEVEL_LIMIT" || true)
 if [ -n "$top_level" ]; then
   printf '%s\n' "$top_level" | while IFS= read -r entry; do
     [ -n "$entry" ] || continue

@@ -71,6 +71,8 @@ Every initialization creates this exact structure. No exceptions.
 
 These rules apply to ALL initialization modes (1, 2, 2B). They enforce deep, evidence-based work and prevent shallow output. Bias toward thoroughness during initialization — this is a one-time investment that shapes every future session.
 
+**Mode 1 exception**: Because empty projects have no source code to read, domain-file minimum content thresholds and the semantic project-specificity self-review do not apply until project files exist. Mode 1 generates only the scaffold and governance structure — no domain knowledge. The Quality Contract still applies to scaffold output: AGENTS.md must have no unresolved placeholders, manifest must be valid, and hooks must be executable.
+
 ### Read-Before-Write Rule
 
 Before writing any knowledge file, you MUST have read the source files you will cite. If you cannot cite a claim to a specific file and line, the claim is either an Open Question or must not be written as a Verified Fact. No exceptions.
@@ -131,9 +133,11 @@ These patterns indicate the agent is not doing deep work. If caught, stop and re
 
 ---
 
+**Path convention**: All `references/...` paths in this skill (scripts, templates, hooks, specs) are relative to the installed skill directory, NOT the project root. Resolve them from wherever your tool installed this skill (e.g., `~/.agents/skills/self-evolution/references/...` or the equivalent on your platform).
+
 ## Mode 1: Initialize — Empty Project
 
-Create the knowledge base skeleton. Read `references/templates/root-agents-empty.md` and use it as the base for AGENTS.md.
+Create the knowledge base skeleton. The scaffold script (`init-scaffold.sh`) generates AGENTS.md from its embedded content — the template file `references/templates/root-agents-empty.md` serves as documentation of the intended structure but the script output is authoritative. Read the template to understand the target structure, then run the script.
 
 ### Steps
 
@@ -168,6 +172,8 @@ Create the knowledge base skeleton. Read `references/templates/root-agents-empty
 - .agents/rules/ exists with at least knowledge-protocol.md
 - .agents/hooks/ exists with session-end.sh, stop.sh, compact-recovery.sh
 - No knowledge content generated (the project is empty — knowledge accumulates through use)
+- No project scan runs (no code to scan)
+- No skill discovery runs (no detected technologies); `manifest.json` `skills.pending_review` remains empty
 
 ---
 
@@ -300,7 +306,7 @@ Use the `DETECTED TECHNOLOGIES` section of the scan output as input for `find-sk
    ## Correction History — record of corrected claims (what was wrong, what replaced it, why)
    ```
 
-   Adapt sections to the project: a domain about deployment might have heavy Conventions and few Verified Facts; a domain about a core algorithm might have many Verified Facts and few Conventions. Empty sections can be left with a single `-` placeholder.
+   Adapt sections to the project: a domain about deployment might have heavy Conventions and few Verified Facts; a domain about a core algorithm might have many Verified Facts and few Conventions. If a section genuinely has no content, write a brief cited explanation (e.g., "No common mistakes identified — project is newly scanned [source: init scan]") rather than leaving it empty.
 
    **Concrete example** (illustrative — your domains will differ by project):
 
@@ -371,6 +377,28 @@ Each entry in the `inventory` array of `manifest.json` must follow this structur
 | `scope` | string[] | Directories/files this knowledge covers |
 | `confidence` | string | One of: `observed`, `verified`, `canonical` |
 | `last_verified` | string | ISO date of last verification |
+
+### Skill Candidate Schema
+
+Each entry in the `skills.pending_review` array of `manifest.json` must follow this structure:
+
+```json
+{
+  "name": "vue-best-practices",
+  "reason": "Detected Vue in package.json dependencies",
+  "source": "init scan",
+  "added": "2026-04-25"
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | string | Skill name as used by `find-skills` or `npx skills add` |
+| `reason` | string | Why this skill was suggested (detected technology, user request, etc.) |
+| `source` | string | How it was discovered: `init scan`, `find-skills`, `user request`, `mode 7 radar` |
+| `added` | string | ISO date when the candidate was added |
+
+Confirmed installs move to `skills.installed` with the same fields plus `installed: "{date}"`.
 
 ### AGENTS.md Authority Model
 
