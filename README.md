@@ -6,7 +6,7 @@ An agent skill for creating and maintaining a project-local knowledge base under
 
 Self-Evolution gives coding agents a persistent memory system for a repository. It initializes project knowledge, captures lessons during work, evolves raw notes into structured documentation, checks knowledge health, and crystallizes repeated workflows into reusable skill material.
 
-The current skill has a 1360-line `SKILL.md` with 7 explicit modes plus 1 ambient mode, 29 skill files, 3 lifecycle hooks, 4 tool adapters, 3 POSIX scripts, and 10 templates.
+The current skill has a 1360-line `SKILL.md` with 7 explicit modes plus 1 ambient mode, 29 skill files, 3 lifecycle hooks, 4 tool integration layers, 3 POSIX scripts, and 10 templates.
 
 ## Why This Exists
 
@@ -119,7 +119,7 @@ your-project/
 - 3 lifecycle hooks: `session-end.sh`, `stop.sh`, and `compact-recovery.sh`.
 - `compact-recovery.sh` provides a post-compaction re-read directive so the agent reloads project routing after context compression.
 - `init-scaffold.sh` copies hook scripts from `references/hooks/` instead of embedding them, ensuring hooks stay in sync with the skill package.
-- 4 tool adapters: Claude Code, Cursor, OpenCode, and Augment Code.
+- 4 tool integration layers: JSON adapters for Claude Code, Cursor, and Augment, native ESM plugin for OpenCode.
 - 3 POSIX scripts: `init-scaffold.sh`, `scan-project.sh`, and `audit-agents.sh`.
 - EVOLUTION-SPEC uses a dual-file architecture: a 130-line root template for distribution and a 228-line `references/` runtime version that is user-local and gitignored when installed into projects.
 

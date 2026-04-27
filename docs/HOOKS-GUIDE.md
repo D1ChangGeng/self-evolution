@@ -96,12 +96,40 @@ Keep the `SessionStart` matcher as `compact`. If it is empty, the recovery direc
 |------|-------------|---------------|---------|
 | Claude Code | Full (27+ events) | `.claude/settings.json` | `adapters/claude-code.json` |
 | Cursor | Full (CC compatible) | `.cursor/hooks.json` | `adapters/cursor.json` |
-| OpenCode | Full (plugin system) | `.opencode/hooks.json` | `adapters/opencode.json` |
+| OpenCode | Full (native plugin) | `.agents/hooks/opencode-plugin.mjs` | `adapters/opencode-plugin.mjs` |
 | Augment Code | Full (CC compatible) | `settings.json` | `adapters/augment.json` |
 | Gemini CLI | Partial | `.gemini/settings.json` | Not shipped |
 | Codex CLI | Partial (expanding) | `hooks.json` | Not shipped |
 | Windsurf | No | — | — |
 | Cline/Roo | No | — | — |
+
+### OpenCode Integration
+
+OpenCode uses a native ESM plugin instead of hooks.json. The hooks.json bridge (via oh-my-openagent) only supports `Stop`, `PreToolUse`, `PostToolUse`, `UserPromptSubmit`, and `PreCompact` — it does not bridge `SessionStart` or `SessionEnd`. The native plugin subscribes directly to OpenCode's event system:
+
+| OpenCode event | Hook script | Equivalent Claude Code event |
+|---|---|---|
+| `session.idle` | `stop.sh` | `Stop` |
+| `session.deleted` | `session-end.sh` | `SessionEnd` |
+| `experimental.session.compacting` | `compact-recovery.sh` | `SessionStart` + `compact` matcher |
+
+The plugin delegates to the same shell scripts used by other tools. No new logic lives in the plugin — it is a 50-line event-to-subprocess router.
+
+Register the plugin after installation:
+
+```bash
+opencode plugin "file://<project-root>/.agents/hooks/opencode-plugin.mjs"
+```
+
+Or add to `opencode.json` manually:
+
+```json
+{
+  "plugin": [
+    "file://<project-root>/.agents/hooks/opencode-plugin.mjs"
+  ]
+}
+```
 
 ## Installation
 
@@ -123,7 +151,8 @@ Installer steps:
 2. Creates `.agents/hooks/` if needed.
 3. Copies `session-end.sh`, `stop.sh`, and `compact-recovery.sh`.
 4. Marks the scripts executable.
-5. Installs the matching adapter config.
+5. For Claude Code, Cursor, Augment: installs the matching adapter config.
+6. For OpenCode: copies `opencode-plugin.mjs` and prints plugin registration instructions.
 
 Commit `.agents/hooks/` and any shared hook config file.
 
@@ -131,10 +160,17 @@ Commit `.agents/hooks/` and any shared hook config file.
 
 ```bash
 mkdir -p .agents/hooks
-cp references/hooks/scripts/session-end.sh .agents/hooks/session-end.sh
-cp references/hooks/scripts/stop.sh .agents/hooks/stop.sh
-cp references/hooks/scripts/compact-recovery.sh .agents/hooks/compact-recovery.sh
+cp references/hooks/session-end.sh .agents/hooks/session-end.sh
+cp references/hooks/stop.sh .agents/hooks/stop.sh
+cp references/hooks/compact-recovery.sh .agents/hooks/compact-recovery.sh
 chmod +x .agents/hooks/session-end.sh .agents/hooks/stop.sh .agents/hooks/compact-recovery.sh
+```
+
+For OpenCode, also copy the native plugin:
+
+```bash
+cp references/hooks/adapters/opencode-plugin.mjs .agents/hooks/opencode-plugin.mjs
+opencode plugin "file://$(pwd)/.agents/hooks/opencode-plugin.mjs"
 ```
 
 ## Custom Hooks
@@ -159,15 +195,31 @@ chmod +x .agents/hooks/session-end.sh .agents/hooks/stop.sh .agents/hooks/compac
 
 ### Hook doesn't fire
 
+Check the config file for your tool:
+
 - Claude Code: `.claude/settings.json`
 - Cursor: `.cursor/hooks.json`
-- OpenCode: `.opencode/hooks.json`
+- OpenCode: `opencode.json` plugin array must include `file://...opencode-plugin.mjs`
 - Augment Code: `settings.json`
 
 Then test from the project root:
 
 ```bash
 sh .agents/hooks/stop.sh
+```
+
+### OpenCode plugin not loading
+
+Verify the plugin is registered:
+
+```bash
+grep "opencode-plugin" .opencode/opencode.json 2>/dev/null || grep "opencode-plugin" ~/.config/opencode/opencode.json 2>/dev/null
+```
+
+If missing, register it:
+
+```bash
+opencode plugin "file://$(pwd)/.agents/hooks/opencode-plugin.mjs"
 ```
 
 ### Compact recovery runs too often

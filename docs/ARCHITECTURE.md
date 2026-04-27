@@ -270,14 +270,18 @@ AGENTS.md
 
 ## 12. Hook Architecture
 
-Hooks use tool-agnostic scripts with tool-specific adapter JSON.
+Hooks use tool-agnostic shell scripts with tool-specific integration layers. Claude Code, Cursor, and Augment use JSON adapters. OpenCode uses a native ESM plugin.
 
 ```text
 tool lifecycle event
-  -> adapter JSON
+  -> tool-specific integration layer
+     -> JSON adapter for Claude Code, Cursor, or Augment
+     -> native ESM plugin for OpenCode
   -> tool-agnostic script
   -> reminder, health check, or recovery directive
 ```
+
+OpenCode uses a native plugin because the `hooks.json` bridge doesn't expose SessionStart and SessionEnd equivalents reliably. The plugin subscribes to `session.idle`, `session.deleted`, and `experimental.session.compacting`, then maps those events to the shared scripts.
 
 | Script | Event | Behavior |
 |---|---|---|
