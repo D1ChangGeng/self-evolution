@@ -484,6 +484,10 @@ These behavioral rules reduce common AI coding mistakes. They bias toward cautio
 
 **Context familiarity is not domain competence.** A long session builds false confidence — having edited 30 files does not mean you understand the 31st. When a task shifts to a subsystem, workflow, or environment you haven't directly read the source for in this session, stop and read the relevant domain file before acting. The trigger is simple: if you cannot cite the specific file/line that governs the behavior you're about to change, you don't know enough yet.
 
+**Verify before acting on infrastructure.** Before any deployment, release, or production operation: read the relevant domain knowledge file first. Never assume which machine is "production" — look it up. Never assume a version number is correct — verify the source file.
+
+**No partial delivery.** When a task requires multiple steps, complete all of them. Do not deliver "step 1 of 3" and wait — finish the full scope. If blocked, state the blocker and propose alternatives instead of delivering an incomplete result. The only acceptable incomplete state is when the user explicitly requested incremental delivery.
+
 ## POST-TASK CHECKLIST
 
 After completing any non-trivial task:
