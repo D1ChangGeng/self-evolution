@@ -16,6 +16,7 @@ Determine the operating mode from context:
 | User says | Mode |
 |-----------|------|
 | "initialize", "init", "set up knowledge base" | **Initialize** (auto-detects empty vs existing) |
+| "deep onboard", "comprehensive init", "audit and restructure" | **Deep Brownfield Onboarding** (Mode 2B) |
 | "evolve", "update knowledge", "compress inbox", "promote" | **Evolve** |
 | "check health", "KB health", "knowledge base status" | **Health Check** |
 | "crystallize", "turn this into a workflow", "formalize this process" | **Crystallize** |
@@ -348,6 +349,176 @@ If the project already has an AGENTS.md:
 - All generated files have sources listing actual files read
 - inbox/ has initial observations from scan
 - .agents/rules/ exists with scope-triggered rules matching generated domains
+
+---
+
+## Mode 2B: Deep Brownfield Onboarding
+
+For existing projects with accumulated code, documentation, and possibly noisy AGENTS.md files. Triggered by "deep onboard", "comprehensive init", or "audit and restructure". Also offered when Mode 2 detects an existing AGENTS.md with >200 lines.
+
+This mode runs AFTER standard Mode 2 (or independently on already-initialized projects). It produces high-quality knowledge equivalent to a senior engineer's first-week understanding.
+
+### Resumable Phase Architecture
+
+Each phase writes its output before the next begins. The user can interrupt and resume at any phase. Progress is tracked in `.agents/knowledge/reference/onboarding-state.json`:
+
+```json
+{
+  "started": "2026-04-27T10:00:00Z",
+  "phases": {
+    "audit": "completed",
+    "inventory": "completed",
+    "extract": "in_progress",
+    "migrate": "pending",
+    "restructure": "pending",
+    "discover": "pending"
+  }
+}
+```
+
+### Phase 1: Audit Existing AGENTS.md
+
+Run the audit script:
+
+```sh
+sh "references/scripts/audit-agents.sh" --file "$PROJECT_ROOT/AGENTS.md"
+```
+
+Output: `.agents/knowledge/reference/agents-audit.md`
+
+Score the existing file on:
+
+| Dimension | What to check |
+|-----------|--------------|
+| Structure | Presence of 10 standard sections (IDENTITY through SELF-EVOLUTION RULES) |
+| Signal density | Line count, section count, directive count, file references |
+| Risk | Potential secrets, absolute paths, internal URLs |
+| Governance | Capture protocol, confidence tracking, SSOT references |
+
+Rating: `good` (8+ sections, 150-300 lines) / `noisy` (>300 lines or <5 sections with bulk content) / `incomplete` (<5 sections) / `risky` (secrets or destructive commands detected)
+
+Report findings to user before proceeding.
+
+### Phase 2: Inventory All Knowledge Artifacts
+
+Output: `.agents/knowledge/reference/artifact-inventory.md`
+
+Scan for every existing knowledge source in the project:
+
+- `AGENTS.md` (root and nested)
+- `CLAUDE.md`, `.claude/commands/*.md`, `.claude/rules/*.md`
+- `.cursor/rules/`, `.cursorrules`
+- `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`
+- `docs/` directory contents
+- `ADR` or `decisions/` directories
+- Existing `.agents/` from prior init-deep or other tools
+- CI/CD workflows, Dockerfile, Makefile, release scripts
+
+For each artifact: record path, line count, and a 1-line summary of what it contains.
+
+### Phase 3: Extract Implicit Project Knowledge
+
+Output: domain files, inbox entries, `.agents/knowledge/reference/deep-scan-report.md`
+
+Use three-tier extraction depth:
+
+**Tier 1 — Full-repo cheap index** (always):
+- Directory tree with file counts
+- scan-project.sh output (already run in Mode 2)
+- grep -r for `TODO`, `FIXME`, `HACK`, `XXX`, `DEPRECATED`, `DO NOT`, `NEVER`, `ALWAYS` (bounded to 200 matches)
+
+**Tier 2 — Targeted high-signal reads** (scaled by project size):
+
+| Project size | Deep-read budget |
+|---|---|
+| Small (<100 files) | 25-40 files |
+| Medium (100-500 files) | 50-80 files |
+| Large (500-2000 files) | 80-140 files |
+
+Priority order for what to read:
+1. Entry points (main.*, app.*, index.*)
+2. Routing/API definitions
+3. Config/schema files
+4. CI/build/deploy files
+5. Top churn files from `git log --since="6 months ago" --name-only --format="" | sort | uniq -c | sort -rn | head -20`
+6. Files with many convention markers (from Tier 1 grep)
+7. Files referenced by existing docs
+8. Representative tests (1-2 per test directory)
+
+**Tier 3 — Domain-focused deep dives** (optional, per user request):
+- Deep read of a specific subsystem
+- Full analysis of a module's conventions and patterns
+
+From readings, generate:
+- Domain files for each identified project area
+- Inbox entries for observations that don't fit domains
+- Intent vs Reality divergences (what docs say vs what code does)
+- Convention patterns (naming, error handling, imports)
+
+### Phase 4: Migrate Existing Knowledge
+
+Output: migrated files + `.agents/knowledge/reference/migration-map.md`
+
+For every substantive chunk from Phase 2 artifacts, assign a destination:
+
+| Source content | Destination |
+|---|---|
+| Project identity, commands, top invariants | Root `AGENTS.md` |
+| Module behavior, conventions, pitfalls | `domains/*.md` |
+| Large route tables, API inventories, code maps | `reference/*.md` |
+| Deployment/release/test workflows | `crystallized/*.md` |
+| Architecture decisions with rationale | `decisions/*.md` |
+| Tool-specific rules (.cursor, .claude) | `.agents/rules/*.md` |
+| Unverified one-off claims | `inbox/{YYYY-MM}.md` |
+
+**Key rule**: nothing valuable is deleted — bulky detail is relocated and linked.
+
+Create a traceability map recording where each piece went:
+
+```markdown
+## Migration Map
+
+| Original location | Content summary | Migrated to | Confidence |
+|---|---|---|---|
+| AGENTS.md lines 45-120 | Auth system conventions | domains/security-auth.md | observed |
+| AGENTS.md lines 200-280 | Deployment runbook | crystallized/deployment-workflow.md | observed |
+| .claude/rules/testing.md | Test conventions | domains/testing.md | observed |
+| docs/architecture.md | System layers | reference/architecture.md | observed |
+```
+
+### Phase 5: Restructure AGENTS.md
+
+Output: `AGENTS.md.proposed` first, then live replacement after approval.
+
+1. Archive the original: move to `.agents/knowledge/archive/AGENTS.before-onboarding.md`
+2. Build new AGENTS.md using the standard template (`root-agents-existing.md`)
+3. Fill from domain files generated in Phases 3-4
+4. Keep only high-retrieval content in root (IDENTITY, COMMANDS, WHERE TO LOOK, top invariants/anti-patterns, governance sections)
+5. Everything else becomes linked knowledge in `domains/`, `reference/`, `crystallized/`
+
+**Approval gate**: Write `AGENTS.md.proposed` and present diff to user. Only replace live AGENTS.md after explicit approval.
+
+### Phase 6: Discover Skills and Report
+
+Output: `manifest.json` `skills.pending_review` + `.agents/knowledge/reference/onboarding-report.md`
+
+1. Use detected technologies (from scan-project.sh) as input for `find-skills`
+2. Write candidates to `manifest.json` `skills.pending_review`
+3. Identify best-practice gaps — concrete findings, not vague recommendations:
+   - "Project uses X but has no documented conventions for it"
+   - "Tests exist but no test command in AGENTS.md"
+   - "Multiple TODO/HACK markers cluster in module Y"
+4. Generate final onboarding report summarizing all phases
+
+### Completion Criteria
+
+- agents-audit.md exists with quality score
+- artifact-inventory.md exists with all knowledge sources listed
+- Domain files generated from deep extraction (not just surface scan)
+- Migration map traces all relocated content
+- AGENTS.md restructured (or .proposed ready for approval)
+- Onboarding report summarizes findings and next steps
+- onboarding-state.json shows all phases completed
 
 ---
 
@@ -1034,6 +1205,7 @@ All templates are in `references/templates/`. Use them as starting points, not r
 | `EVOLUTION-SPEC.md` | Pre-validation checkpoint | Step 0 in Mode 1 and Mode 2 |
 | `scripts/init-scaffold.sh` | Deterministic scaffold creation | Mode 1 step 2, Mode 2 scaffold setup |
 | `scripts/scan-project.sh` | Deterministic project pre-scanner | Mode 2 scaffold setup |
+| `scripts/audit-agents.sh` | AGENTS.md quality audit | Mode 2B Phase 1 |
 | `hooks/session-end.sh` | Session end capture reminder | Hooks integration |
 | `hooks/stop.sh` | Health check reminder on task completion | Hooks integration |
 | `hooks/install-hooks.sh` | Auto-detect tool and install hook adapters | Hooks integration |

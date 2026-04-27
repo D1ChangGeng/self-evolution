@@ -66,9 +66,9 @@ If a dimension's `last_reviewed` exceeds 60 days AND you have reason to believe 
 
 ### 5. Initialization Strategy
 
-**Current choice**: POSIX shell scripts create deterministic scaffold (`init-scaffold.sh` + `scan-project.sh`). LLM generates only project-specific content. Step 0 pre-validation runs before scripts.
+**Current choice**: Three initialization paths — Mode 1 (empty project scaffold), Mode 2 (existing project scan + domain generation), Mode 2B (deep brownfield onboarding with 6-phase audit/extract/restructure). POSIX scripts handle deterministic work.
 
-**Change trigger**: LLM tool-use becomes deterministic enough that scripting is unnecessary, OR scaffold content needs project-specific adaptation that a static script can't handle.
+**Change trigger**: LLM tool-use becomes deterministic enough that scripting is unnecessary, OR the brownfield onboarding phases prove insufficient for complex legacy projects.
 
 **Deep reference**: [init-deep-reference.md](references/init-deep-reference.md)
 
