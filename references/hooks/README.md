@@ -97,7 +97,7 @@ For OpenCode, the installer copies `opencode-plugin.mjs` into `.agents/hooks/` a
 ```json
 {
   "plugin": [
-    "file://<project-root>/.agents/hooks/opencode-plugin.mjs"
+    "file://.agents/hooks/opencode-plugin.mjs"
   ]
 }
 ```

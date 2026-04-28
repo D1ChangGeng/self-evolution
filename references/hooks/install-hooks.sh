@@ -240,17 +240,54 @@ case "$tool" in
   opencode)
     mkdir -p "$project_root/.opencode" || exit 1
     copy_file_if_safe "$script_dir/adapters/opencode-plugin.mjs" "$hooks_dir/opencode-plugin.mjs" 'OpenCode native plugin'
-    plugin_uri="file://$project_root/.agents/hooks/opencode-plugin.mjs"
     opencode_config="$project_root/.opencode/opencode.json"
+    plugin_ref="file://.agents/hooks/opencode-plugin.mjs"
+    global_config="${XDG_CONFIG_HOME:-$HOME/.config}/opencode/opencode.json"
     if [ -f "$opencode_config" ]; then
       if grep -q 'opencode-plugin\.mjs' "$opencode_config" 2>/dev/null; then
         say "OpenCode config already references the plugin; skipping"
       else
-        warn "Add this to your opencode.json plugin array: \"$plugin_uri\""
+        warn "Add this to your .opencode/opencode.json plugin array: \"$plugin_ref\""
       fi
     else
-      say "note: register the plugin by running: opencode plugin \"$plugin_uri\""
-      say "  or add to your opencode.json: { \"plugin\": [\"$plugin_uri\"] }"
+      if [ -f "$global_config" ]; then
+        cp "$global_config" "$opencode_config"
+        say "copied global OpenCode config to project level: $opencode_config"
+      else
+        printf '{\n}\n' > "$opencode_config"
+        say "created minimal project-level OpenCode config: $opencode_config"
+      fi
+      if grep -Eq '"plugin"[[:space:]]*:' "$opencode_config" 2>/dev/null; then
+        if ! grep -q 'opencode-plugin\.mjs' "$opencode_config" 2>/dev/null; then
+          awk_result=$(awk -v ref="$plugin_ref" '
+            /"plugin"[[:space:]]*:[[:space:]]*\[/ {
+              print $0
+              printf "    \"%s\",\n", ref
+              next
+            }
+            { print }
+          ' "$opencode_config")
+          if [ -n "$awk_result" ]; then
+            printf '%s\n' "$awk_result" > "$opencode_config"
+            say "added plugin to existing plugin array"
+          else
+            warn "could not auto-add plugin; add manually: \"$plugin_ref\""
+          fi
+        fi
+      else
+        append_hooks_section "$opencode_config" /dev/stdin <<PLUGINJSON
+{
+  "plugin": [
+    "$plugin_ref"
+  ]
+}
+PLUGINJSON
+        if [ $? -eq 0 ]; then
+          say "added plugin section to OpenCode config"
+        else
+          warn "could not auto-add plugin; add \"$plugin_ref\" to .opencode/opencode.json plugin array manually"
+        fi
+      fi
     fi
     ;;
   augment)

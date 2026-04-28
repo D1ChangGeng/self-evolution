@@ -1245,29 +1245,33 @@ If the project uses a tool that supports lifecycle hooks (Claude Code, Cursor, O
 |------|-------|--------|
 | `session-end.sh` | Session terminates | Appends a capture reminder to `inbox/{YYYY-MM}.md` |
 | `stop.sh` | Agent completes task | Checks `manifest.json` for inbox pressure / evolution staleness, prints reminder to stderr |
+| `compact-recovery.sh` | Context compacted | Outputs re-read directive injected into agent context |
 
 ### Setup
 
-The scaffold script (`init-scaffold.sh`) creates `.agents/hooks/` with both hook scripts. To wire them into your tool:
+The scaffold script (`init-scaffold.sh`) creates `.agents/hooks/` with all 3 hook scripts. To wire them into your tool:
 
 ```sh
 sh "references/hooks/install-hooks.sh" --project-root "$PROJECT_ROOT"
 ```
 
-The installer auto-detects your tool and installs the appropriate adapter configuration. Supported tools:
+The installer auto-detects your tool and installs the appropriate adapter. For OpenCode, it copies the global `opencode.json` to the project level before adding the plugin reference — this preserves existing provider, model, and plugin configuration. Supported tools:
 
-| Tool | Config Location | Format |
-|------|----------------|--------|
-| Claude Code | `.claude/settings.json` | Native hooks |
-| Cursor | `.cursor/hooks.json` | Claude Code compatible |
-| OpenCode | `.opencode/hooks.json` | Claude Code compatible (via bridge plugin) |
-| Augment Code | settings.json | Claude Code compatible |
+| Tool | Config Location | Integration |
+|------|----------------|-------------|
+| Claude Code | `.claude/settings.json` | JSON adapter merged into settings |
+| Cursor | `.cursor/hooks.json` | JSON adapter copied |
+| OpenCode | `.opencode/opencode.json` | Native ESM plugin + project-level config (global config copied first to preserve providers/plugins) |
+| Augment Code | `.augment/settings.json` | JSON adapter merged into settings |
+
+**OpenCode note**: The installer copies the global `opencode.json` to the project before adding the plugin, because project-level config overrides global config entirely. Without this step, existing provider and plugin configurations would be lost.
 
 ### Hook Design Principles
 
 - **Always exit 0** — hooks must never block tool operations
-- **Tool-agnostic scripts** — `session-end.sh` and `stop.sh` are POSIX sh with no tool-specific code
-- **Adapter pattern** — tool-specific JSON configs in `references/hooks/adapters/` map tool events to universal scripts
+- **Tool-agnostic scripts** — `session-end.sh`, `stop.sh`, and `compact-recovery.sh` are POSIX sh with no tool-specific code
+- **Adapter pattern** — Claude Code/Cursor/Augment use JSON configs; OpenCode uses a native ESM plugin that delegates to the same shell scripts
+- **Project-scoped** — hooks and adapter configs are installed per-project, never globally
 - **Forward-compatible** — AGENTS.md spec proposal #167 is standardizing lifecycle commands; this design aligns with the proposed `post-chat` event
 
 ---

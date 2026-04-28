@@ -115,21 +115,17 @@ OpenCode uses a native ESM plugin instead of hooks.json. The hooks.json bridge (
 
 The plugin delegates to the same shell scripts used by other tools. No new logic lives in the plugin — it is a 50-line event-to-subprocess router.
 
-Register the plugin after installation:
-
-```bash
-opencode plugin "file://<project-root>/.agents/hooks/opencode-plugin.mjs"
-```
-
-Or add to `opencode.json` manually:
+Register the plugin in project-level `.opencode/opencode.json` (not globally):
 
 ```json
 {
   "plugin": [
-    "file://<project-root>/.agents/hooks/opencode-plugin.mjs"
+    "file://.agents/hooks/opencode-plugin.mjs"
   ]
 }
 ```
+
+The installer creates this file automatically if it does not exist. Register at project level so the plugin only loads for projects that use self-evolution.
 
 ## Installation
 
@@ -170,7 +166,16 @@ For OpenCode, also copy the native plugin:
 
 ```bash
 cp references/hooks/adapters/opencode-plugin.mjs .agents/hooks/opencode-plugin.mjs
-opencode plugin "file://$(pwd)/.agents/hooks/opencode-plugin.mjs"
+```
+
+Then create `.opencode/opencode.json` with:
+
+```json
+{
+  "plugin": [
+    "file://.agents/hooks/opencode-plugin.mjs"
+  ]
+}
 ```
 
 ## Custom Hooks
@@ -199,7 +204,7 @@ Check the config file for your tool:
 
 - Claude Code: `.claude/settings.json`
 - Cursor: `.cursor/hooks.json`
-- OpenCode: `opencode.json` plugin array must include `file://...opencode-plugin.mjs`
+- OpenCode: `.opencode/opencode.json` plugin array must include `"file://.agents/hooks/opencode-plugin.mjs"`
 - Augment Code: `settings.json`
 
 Then test from the project root:
@@ -216,10 +221,14 @@ Verify the plugin is registered:
 grep "opencode-plugin" .opencode/opencode.json 2>/dev/null || grep "opencode-plugin" ~/.config/opencode/opencode.json 2>/dev/null
 ```
 
-If missing, register it:
+If missing, create `.opencode/opencode.json`:
 
-```bash
-opencode plugin "file://$(pwd)/.agents/hooks/opencode-plugin.mjs"
+```json
+{
+  "plugin": [
+    "file://.agents/hooks/opencode-plugin.mjs"
+  ]
+}
 ```
 
 ### Compact recovery runs too often
