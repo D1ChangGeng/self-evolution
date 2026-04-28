@@ -281,7 +281,7 @@ tool lifecycle event
   -> reminder, health check, or recovery directive
 ```
 
-OpenCode uses a native plugin because the `hooks.json` bridge doesn't expose SessionStart and SessionEnd equivalents reliably. The plugin subscribes to `session.idle`, `session.deleted`, and `experimental.session.compacting`, then maps those events to the shared scripts.
+OpenCode uses a native plugin because the `hooks.json` bridge doesn't expose SessionStart and SessionEnd equivalents reliably. The plugin subscribes to `session.idle`, `session.deleted`, and `experimental.session.compacting`, then maps those events to the shared scripts. The installer copies the global `opencode.json` to project level before adding the plugin reference, because project-level config overrides global config entirely.
 
 | Script | Event | Behavior |
 |---|---|---|

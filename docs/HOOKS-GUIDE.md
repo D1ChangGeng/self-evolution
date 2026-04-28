@@ -125,7 +125,7 @@ Register the plugin in project-level `.opencode/opencode.json` (not globally):
 }
 ```
 
-The installer creates this file automatically if it does not exist. Register at project level so the plugin only loads for projects that use self-evolution.
+The installer creates this file automatically. When no project-level `opencode.json` exists, the installer first copies the global config (`~/.config/opencode/opencode.json`) to preserve existing provider, model, and plugin settings, then injects the plugin reference into the copied file. Register at project level so the plugin only loads for projects that use self-evolution.
 
 ## Installation
 
