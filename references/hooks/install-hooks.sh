@@ -241,7 +241,7 @@ case "$tool" in
     mkdir -p "$project_root/.opencode" || exit 1
     copy_file_if_safe "$script_dir/adapters/opencode-plugin.mjs" "$hooks_dir/opencode-plugin.mjs" 'OpenCode native plugin'
     opencode_config="$project_root/.opencode/opencode.json"
-    plugin_ref="file://.agents/hooks/opencode-plugin.mjs"
+    plugin_ref="file://$project_root/.agents/hooks/opencode-plugin.mjs"
     global_config="${XDG_CONFIG_HOME:-$HOME/.config}/opencode/opencode.json"
     if [ -f "$opencode_config" ]; then
       if grep -q 'opencode-plugin\.mjs' "$opencode_config" 2>/dev/null; then

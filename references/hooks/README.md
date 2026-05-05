@@ -92,12 +92,12 @@ For Claude Code and Augment, the installer merges a `hooks` key into `settings.j
 
 For Cursor, the installer copies `hooks.json` if it does not already exist. If the target file differs, it warns and skips.
 
-For OpenCode, the installer copies `opencode-plugin.mjs` into `.agents/hooks/` and prints registration instructions. The plugin must be added to your `opencode.json` plugin array:
+For OpenCode, the installer copies `opencode-plugin.mjs` into `.agents/hooks/` and registers it in your `opencode.json` plugin array with an absolute `file:///` URL. Relative `file://.agents/...` URLs are invalid on Linux because `.agents` is parsed as a URL host.
 
 ```json
 {
   "plugin": [
-    "file://.agents/hooks/opencode-plugin.mjs"
+    "file:///absolute/project/root/.agents/hooks/opencode-plugin.mjs"
   ]
 }
 ```

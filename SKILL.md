@@ -1,6 +1,6 @@
 ---
 name: self-evolution
-description: "Initialize and maintain a project self-evolution knowledge base. Creates a hierarchical knowledge system under .agents/knowledge/ with lifecycle management: capture, organize, verify, promote, compress, and retire project knowledge. Use this skill whenever the user asks to initialize project knowledge, set up AGENTS.md, create a knowledge base, evolve project documentation, check knowledge health, or crystallize workflows into skills. Also use when users say 'set up project memory', 'initialize project context', 'create project brain', or any variation of wanting persistent, evolving project knowledge for AI-assisted development."
+description: "Initialize and maintain a project self-evolution knowledge base. Creates .agents/knowledge/ with lifecycle management: capture, organize, verify, promote, compress, and retire project knowledge. Installs tool lifecycle hooks, including OpenCode native plugin registration with an absolute file:/// URL so Linux does not treat the project path as a URL host. Use this skill whenever the user asks to initialize project knowledge, set up AGENTS.md, create a knowledge base, evolve project documentation, check knowledge health, install knowledge hooks, or crystallize workflows into skills. Also use when users say 'set up project memory', 'initialize project context', 'create project brain', or any variation of wanting persistent, evolving project knowledge for AI-assisted development."
 ---
 
 # Project Self-Evolution Knowledge System
