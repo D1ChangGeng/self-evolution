@@ -181,7 +181,8 @@ Create the knowledge base skeleton. The scaffold script (`init-scaffold.sh`) gen
    This creates all directories, README.md, manifest.json, knowledge-protocol.md, and AGENTS.md with defaults filled.
 3. Verify the script output: confirm AGENTS.md exists, all directories created, manifest.json is valid
 4. Generate scope-triggered rules (see Scope-Triggered Rules Generation section)
-5. Report completion: list created files and explain what to do next
+5. **Run Hook Integration Decision Point** (see `## Hook Integration Decision Point` section later in this file). Present the 5-option prompt (opencode / claude-code / cursor / augment-code / custom). Run installer for the chosen tool OR record the declination / deferral in `manifest.json` `hooks.integration`. Do NOT silently skip this step. Do NOT claim "hooks installed" when only the shell scripts are present.
+6. Report completion: list created files, state the hook integration outcome explicitly ("hooks active: opencode" / "hooks deferred" / "hooks declined"), and explain what to do next.
 
 ### Mode 1 Quality Gate
 - All required files exist (AGENTS.md, README.md, manifest.json, knowledge-protocol.md, hook scripts)
@@ -193,7 +194,8 @@ Create the knowledge base skeleton. The scaffold script (`init-scaffold.sh`) gen
 - AGENTS.md exists at project root with CODING DISCIPLINE, POST-TASK CHECKLIST and SELF-EVOLUTION RULES
 - .agents/knowledge/ exists with README.md, manifest.json, and 7 subdirectories
 - .agents/rules/ exists with at least knowledge-protocol.md
-- .agents/hooks/ exists with session-end.sh, stop.sh, compact-recovery.sh
+- .agents/hooks/ contains the 3 shell scripts (session-end.sh, stop.sh, compact-recovery.sh) — scripts on disk
+- **Hook integration decision recorded**: `manifest.json` `hooks.integration` is one of `opencode | claude-code | cursor | augment-code | custom | declined | deferred`. If a tool was selected, the corresponding adapter file (`.opencode/opencode.json` / `.claude/settings.json` / `.cursor/hooks.json` / `.augment/settings.json`) is present and references the hook scripts. "Scripts on disk" alone does NOT satisfy this criterion.
 - No knowledge content generated (the project is empty — knowledge accumulates through use)
 - No project scan runs (no code to scan)
 - No skill discovery runs (no detected technologies); `manifest.json` `skills.pending_review` remains empty
@@ -378,6 +380,7 @@ Use the `DETECTED TECHNOLOGIES` section of the scan output as input for `find-sk
 
 5. **Update** `manifest.json` with populated inventory (since the scaffold already created the base file; see Manifest Inventory Entry Schema below)
 6. Generate scope-triggered rules (see Scope-Triggered Rules Generation section)
+7. **Run Hook Integration Decision Point** (see `## Hook Integration Decision Point` section later in this file). Present the 5-option prompt (opencode / claude-code / cursor / augment-code / custom). Run installer for the chosen tool OR record the declination / deferral in `manifest.json` `hooks.integration`. Do NOT silently skip. Do NOT claim "hooks installed" when only shell scripts are present.
 
 ### Manifest Inventory Entry Schema
 
@@ -422,6 +425,36 @@ Each entry in the `skills.pending_review` array of `manifest.json` must follow t
 | `added` | string | ISO date when the candidate was added |
 
 Confirmed installs move to `skills.installed` with the same fields plus `installed: "{date}"`.
+
+### Hook Integration Schema
+
+`manifest.json` MUST contain a top-level `hooks` object once the Hook Integration Decision Point has run. Schema:
+
+```json
+{
+  "hooks": {
+    "integration": "opencode",
+    "decided_at": "2026-05-07T01:00:00Z",
+    "adapter_path": ".opencode/opencode.json",
+    "note": "Native plugin via opencode-plugin.mjs; preserves global providers and MCP."
+  }
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `integration` | string | One of: `opencode`, `claude-code`, `cursor`, `augment-code`, `custom`, `declined`, `deferred` |
+| `decided_at` | string | ISO datetime when the decision was recorded |
+| `adapter_path` | string \| null | Relative path to the adapter file. Required for the four named tools. `null` for `custom` / `declined` / `deferred`. |
+| `note` | string | Free-form rationale or operational note. For `custom`, document the manual integration path. For `declined`, document why. |
+
+**State transitions**:
+
+- `deferred` → any other state on the next init / evolve / health-check session that re-asks the decision
+- `opencode | claude-code | cursor | augment-code` → `declined` if the user later removes the adapter (record this transition in evolve mode)
+- `custom` → a named tool if the user later switches to a bundled integration
+
+The decision point is rerun ONLY when `integration` is missing OR set to `deferred`. Other states are stable and should not re-prompt.
 
 ### AGENTS.md Authority Model
 
@@ -478,7 +511,8 @@ If the project already has an AGENTS.md:
 - All generated files have sources listing actual files read
 - inbox/ has initial observations from scan
 - .agents/rules/ exists with scope-triggered rules matching generated domains
-- .agents/hooks/ exists with session-end.sh, stop.sh, compact-recovery.sh
+- .agents/hooks/ contains the 3 shell scripts (session-end.sh, stop.sh, compact-recovery.sh) — scripts on disk
+- **Hook integration decision recorded**: `manifest.json` `hooks.integration` is one of `opencode | claude-code | cursor | augment-code | custom | declined | deferred`. If a tool was selected, the corresponding adapter file is present and references the hook scripts. "Scripts on disk" alone does NOT satisfy this criterion.
 
 ---
 
@@ -638,7 +672,8 @@ Output: `manifest.json` `skills.pending_review` + `.agents/knowledge/reference/o
    - "Project uses X but has no documented conventions for it"
    - "Tests exist but no test command in AGENTS.md"
    - "Multiple TODO/HACK markers cluster in module Y"
-4. Generate final onboarding report summarizing all phases
+4. **Run Hook Integration Decision Point** if `manifest.json` `hooks.integration` is missing, set to `deferred`, OR set to a tool but the adapter file no longer exists. See `## Hook Integration Decision Point` section. Mode 2B re-asks because brownfield projects often inherit a half-wired state. Record the result in `manifest.json`.
+5. Generate final onboarding report summarizing all phases, including an explicit `Hook integration: <state>` line in the report header — one of "active (opencode adapter wired)", "deferred (re-asks next session)", "declined", or "custom (manual integration)". Do NOT use the bare phrase "3 hooks installed" anywhere in the report; that conflates "scripts on disk" with "hooks active".
 
 ### Completion Criteria
 
@@ -647,8 +682,9 @@ Output: `manifest.json` `skills.pending_review` + `.agents/knowledge/reference/o
 - Domain files generated from deep extraction (not just surface scan)
 - Migration map traces all relocated content
 - AGENTS.md restructured (or .proposed ready for approval)
-- Onboarding report summarizes findings and next steps
+- Onboarding report summarizes findings and next steps, AND explicitly states the Hook integration state ("active / deferred / declined / custom") on a dedicated line — not buried inside an artifact-count phrase
 - onboarding-state.json shows all phases completed
+- **Hook integration decision recorded**: `manifest.json` `hooks.integration` is one of `opencode | claude-code | cursor | augment-code | custom | declined | deferred`. If a tool was selected, the corresponding adapter file is present and references the hook scripts.
 
 ---
 
@@ -820,7 +856,9 @@ Before starting, verify manifest.json:
 
 8. **Update AGENTS.md "Where to Look" table**: Add/remove entries matching current domain/reference files.
 
-9. **Report**: Summarize what changed:
+9. **Re-check hook integration**: If `manifest.json` `hooks.integration` is `deferred` OR missing, run the Hook Integration Decision Point now (see `## Hook Integration Decision Point`). Evolve sessions are a natural moment to revisit deferred decisions. If integration is set to a tool but the adapter file is missing or stale, prompt for repair (re-run installer) or for an explicit decline.
+
+10. **Report**: Summarize what changed:
    - Items compressed from inbox
    - New domains created
    - Knowledge corrected or updated
@@ -828,6 +866,7 @@ Before starting, verify manifest.json:
    - Conflicts found and how they were resolved
    - Promotions made
    - **Recurring themes**: list themes that appeared 3+ times with entry count (e.g., "deployment/version mismatch — 4 entries across 3 sessions"). These are crystallization or root-cause-investigation candidates.
+   - Hook integration state (active / deferred / declined / custom / broken) and any change since previous session
    - Health score before → after
 
 ---
@@ -846,12 +885,17 @@ A fast triage that reports key indicators WITHOUT computing a full numeric score
    - Does it have a "SELF-EVOLUTION RULES" section?
    - If any are missing: report as critical — the self-evolution system is disconnected
 2. **Verify manifest.json** — if missing or corrupt, rebuild from filesystem before continuing
-3. **Report key indicators** (no score calculation needed):
+3. **Verify hook integration state**:
+   - Read `manifest.json` `hooks.integration`. If absent OR set to `deferred`, surface as a high-priority action: "Hook integration is unwired — run the Hook Integration Decision Point (see SKILL.md) to choose opencode / claude-code / cursor / augment-code / custom."
+   - If set to a tool but the corresponding adapter file is missing or no longer references the hook scripts, surface as critical: "Hook integration recorded as `{tool}` but adapter file is missing or stale — hooks are not actually firing."
+   - If set to `declined` or `custom`, no action needed; record in the report.
+4. **Report key indicators** (no score calculation needed):
    - Inbox item count and oldest unprocessed date
    - Stale candidate count (from manifest)
    - Conflict count (from manifest)
    - Confidence distribution (count of observed/verified/canonical files)
-4. **Report top 3 priority actions** based on the triage order in health-check.md
+   - Hook integration state (active / deferred / declined / custom / broken)
+5. **Report top 3 priority actions** based on the triage order in health-check.md. Hook integration in `deferred` or `broken` state is always in the top 3.
 
 ### Deep Health Check
 
@@ -866,6 +910,7 @@ Computes the full numeric health score using the formula in health-check.md.
    - Domain files with scope fields that point to non-existent directories
    - Broken AGENTS.md pointers (Where to Look entries pointing to missing files)
    - Missing .agents/rules/ files for existing domain files
+   - Hook adapter staleness: if `hooks.integration` points to a tool, verify the adapter file exists and the plugin / hooks key still references the scripts in `.agents/hooks/` by absolute path
 3. Report full health analysis with actionable recommendations
 
 ---
@@ -1235,11 +1280,116 @@ The `.agents/rules/` directory is the canonical location. If the project also us
 
 ---
 
-## Hooks Integration (Optional)
+## Hook Integration Decision Point
 
-If the project uses a tool that supports lifecycle hooks (Claude Code, Cursor, OpenCode, Augment Code, Gemini CLI), hooks provide deterministic automation for knowledge capture and health monitoring.
+**This is not optional in the sense of "skip silently." Every Mode 1 / Mode 2 / Mode 2B run MUST surface this decision to the user — either by performing it during the run, or by recording an explicit declination. "Hook scripts on disk" and "hooks active" are different states; they must not be conflated.**
 
-### What Hooks Do
+### Why a decision point is needed
+
+The scaffold script (`init-scaffold.sh`) creates three POSIX shell scripts under `.agents/hooks/` (`session-end.sh`, `stop.sh`, `compact-recovery.sh`). These scripts are **inert until a tool adapter is wired**. An adapter is a tool-specific config file (e.g. `.opencode/opencode.json`, `.claude/settings.json`, `.cursor/hooks.json`, `.augment/settings.json`) that subscribes the tool's lifecycle events to the shell scripts.
+
+Without the adapter:
+
+- `session-end.sh` never fires when a session ends → no inbox capture marker → POST-TASK CHECKLIST relies entirely on model recall
+- `stop.sh` never fires when a task completes → no deterministic reminder when `inbox_count > 10` or `days_since_evolution > 14`
+- `compact-recovery.sh` never fires after context compaction → the model can drift away from AGENTS.md invariants without warning
+
+These are the failure modes the hook system was designed to prevent. Leaving the scripts unwired silently re-creates them.
+
+### What the agent MUST do
+
+After the scaffold step in any init mode, present this decision to the user with all four options enumerated:
+
+```
+Hook scripts are now on disk at .agents/hooks/. They will only fire if wired to your tool's
+lifecycle events. Pick one:
+
+  1. opencode      — copies your global ~/.config/opencode/opencode.json to
+                     .opencode/opencode.json (preserving providers / plugins / MCP servers)
+                     and registers .agents/hooks/opencode-plugin.mjs as a plugin. The native
+                     plugin maps session.idle → stop.sh, session.deleted → session-end.sh,
+                     experimental.session.compacting → compact-recovery.sh. Full coverage of
+                     all 3 lifecycle events. Global config is untouched.
+
+  2. claude-code   — merges a "hooks" key into .claude/settings.json that wires
+                     SessionEnd → session-end.sh and Stop → stop.sh. compact-recovery.sh
+                     is supported via SessionStart with the "compact" matcher. If
+                     .claude/settings.json already has a hooks key, the installer warns
+                     and leaves it untouched (manual merge required).
+
+  3. cursor        — copies a hooks.json adapter into .cursor/hooks.json. Same script
+                     wiring as Claude Code. If the file already exists and differs, the
+                     installer warns and skips.
+
+  4. augment-code  — merges a hooks key into .augment/settings.json. Same wiring shape
+                     as Claude Code.
+
+  5. custom        — leave hooks unwired; you will integrate them manually into another
+                     tool, OR you decline hooks for this project. The agent records the
+                     decision in .agents/knowledge/manifest.json under
+                     `hooks.integration: "declined" | "custom"` so a future evolve session
+                     does not re-prompt.
+
+Pick a number, or say "skip" to decide later (the prompt will re-appear next time you run
+init, evolve, or health check).
+```
+
+After the user chooses:
+
+- **Options 1-4**: run `sh "references/hooks/install-hooks.sh" --project-root "$PROJECT_ROOT" --tool {choice}`. The installer is idempotent — running it again is safe. After the install, **verify** by listing `.{tool}/...` adapter file presence and confirming the plugin reference is in place. If install fails, surface the error and offer the next option, do not fall through silently.
+- **Option 5 (custom)**: write to `manifest.json`:
+  ```json
+  "hooks": {
+    "integration": "custom",
+    "decided_at": "{ISO date}",
+    "note": "{user-supplied or 'manual integration; not using a bundled adapter'}"
+  }
+  ```
+  Or for explicit decline:
+  ```json
+  "hooks": {
+    "integration": "declined",
+    "decided_at": "{ISO date}",
+    "note": "{reason}"
+  }
+  ```
+- **"Skip"**: write `"hooks": { "integration": "deferred", "asked_at": "{ISO date}" }` to manifest. The next init/evolve/health-check session re-asks.
+
+### What "wired" actually verifies
+
+Hooks are verifiably wired when ALL of:
+
+1. The 3 hook scripts exist in `.agents/hooks/` and are executable (chmod +x).
+2. A tool-specific adapter file exists with a hook registration:
+   - opencode: `.opencode/opencode.json` `plugin` array contains `file://{absolute project root}/.agents/hooks/opencode-plugin.mjs`, AND `.agents/hooks/opencode-plugin.mjs` is present
+   - claude-code: `.claude/settings.json` has a top-level `hooks` key with `SessionEnd` / `Stop` entries pointing at the shell scripts
+   - cursor: `.cursor/hooks.json` exists with `SessionEnd` / `Stop` entries
+   - augment-code: `.augment/settings.json` has the equivalent `hooks` block
+3. Manifest `hooks.integration` is set to one of `opencode | claude-code | cursor | augment-code | custom | declined | deferred` so the decision is recorded.
+
+If 1 + 2 + 3 are all satisfied, hooks are wired. Anything less is "scripts on disk only" and must be reported as such.
+
+### Reporting in onboarding output
+
+Whether hooks are wired changes how every Mode reports completion. Reports MUST distinguish:
+
+- ✅ "Hooks active: opencode adapter wired, all 3 events bound"
+- ⚠️ "Hooks installed but not wired: 3 scripts on disk, no adapter detected. Decision: deferred — re-asks next session."
+- ❌ "Hooks declined: scripts present but adapter not requested. Manifest records `integration: declined`."
+
+Do NOT use the phrase "3 hooks installed" alone — it conflates the two states.
+
+### Hook Design Principles
+
+These properties are stable across all integration choices:
+
+- **Always exit 0** — hooks must never block tool operations
+- **Tool-agnostic scripts** — `session-end.sh`, `stop.sh`, and `compact-recovery.sh` are POSIX sh with no tool-specific code
+- **Adapter pattern** — Claude Code/Cursor/Augment use JSON configs; OpenCode uses a native ESM plugin that delegates to the same shell scripts
+- **Project-scoped** — hooks and adapter configs are installed per-project, never globally
+- **Forward-compatible** — AGENTS.md spec proposal #167 is standardizing lifecycle commands; this design aligns with the proposed `post-chat` event
+
+### What each hook does (reference)
 
 | Hook | Event | Action |
 |------|-------|--------|
@@ -1247,15 +1397,7 @@ If the project uses a tool that supports lifecycle hooks (Claude Code, Cursor, O
 | `stop.sh` | Agent completes task | Checks `manifest.json` for inbox pressure / evolution staleness, prints reminder to stderr |
 | `compact-recovery.sh` | Context compacted | Outputs re-read directive injected into agent context |
 
-### Setup
-
-The scaffold script (`init-scaffold.sh`) creates `.agents/hooks/` with all 3 hook scripts. To wire them into your tool:
-
-```sh
-sh "references/hooks/install-hooks.sh" --project-root "$PROJECT_ROOT"
-```
-
-The installer auto-detects your tool and installs the appropriate adapter. For OpenCode, it copies the global `opencode.json` to the project level before adding the plugin reference — this preserves existing provider, model, and plugin configuration. Supported tools:
+### Adapter quick reference
 
 | Tool | Config Location | Integration |
 |------|----------------|-------------|
@@ -1265,14 +1407,6 @@ The installer auto-detects your tool and installs the appropriate adapter. For O
 | Augment Code | `.augment/settings.json` | JSON adapter merged into settings |
 
 **OpenCode note**: The installer copies the global `opencode.json` to the project before adding the plugin, because project-level config overrides global config entirely. Without this step, existing provider and plugin configurations would be lost.
-
-### Hook Design Principles
-
-- **Always exit 0** — hooks must never block tool operations
-- **Tool-agnostic scripts** — `session-end.sh`, `stop.sh`, and `compact-recovery.sh` are POSIX sh with no tool-specific code
-- **Adapter pattern** — Claude Code/Cursor/Augment use JSON configs; OpenCode uses a native ESM plugin that delegates to the same shell scripts
-- **Project-scoped** — hooks and adapter configs are installed per-project, never globally
-- **Forward-compatible** — AGENTS.md spec proposal #167 is standardizing lifecycle commands; this design aligns with the proposed `post-chat` event
 
 ---
 

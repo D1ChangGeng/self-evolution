@@ -96,11 +96,13 @@ If a dimension's `last_reviewed` exceeds 60 days AND you have reason to believe 
 
 ### 8. Hooks & Deterministic Automation
 
-**Current choice**: POSIX sh hook scripts in `.agents/hooks/`, wired via adapter JSON configs. Supports Claude Code, Cursor, OpenCode, Augment Code.
+**Current choice**: POSIX sh hook scripts in `.agents/hooks/`, wired via adapter JSON configs (Claude Code / Cursor / Augment) or a native ESM plugin (OpenCode). **Integration is opt-in but explicitly prompted**: every Mode 1 / Mode 2 / Mode 2B run executes the Hook Integration Decision Point, presenting opencode / claude-code / cursor / augment-code / custom as the user's choices, and records the result in `manifest.json` `hooks.integration`. "Hooks installed" (scripts on disk) and "hooks active" (adapter wired) are reported as distinct states. Mode 4 / Mode 5 re-prompt only when `hooks.integration` is `deferred` or missing.
 
-**Change trigger**: AGENTS.md spec standardizes lifecycle commands, OR hook event support converges into a single universal format.
+**Change trigger**: AGENTS.md spec standardizes lifecycle commands, OR hook event support converges into a single universal format, OR the decision-point UX needs revision based on user observations (e.g., users repeatedly choose `custom` because the bundled adapters miss a tool that should be supported).
 
-**Deep reference**: [hooks/README.md](references/hooks/README.md)
+**Deep reference**: [hooks/README.md](references/hooks/README.md) + `## Hook Integration Decision Point` section in `SKILL.md`
+
+**Last reviewed**: 2026-05-07 — added explicit decision point and `manifest.json` `hooks.integration` schema after observing that "hooks installed but unwired" was being reported to users as if hooks were active.
 
 ---
 
@@ -128,3 +130,11 @@ When any of these files change, the relevant dimension in `references/EVOLUTION-
 | `references/philosophy.md` | §1, §2, §3 (whichever applies) |
 | `references/lifecycle.md` | §6 Lifecycle |
 | `references/health-check.md` | §7 Health & Review Cadence |
+
+## Known Improvement Backlog
+
+- **2026-05-07** — Decision-point pattern (added in this revision for hook integration) currently exists only for one decision. If a future review finds 2+ other decisions being silently skipped (e.g., skill installation choice during Mode 6, or design-token migration during AGENTS.md restructure), generalize the pattern into a reusable "Decision Point" mechanism in SKILL.md instead of duplicating the prose. Trigger: 2+ independent observations.
+
+## Review Log
+
+- **2026-05-07** — Added explicit Hook Integration Decision Point to SKILL.md (Mode 1 / Mode 2 / Mode 2B step lists, Mode 4 / Mode 5 re-prompt logic). Added `hooks` object to manifest schema. Updated §8 of this spec. Triggered by inbox `[SKILL-IDEA:self-evolution]` entry from a deep-init session where `onboarding-report.md` reported "3 hooks" as if active when only the shell scripts were on disk; the user had to ask whether hooks needed initialization. The fix splits "scripts on disk" from "wired to tool" as separate completion criteria, lets the user explicitly choose among opencode / claude-code / cursor / augment-code / custom, and records the choice in `manifest.json` so re-prompts are deterministic.

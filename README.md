@@ -119,7 +119,8 @@ your-project/
 - 3 lifecycle hooks: `session-end.sh`, `stop.sh`, and `compact-recovery.sh`.
 - `compact-recovery.sh` provides a post-compaction re-read directive so the agent reloads project routing after context compression.
 - `init-scaffold.sh` copies hook scripts from `references/hooks/` instead of embedding them, ensuring hooks stay in sync with the skill package.
-- 4 tool integration layers: JSON adapters for Claude Code, Cursor, and Augment, native ESM plugin for OpenCode.
+- **Hook integration is an explicit decision, not a silent default.** Every Mode 1 / Mode 2 / Mode 2B run executes the Hook Integration Decision Point and asks you to pick among opencode / claude-code / cursor / augment-code / custom. The choice is recorded in `manifest.json` `hooks.integration` so it never re-prompts unless you defer or the adapter goes stale. "Hook scripts on disk" and "hooks active" are reported as distinct states.
+- 4 tool integration layers: JSON adapters for Claude Code, Cursor, and Augment, native ESM plugin for OpenCode. Or pick `custom` to integrate manually.
 - 3 POSIX scripts: `init-scaffold.sh`, `scan-project.sh`, and `audit-agents.sh`.
 - EVOLUTION-SPEC uses a dual-file architecture: a 130-line root template for distribution and a 228-line `references/` runtime version that is user-local and gitignored when installed into projects.
 
