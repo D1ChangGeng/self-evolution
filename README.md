@@ -21,13 +21,13 @@ The current skill has a 1360-line `SKILL.md` with 7 explicit modes plus 1 ambien
 Install the skill:
 
 ```bash
-npx skills add D1ChangGeng/self-evolution-skill --skill self-evolution -g -y
+npx skills add D1ChangGeng/self-evolution --skill self-evolution -g -y
 ```
 
 Update an existing installation to the latest version:
 
 ```bash
-npx skills add D1ChangGeng/self-evolution-skill --skill self-evolution -g -y
+npx skills add D1ChangGeng/self-evolution --skill self-evolution -g -y
 ```
 
 The install command is also the update command — it overwrites the skill files with the latest version. Project knowledge under `.agents/knowledge/` is never affected because the skill and project data live in separate directories.
@@ -131,11 +131,11 @@ your-project/
 | [Architecture](docs/ARCHITECTURE.md) | Skill structure, data flow, lifecycle, and extension points. |
 | [Usage Guide](docs/USAGE-GUIDE.md) | Mode-by-mode usage and examples. |
 | [Hooks Guide](docs/HOOKS-GUIDE.md) | Hook installation, adapters, and automation behavior. |
-| [Philosophy](references/philosophy.md) | The three gaps, failure modes, and design rationale. |
-| [Lifecycle](references/lifecycle.md) | Capture, organize, verify, promote, compress, and retire flow. |
-| [Health Check](references/health-check.md) | Knowledge base metrics and scoring. |
-| [Evolution Spec](EVOLUTION-SPEC.md) | Distributable 9-dimension template. |
-| [Runtime Evolution Spec](references/EVOLUTION-SPEC.md) | Runtime 9-dimension spec used during skill operation. |
+| [Philosophy](skills/self-evolution/references/philosophy.md) | The three gaps, failure modes, and design rationale. |
+| [Lifecycle](skills/self-evolution/references/lifecycle.md) | Capture, organize, verify, promote, compress, and retire flow. |
+| [Health Check](skills/self-evolution/references/health-check.md) | Knowledge base metrics and scoring. |
+| [Evolution Spec](skills/self-evolution/EVOLUTION-SPEC.md) | Distributable 9-dimension template. |
+| [Runtime Evolution Spec](skills/self-evolution/references/EVOLUTION-SPEC.md) | Runtime 9-dimension spec used during skill operation. |
 
 ## Skill File Reference
 

@@ -12,5 +12,5 @@ Thumbs.db
 # Test artifacts
 /tmp/
 
-# User-local evolution state (created from root EVOLUTION-SPEC.md template on first use)
-references/EVOLUTION-SPEC.md
+# User-local evolution state (created from the skill's EVOLUTION-SPEC.md template on first use)
+skills/self-evolution/references/EVOLUTION-SPEC.md
