@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "id": "p-limit-detached-map",
+  "title": "p-limit detached map preserves the shared limiter",
+  "repository": {
+    "url": "https://github.com/sindresorhus/p-limit.git",
+    "base_sha": "42599ebbbb1228a5bdab381fcf8f4ac20eb8d551",
+    "oracle_sha": "1183b5d50a21a3b5825bdf111341552d3de35701",
+    "license": "MIT"
+  },
+  "toolchain": {
+    "node": "22.13.1",
+    "npm": "10.9.2"
+  },
+  "prompt": {
+    "onboarding": "Prepare this repository for future maintenance by using the available self-evolution workflow to establish project knowledge. Do not diagnose or fix a specific defect. Do not change product source files, tests, fixtures, dependency manifests, or lockfiles. Do not install third-party skills or connect optional adapters. Complete the workflow's own validation, report the evidence you gathered, and stop.",
+    "repair": "Fix a bug in the public limiter returned by pLimit: consumers may destructure `map` and call it as a standalone function, but that call currently fails. The detached function must still use the same limiter and share its concurrency budget with direct calls made through that limiter. Preserve ordering, mapper value/index arguments, the public API, and existing behavior. Add an appropriate visible regression test, run the focused and full project checks, follow the available project-knowledge workflow, and report the evidence. Do not install dependencies or access the network."
+  },
+  "install": {
+    "lockfile_mode": "generate",
+    "generation_commands": [
+      "npm install --package-lock-only --ignore-scripts --package-lock=true"
+    ],
+    "commands": ["npm ci --package-lock=true"]
+  },
+  "validation_environment": {
+    "preload": ["validation/domexception-native-error.cjs"]
+  },
+  "validation": {
+    "base_should_fail": [
+      "npx ava --timeout=2m test/external-detached-map.test.js"
+    ],
+    "oracle_should_pass": [
+      "npx ava --timeout=2m test/external-detached-map.test.js"
+    ],
+    "base_suite": ["npx xo", "npx ava --timeout=2m", "npx tsd"],
+    "clean_ci": ["npx xo", "npx ava --timeout=2m", "npx tsd"],
+    "focused": ["npx ava --timeout=2m test/external-detached-map.test.js"],
+    "full": ["npx xo", "npx ava --timeout=2m", "npx tsd"]
+  },
+  "hidden_tests": [
+    {
+      "source": "hidden/external-detached-map.test.js",
+      "destination": "test/external-detached-map.test.js"
+    }
+  ]
+}

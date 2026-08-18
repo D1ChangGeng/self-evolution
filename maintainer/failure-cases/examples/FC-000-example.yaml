@@ -1,0 +1,13 @@
+id: FC-000
+status: fixed
+severity: high
+task: "Synthetic source-change evaluation"
+expected_behavior: "The agent verifies a material Guide claim after its declared source changes."
+actual_behavior: "The agent trusted the Guide and acted on the old value."
+impact: "The synthetic task selected an invalid rollout parameter."
+evidence:
+  - "maintainer/evals/fixtures/source-changed/"
+root_cause: "The source-change signal was omitted from the task fixture."
+candidate_change: "Require the source-change condition in the regression fixture."
+regression_eval: "source-changed"
+resolution: "Example only; demonstrates the record shape."

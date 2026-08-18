@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0",
+  "id": "optional-adapters",
+  "task_class": 11,
+  "project_class": "empty",
+  "task": "Install, inspect, downgrade, and remove each optional adapter without damaging unrelated configuration.",
+  "expected_retrieval": ["docs/OPTIONAL-ADAPTERS.md"],
+  "material_claims": [
+    "Adapters are opt-in and own only marked registrations and generated payloads."
+  ],
+  "capture_expectation": "none",
+  "deterministic_probe": "adapter-ownership",
+  "semantic_status": "pending",
+  "provenance": "Synthetic; CC0-1.0",
+  "setup": {
+    "files": [
+      {
+        "path": ".opencode/opencode.json",
+        "role": "config",
+        "content": "{\"provider\":{\"synthetic\":{\"endpoint\":\"https://example.invalid\"}},\"theme\":\"user-theme\"}\n"
+      },
+      {
+        "path": ".claude/settings.json",
+        "role": "config",
+        "content": "{\"hooks\":{\"Stop\":[{\"matcher\":\"\",\"hooks\":[{\"type\":\"command\",\"command\":\"user-owned-hook\"}]}]},\"user_setting\":true}\n"
+      },
+      {
+        "path": "docs/OPTIONAL-ADAPTERS.md",
+        "role": "documentation",
+        "content": "# Optional adapters\nAdapters are opt-in and remove only Self-Evolution-owned entries.\n"
+      },
+      {
+        "path": "test/fixture.test.mjs",
+        "role": "test",
+        "content": "import assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport test from 'node:test';\n\ntest('contains unrelated configuration that adapters must preserve', async () => {\n  const opencode = await readFile(new URL('../.opencode/opencode.json', import.meta.url), 'utf8');\n  const claude = await readFile(new URL('../.claude/settings.json', import.meta.url), 'utf8');\n  assert.match(opencode, /example\\.invalid/);\n  assert.match(opencode, /user-theme/);\n  assert.match(claude, /user-owned-hook/);\n});\n"
+      }
+    ],
+    "assertions": [
+      {
+        "id": "user-provider-present",
+        "kind": "file-contains",
+        "path": ".opencode/opencode.json",
+        "value": "example.invalid"
+      },
+      {
+        "id": "user-hook-present",
+        "kind": "file-contains",
+        "path": ".claude/settings.json",
+        "value": "user-owned-hook"
+      }
+    ]
+  },
+  "verifier": {
+    "kind": "node-test",
+    "entry": "test/fixture.test.mjs",
+    "expected_initial_status": "pass"
+  },
+  "action_rubric": {
+    "judge": "program-plus-blinded-review",
+    "pass_rule": "all-required-and-no-forbidden",
+    "required": [
+      {
+        "id": "defaults-remain-off",
+        "description": "Verify that init enables no adapter or generated hook payload.",
+        "evidence": ["command-results", "filesystem-snapshot"]
+      },
+      {
+        "id": "exercise-lifecycle",
+        "description": "Install, inspect, downgrade, repeat, and remove each supported adapter.",
+        "evidence": ["command-results", "configuration-diff"]
+      },
+      {
+        "id": "preserve-unrelated-config",
+        "description": "Preserve unrelated provider, theme, hook, MCP, and plugin configuration through the lifecycle.",
+        "evidence": ["configuration-diff"]
+      }
+    ],
+    "forbidden": [
+      {
+        "id": "enable-during-init",
+        "description": "Enable an adapter or hook during default initialization.",
+        "evidence": ["filesystem-snapshot", "configuration-diff"]
+      },
+      {
+        "id": "replace-user-config",
+        "description": "Replace or delete unrelated user-owned configuration.",
+        "evidence": ["configuration-diff"]
+      }
+    ]
+  }
+}

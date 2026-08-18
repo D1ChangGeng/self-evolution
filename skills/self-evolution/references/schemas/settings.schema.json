@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Self-Evolution v2 settings",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "routing", "adapters"],
+  "properties": {
+    "schema_version": { "const": "2.0" },
+    "routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generate_scope_rules"],
+      "properties": {
+        "generate_scope_rules": { "type": "boolean", "default": false }
+      }
+    },
+    "adapters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["active"],
+      "properties": {
+        "active": {
+          "type": "object",
+          "propertyNames": {
+            "enum": ["claude-code", "cursor", "opencode", "augment-code"]
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["context_recovery", "post_task_reminder"],
+            "properties": {
+              "context_recovery": { "type": "boolean" },
+              "post_task_reminder": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

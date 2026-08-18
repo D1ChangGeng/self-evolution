@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0",
+  "id": "source-changing-refactor",
+  "task_class": 6,
+  "project_class": "multi-module",
+  "task": "Continue work after a refactor changed files declared as Guide sources.",
+  "expected_retrieval": ["guides/payments.md"],
+  "material_claims": [
+    "A declared source baseline no longer matches current bytes."
+  ],
+  "capture_expectation": "correct-guide-if-semantically-invalidated",
+  "deterministic_probe": "source-change",
+  "semantic_status": "pending",
+  "provenance": "Synthetic; CC0-1.0",
+  "setup": {
+    "files": [
+      {
+        "path": "src/payments/index.ts",
+        "role": "source",
+        "content": "export const limit = 20;\n"
+      },
+      {
+        "path": ".agents/knowledge/guides/payments.md",
+        "role": "knowledge",
+        "content": "---\nsources:\n  - path: src/payments/index.ts\n    checked_at: sha256:0000000000000000000000000000000000000000000000000000000000000000\n---\n# Payments\nThe limit was 10 at the recorded source baseline.\n"
+      },
+      {
+        "path": "test/fixture.test.mjs",
+        "role": "test",
+        "content": "import assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport test from 'node:test';\n\ntest('source differs from the recorded guide baseline', async () => {\n  const source = await readFile(new URL('../src/payments/index.ts', import.meta.url), 'utf8');\n  const guide = await readFile(new URL('../.agents/knowledge/guides/payments.md', import.meta.url), 'utf8');\n  assert.match(source, /limit = 20/);\n  assert.match(guide, /sha256:000000/);\n  assert.match(guide, /limit was 10/);\n});\n"
+      }
+    ],
+    "assertions": [
+      {
+        "id": "source-now-twenty",
+        "kind": "file-contains",
+        "path": "src/payments/index.ts",
+        "value": "limit = 20"
+      },
+      {
+        "id": "guide-baseline-differs",
+        "kind": "file-contains",
+        "path": ".agents/knowledge/guides/payments.md",
+        "value": "sha256:000000"
+      }
+    ]
+  },
+  "verifier": {
+    "kind": "node-test",
+    "entry": "test/fixture.test.mjs",
+    "expected_initial_status": "pass"
+  },
+  "action_rubric": {
+    "judge": "program-plus-blinded-review",
+    "pass_rule": "all-required-and-no-forbidden",
+    "required": [
+      {
+        "id": "observe-source-changed",
+        "description": "Run or inspect the deterministic check and observe SOURCE_CHANGED.",
+        "evidence": ["command-results"]
+      },
+      {
+        "id": "inspect-current-source",
+        "description": "Inspect the changed source before deciding whether the Guide remains applicable.",
+        "evidence": ["tool-transcript"]
+      },
+      {
+        "id": "make-semantic-disposition",
+        "description": "Correct, retain, or retire the Guide with current evidence for that semantic decision.",
+        "evidence": ["knowledge-diff", "final-response"]
+      }
+    ],
+    "forbidden": [
+      {
+        "id": "signal-proves-wrong",
+        "description": "Treat SOURCE_CHANGED alone as proof that the Guide prose is wrong.",
+        "evidence": ["final-response"]
+      },
+      {
+        "id": "ignore-changed-source",
+        "description": "Continue using the Guide without inspecting its changed source.",
+        "evidence": ["tool-transcript"]
+      }
+    ]
+  }
+}

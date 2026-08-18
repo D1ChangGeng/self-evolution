@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Self-Evolution"
+  short_description: "Build and maintain lean project knowledge"
+  default_prompt: "Use $self-evolution to set up or improve this project's durable knowledge and retrieval routes."

@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "id": "uncovered-scope",
+  "task_class": 8,
+  "project_class": "multi-module",
+  "task": "Work in a new module with no matching knowledge document.",
+  "expected_retrieval": ["AGENTS.md", "current code and tests"],
+  "material_claims": ["No matching Guide is itself a valid retrieval outcome."],
+  "capture_expectation": "conditional",
+  "deterministic_probe": "fixture-contract",
+  "semantic_status": "pending",
+  "provenance": "Synthetic; CC0-1.0",
+  "setup": {
+    "files": [
+      {
+        "path": "AGENTS.md",
+        "role": "agents",
+        "content": "# Project instructions\nUse matching Guides when present; otherwise inspect current code and tests.\n"
+      },
+      {
+        "path": "src/telemetry/counter.ts",
+        "role": "source",
+        "content": "export const increment = (value) => value + 1;\n"
+      },
+      {
+        "path": "test/telemetry.test.ts",
+        "role": "test",
+        "content": "import assert from 'node:assert/strict';\nimport test from 'node:test';\nimport { increment } from '../src/telemetry/counter.ts';\n\ntest('increments', () => assert.equal(increment(1), 2));\n"
+      },
+      {
+        "path": ".agents/knowledge/guides/payments.md",
+        "role": "knowledge",
+        "content": "# Payments\nOnly applies to src/payments/**.\n"
+      }
+    ],
+    "assertions": [
+      {
+        "id": "telemetry-source-exists",
+        "kind": "file-exists",
+        "path": "src/telemetry/counter.ts"
+      },
+      {
+        "id": "telemetry-guide-absent",
+        "kind": "file-absent",
+        "path": ".agents/knowledge/guides/telemetry.md"
+      }
+    ]
+  },
+  "verifier": {
+    "kind": "node-test",
+    "entry": "test/telemetry.test.ts",
+    "expected_initial_status": "pass"
+  },
+  "action_rubric": {
+    "judge": "blinded-review",
+    "pass_rule": "all-required-and-no-forbidden",
+    "required": [
+      {
+        "id": "report-no-match",
+        "description": "Treat no matching Guide as a valid retrieval outcome.",
+        "evidence": ["retrieval-log", "final-response"]
+      },
+      {
+        "id": "use-repository-evidence",
+        "description": "Base the work on current telemetry code and tests.",
+        "evidence": ["tool-transcript", "test-results"]
+      },
+      {
+        "id": "capture-only-if-durable",
+        "description": "Leave knowledge unchanged unless the investigation uncovers future action value.",
+        "evidence": ["knowledge-diff", "final-response"]
+      }
+    ],
+    "forbidden": [
+      {
+        "id": "missing-guide-health-failure",
+        "description": "Report missing scope coverage as a deterministic health failure.",
+        "evidence": ["command-results", "final-response"]
+      },
+      {
+        "id": "boilerplate-guide",
+        "description": "Create a telemetry Guide merely to fill directory coverage.",
+        "evidence": ["knowledge-diff"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "id": "qs-surrogate-boundary",
+  "title": "qs encoder preserves surrogate pairs at chunk boundaries",
+  "repository": {
+    "url": "https://github.com/ljharb/qs.git",
+    "base_sha": "9532969635a4bc96506370b28dd28dcab446e7ee",
+    "oracle_sha": "59da434d5de8c3d2564e4d75aeedde2e8af72369",
+    "license": "BSD-3-Clause"
+  },
+  "toolchain": {
+    "node": "22.13.1",
+    "npm": "10.9.2"
+  },
+  "prompt": {
+    "onboarding": "Prepare this repository for future maintenance by using the available self-evolution workflow to establish project knowledge. Do not diagnose or fix a specific defect. Do not change product source files, tests, fixtures, dependency manifests, lockfiles, or generated distribution files. Do not install third-party skills or connect optional adapters. Complete the workflow's own validation, report the evidence you gathered, and stop.",
+    "repair": "Fix the UTF-8 query-string encoder so its long-string chunking never splits a valid UTF-16 surrogate pair at a 1024-code-unit boundary. The defect occurs at the first and later chunk boundaries and may occur more than once in a string. Preserve the encoder's historical handling of lone surrogates and all existing formats and charsets. Add an appropriate visible regression test, run the focused test and the complete project checks, follow the available project-knowledge workflow, and report the evidence. Do not install dependencies or access the network."
+  },
+  "install": {
+    "lockfile_mode": "generate",
+    "generation_commands": [
+      "npm install --package-lock-only --ignore-scripts --package-lock=true"
+    ],
+    "commands": ["npm ci --ignore-scripts --package-lock=true"]
+  },
+  "validation": {
+    "base_should_fail": ["npx tape test/external-surrogate-boundary.test.js"],
+    "oracle_should_pass": ["npx tape test/external-surrogate-boundary.test.js"],
+    "base_suite": [
+      "npm run tests-only",
+      "npm run lint",
+      "npx eclint check lib test"
+    ],
+    "clean_ci": [
+      "npm run tests-only",
+      "npm run lint",
+      "npx eclint check lib test"
+    ],
+    "focused": ["npx tape test/external-surrogate-boundary.test.js"],
+    "full": ["npm run tests-only", "npm run lint", "npx eclint check lib test"]
+  },
+  "hidden_tests": [
+    {
+      "source": "hidden/external-surrogate-boundary.test.js",
+      "destination": "test/external-surrogate-boundary.test.js"
+    }
+  ]
+}

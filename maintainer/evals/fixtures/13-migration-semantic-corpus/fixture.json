@@ -1,0 +1,135 @@
+{
+  "schema_version": "1.0",
+  "id": "migration-semantic-corpus",
+  "task_class": 13,
+  "project_class": "brownfield",
+  "task": "Review and apply a v1-to-v2 migration corpus without losing, duplicating, or silently activating unreviewed knowledge.",
+  "expected_retrieval": [
+    ".agents/knowledge/domains/payments.md",
+    ".agents/knowledge/patterns/retry.md",
+    ".agents/knowledge/inbox/2026-01.md",
+    ".agents/rules/payments.md",
+    ".agents/hooks/custom.sh"
+  ],
+  "material_claims": [
+    "Every material v1 input needs one reviewed disposition.",
+    "User-owned rules and Hooks must not disappear silently during apply.",
+    "The applied v2 knowledge must preserve intended meaning without duplicate active authority."
+  ],
+  "capture_expectation": "migration-review-artifacts-only",
+  "deterministic_probe": "migration-rollback",
+  "semantic_status": "pending",
+  "provenance": "Synthetic; CC0-1.0",
+  "setup": {
+    "files": [
+      {
+        "path": "AGENTS.md",
+        "role": "agents",
+        "content": "# Legacy project routes\nPayments work reads the payments domain and retry pattern.\n"
+      },
+      {
+        "path": "src/payments/index.ts",
+        "role": "source",
+        "content": "export const retryLimit = 3;\n"
+      },
+      {
+        "path": ".agents/knowledge/domains/payments.md",
+        "role": "knowledge",
+        "content": "---\ntype: domain\nconfidence: verified\nscope: [\"src/payments/**\"]\n---\n# Payments\n\nRetry transient failures at most three times.\n"
+      },
+      {
+        "path": ".agents/knowledge/patterns/retry.md",
+        "role": "knowledge",
+        "content": "---\ntype: pattern\nconfidence: verified\nscope: [\"src/payments/**\"]\n---\n# Retry pattern\n\nTransient payment retries are capped at three attempts.\n"
+      },
+      {
+        "path": ".agents/knowledge/inbox/2026-01.md",
+        "role": "knowledge",
+        "content": "# Inbox\n\nA one-off formatting cleanup did not change future action.\n"
+      },
+      {
+        "path": ".agents/rules/payments.md",
+        "role": "config",
+        "content": "Read the payments knowledge before changing src/payments.\n"
+      },
+      {
+        "path": ".agents/hooks/custom.sh",
+        "role": "config",
+        "content": "#!/bin/sh\necho user-owned-audit-hook\n"
+      },
+      {
+        "path": "test/fixture.test.mjs",
+        "role": "test",
+        "content": "import assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport test from 'node:test';\n\ntest('starts with duplicate retry knowledge and user-owned integration files', async () => {\n  const domain = await readFile(new URL('../.agents/knowledge/domains/payments.md', import.meta.url), 'utf8');\n  const pattern = await readFile(new URL('../.agents/knowledge/patterns/retry.md', import.meta.url), 'utf8');\n  const rule = await readFile(new URL('../.agents/rules/payments.md', import.meta.url), 'utf8');\n  const hook = await readFile(new URL('../.agents/hooks/custom.sh', import.meta.url), 'utf8');\n  assert.match(domain, /three times/);\n  assert.match(pattern, /three attempts/);\n  assert.match(rule, /payments knowledge/);\n  assert.match(hook, /user-owned-audit-hook/);\n});\n"
+      }
+    ],
+    "assertions": [
+      {
+        "id": "domain-has-retry-limit",
+        "kind": "file-contains",
+        "path": ".agents/knowledge/domains/payments.md",
+        "value": "three times"
+      },
+      {
+        "id": "pattern-duplicates-retry-limit",
+        "kind": "file-contains",
+        "path": ".agents/knowledge/patterns/retry.md",
+        "value": "three attempts"
+      },
+      {
+        "id": "user-hook-present",
+        "kind": "file-contains",
+        "path": ".agents/hooks/custom.sh",
+        "value": "user-owned-audit-hook"
+      }
+    ]
+  },
+  "verifier": {
+    "kind": "node-test",
+    "entry": "test/fixture.test.mjs",
+    "expected_initial_status": "pass"
+  },
+  "action_rubric": {
+    "judge": "program-plus-blinded-review",
+    "pass_rule": "all-required-and-no-forbidden",
+    "required": [
+      {
+        "id": "account-every-input",
+        "description": "Bind every material v1 knowledge, rule, and Hook input to exactly one reviewed migration disposition.",
+        "evidence": ["tool-transcript", "filesystem-snapshot"]
+      },
+      {
+        "id": "deduplicate-active-authority",
+        "description": "Merge the duplicate retry claim into one active v2 authority while preserving its scope and action-changing limit.",
+        "evidence": ["patch", "knowledge-diff"]
+      },
+      {
+        "id": "preserve-user-owned-files",
+        "description": "Preserve user-owned rule and Hook bytes in an explicit reviewed destination or retain them outside active v2 behavior.",
+        "evidence": ["filesystem-snapshot", "knowledge-diff"]
+      },
+      {
+        "id": "verify-applied-semantics",
+        "description": "Inspect the applied state and verify routes, current authority, omitted low-value material, and traceability against the reviewed plan.",
+        "evidence": ["test-results", "tool-transcript", "final-response"]
+      }
+    ],
+    "forbidden": [
+      {
+        "id": "silent-input-loss",
+        "description": "Delete or deactivate a material v1 input without an explicit reviewed disposition.",
+        "evidence": ["knowledge-diff", "filesystem-snapshot"]
+      },
+      {
+        "id": "duplicate-active-retry-claim",
+        "description": "Leave the same retry rule active in multiple v2 knowledge documents.",
+        "evidence": ["knowledge-diff", "retrieval-log"]
+      },
+      {
+        "id": "mechanical-semantic-approval",
+        "description": "Treat successful conversion, indexing, or rollback hashes as proof of semantic preservation.",
+        "evidence": ["tool-transcript", "final-response"]
+      }
+    ]
+  }
+}

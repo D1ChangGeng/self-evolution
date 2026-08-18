@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Self-Evolution v2 Guide frontmatter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "status", "scope", "use_when"],
+  "properties": {
+    "kind": { "enum": ["guide", "runbook", "map", "policy"] },
+    "status": { "enum": ["draft", "active", "superseded", "retired"] },
+    "scope": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/projectPath" }
+    },
+    "use_when": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "review_when": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/source" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": ".*\\S.*"
+    },
+    "projectPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "checked_at"],
+      "properties": {
+        "path": { "$ref": "#/$defs/projectPath" },
+        "checked_at": {
+          "type": "string",
+          "pattern": "^(git:[0-9A-Fa-f]{7,64}|sha256:[0-9a-f]{64})$"
+        }
+      }
+    }
+  }
+}

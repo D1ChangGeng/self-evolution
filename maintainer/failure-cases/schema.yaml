@@ -1,0 +1,47 @@
+schema_version: "1.0"
+required:
+  - id
+  - status
+  - severity
+  - task
+  - expected_behavior
+  - actual_behavior
+  - impact
+  - evidence
+  - root_cause
+  - candidate_change
+properties:
+  id:
+    type: string
+    pattern: "^FC-[0-9]{3,}$"
+  status:
+    enum: [open, accepted, rejected, fixed]
+  severity:
+    enum: [critical, high, medium, low]
+  task:
+    type: string
+    min_length: 1
+  expected_behavior:
+    type: string
+    min_length: 1
+  actual_behavior:
+    type: string
+    min_length: 1
+  impact:
+    type: string
+    min_length: 1
+  evidence:
+    type: array
+    min_items: 1
+    items:
+      type: string
+  root_cause:
+    type: string
+    description: Use "unknown" until evidence supports a cause.
+  candidate_change:
+    type: string
+    description: Use "none" when the case does not yet justify a mechanism.
+  regression_eval:
+    type: [string, "null"]
+  resolution:
+    type: [string, "null"]

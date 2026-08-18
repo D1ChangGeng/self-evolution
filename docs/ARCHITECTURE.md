@@ -1,358 +1,257 @@
 # Architecture
 
-## 1. Current Shape
+## Product Boundary
 
-Self-Evolution is a four-layer system for project memory, task guidance, skill maintenance, and project-specific adaptation. It stores what is true about a project, discovers best-practice skills when work requires them, records improvements to itself, and allows local overrides after review.
+Self-Evolution v2 is a project context system with three separate surfaces:
 
-This file is factual. Design rationale belongs in `references/philosophy.md`.
-
-## 2. Four-Layer Model
-
-```text
-+------------------------------------------------------------------+
-| Layer 4: Project Specialization                                  |
-| SKILL-LOCAL.md overlay -> candidate -> active override            |
-| "How this system adapts to specific project types"               |
-+------------------------------------------------------------------+
-                               ^
-+------------------------------------------------------------------+
-| Layer 3: Self-Improvement                                        |
-| Mode 7 -> [SKILL-FIX]/[SKILL-IDEA]/[SKILL-COMPAT] -> Radar        |
-| "How this system improves itself"                                |
-+------------------------------------------------------------------+
-                               ^
-+------------------------------------------------------------------+
-| Layer 2: Task Execution Wisdom                                   |
-| find-skills -> detected technologies -> skills.pending_review     |
-| "What best practices exist for this type of work"                |
-+------------------------------------------------------------------+
-                               ^
-+------------------------------------------------------------------+
-| Layer 1: Project Knowledge                                       |
-| AGENTS.md -> domains/ -> inbox/ -> patterns/                     |
-| "What is true about this project"                                |
-+------------------------------------------------------------------+
-```
-
-| Layer | Main artifacts | Main output |
+| Surface | Owns | Does not own |
 |---|---|---|
-| 1. Project Knowledge | `AGENTS.md`, `domains/`, `inbox/`, `patterns/` | Project facts and decisions |
-| 2. Task Execution Wisdom | `find-skills`, scan output, `skills.pending_review` | Skill suggestions for current work |
-| 3. Self-Improvement | Mode 7, skill tags, Capability Radar | Repairs and future skill work |
-| 4. Project Specialization | `SKILL-LOCAL.md`, candidates, active overrides | Reviewed local behavior changes |
+| Project Knowledge Core | Durable project knowledge and retrieval | Task state, skill discovery, global settings |
+| Optional Tool Integration | Explicit reminders and generated routing | Knowledge content or semantic judgment |
+| Maintainer System | Failure cases, proposals, evaluations, releases | User-project runtime behavior |
 
-## 3. Layer 1: Project Knowledge
+The separation prevents a project knowledge system from becoming a control
+plane for the entire agent environment.
 
-Layer 1 stores project-specific truth.
-
-```text
-AGENTS.md
-  -> domains/
-  -> inbox/
-  -> patterns/
-```
-
-| Artifact | Role | Confidence posture |
-|---|---|---|
-| `AGENTS.md` | Thin router, project identity, high-value invariants | Canonical summaries |
-| `domains/` | Organized knowledge by subsystem or work area | Observed or verified |
-| `inbox/` | Raw captures, corrections, incidents, reminders | Observed |
-| `patterns/` | Repeated conventions after evidence accumulates | Verified |
-| `reference/` | Stable maps, inventories, route lists | Verified preferred |
-| `decisions/` | Choices that constrain future work | Verified or canonical |
-| `crystallized/` | Repeatable workflows | Verified |
-| `archive/` | Retired or superseded material | Historical |
-
-Layer 1 doesn't store generic framework practice. That belongs to Layer 2.
-
-## 4. Layer 2: Task Execution Wisdom
-
-Layer 2 discovers best-practice skills for the current task and detected technologies.
+## Runtime Layers
 
 ```text
-scan-project.sh
-  -> detected technologies
-  -> find-skills
-  -> manifest.json skills.pending_review
-  -> user confirmation at boundary
++----------------------------------------------------------+
+| Model: relevance, value, applicability, conflict, action |
++----------------------------------------------------------+
+                            ^
++----------------------------------------------------------+
+| Reality: code, tests, config, runtime, docs, decisions   |
++----------------------------------------------------------+
+                            ^
++----------------------------------------------------------+
+| Knowledge: Guides, Decisions, Observations               |
++----------------------------------------------------------+
+                            ^
++----------------------------------------------------------+
+| Retrieval: AGENTS.md, scope, use_when, index.yaml        |
++----------------------------------------------------------+
+                            ^
++----------------------------------------------------------+
+| CLI: schema, paths, links, source signals, atomic writes |
++----------------------------------------------------------+
 ```
 
-Only two skills are referenced by name.
+The arrows are evidence flow, not authority inheritance. A generated index can
+prove that a file was parsed; it cannot prove the document should guide a
+decision. Code can show implemented behavior; it may not prove deployed state
+or business intent. The model selects evidence appropriate to the risk.
 
-| Skill | Role |
-|---|---|
-| `find-skills` | Runtime discovery of task-specific skills |
-| `skill-creator` | Creation or improvement of skills after repeated workflow evidence |
-
-All other skill lookup is delegated to `find-skills`. The manifest key `skills.pending_review` is a write-ahead queue for suggestions that need user approval before install or use.
-
-## 5. Layer 3: Self-Improvement
-
-Layer 3 records and processes improvements to Self-Evolution itself.
+## Filesystem Contract
 
 ```text
-skill issue found during work
-  -> inbox tag
-  -> Mode 7 triage
-  -> repair, reject, defer, or Capability Radar
+project/
+|-- AGENTS.md
+`-- .agents/
+    |-- settings.yaml
+    |-- knowledge/
+    |   |-- index.yaml
+    |   |-- guides/
+    |   |-- decisions/
+    |   |-- observations/
+    |   `-- archive/
+    `-- generated/
+        |-- rules/
+        `-- adapters/
 ```
 
-| Tag | Meaning | Mode 7 action |
-|---|---|---|
-| `[SKILL-FIX]` | Current behavior is wrong or incomplete | Repair or investigate |
-| `[SKILL-IDEA]` | Possible new capability | Evaluate scope and overlap |
-| `[SKILL-COMPAT]` | Tool or platform compatibility issue | Update scripts, hooks, or docs |
+The tree describes possible locations, not mandatory empty directories.
+Onboarding creates the minimal root files and adds knowledge directories on
+demand. `generated/` is disposable output derived from knowledge or settings.
 
-The Capability Radar tracks gaps and deferred improvements after triage.
+### AGENTS.md
 
-## 6. Layer 4: Project Specialization
+`AGENTS.md` is the highest-attention routing surface. It should remain small and
+contain only:
 
-Layer 4 adapts behavior for a project type without changing core invariants.
+- project purpose;
+- essential commands supported by manifests, CI, or scripts;
+- critical project rules;
+- a Where to Look table;
+- the rule to verify material knowledge against current evidence and correct it
+  when reality disagrees.
+
+It does not summarize every Guide, expose adapter state, report knowledge
+health, or host project history.
+
+### Guides
+
+Guide frontmatter exposes retrieval metadata:
+
+```yaml
+---
+kind: guide
+status: active
+scope:
+  - "src/payments/**"
+use_when:
+  - "modifying payment processing"
+review_when:
+  - "payment integration or configuration changes"
+sources:
+  - path: "src/payments/**"
+    checked_at: "git:abc1234"
+---
+```
+
+`kind` is one of `guide`, `runbook`, `map`, or `policy`. Current Guide statuses
+are `draft` and `active`; non-current statuses are `superseded` and `retired`.
+Scope and use conditions are required because a document without a future
+consumer is maintenance cost, not project context.
+
+Structured sources are optional. They support change detection, not automatic
+staleness judgment. Git baselines may use `git:<commit>`; a non-Git single file
+may use `sha256:<digest>`. Runtime results and external documents belong in the
+Guide's evidence prose because the local CLI does not verify them over the
+network.
+
+### Decisions
+
+Decision frontmatter uses `kind: decision`, a unique ID, status, date, scope,
+and supersession relationship. Supported states distinguish proposed,
+accepted, superseded, and rejected decisions.
+
+A Decision remains separate from a Guide because its primary query is why a
+choice was made and when it should be reconsidered. Superseding a Decision
+changes its state and relationship; it does not overwrite history.
+
+### Observations
+
+Observations are monthly Markdown entries used only when a valuable finding has
+no obvious authoritative destination. They state:
+
+1. what was learned;
+2. what future action it changes;
+3. the evidence;
+4. the likely destination.
+
+They are not indexed for normal retrieval and are not append-only forever.
+Maintain may integrate, archive, or delete entries that no longer have future
+value.
+
+### Archive
+
+Archive is excluded from current retrieval. It exists for material history,
+audit, and migration traceability. A status change plus archive move must not
+leave current routing pointed at the old document.
+
+### Generated Index
+
+`index.yaml` is rebuilt from current consumable Guides and Decisions. Entries
+contain only retrieval fields and use stable POSIX paths and ordering. It
+excludes Observations, Archive, generated files, and non-current statuses.
+
+The output contains no wall-clock timestamp, health statistics, confidence
+distribution, backlog pressure, skill queue, or adapter note, so identical input
+produces identical bytes.
+
+### Settings
+
+`.agents/settings.yaml` is the only project settings file. It stores user
+choices that cannot be inferred:
+
+- whether scope rules are generated;
+- which tool adapters and features are enabled;
+- whether a post-task reminder is enabled.
+
+All optional behavior defaults to off. Generated rules are synchronized by
+`kb index` only when the setting is enabled.
+
+## Retrieval Flow
 
 ```text
-patterns/ + crystallized/
-  -> Mode 4 detects project-specific pattern
-  -> candidate in SKILL-LOCAL.md
-  -> Mode 7 review
-  -> active override or rejection
+understand task
+  -> read AGENTS.md candidate routes
+  -> match scope and use_when
+  -> load the smallest relevant set
+  -> inspect source baselines and limitations
+  -> verify material or changed claims against current reality
+  -> perform and verify the task
 ```
 
-| State | Meaning | Affects behavior? |
-|---|---|---|
-| Evidence | Repeated facts or workflows | No |
-| Candidate | Proposed local behavior in `SKILL-LOCAL.md` | No |
-| Active Override | Reviewed project-specific override | Yes |
-| Rejected | Reviewed and declined | No |
+Full-text search is the fallback when routing misses. A missing Guide is not in
+itself a reason to create one.
 
-| Active overrides can change | Active overrides can't change |
-|---|---|
-| Capture conditions | Architectural invariants |
-| Health thresholds | Confidence ladder |
-| Promotion criteria | Write-first capture |
-| Project-type defaults | Hook independence |
+## Write Flow
 
-## 7. Attention Defense Layers
-
-The system protects attention with prompt placement, scope routing, and deterministic hooks.
-
-| # | Layer | Timing | Purpose |
-|---|---|---|---|
-| 1 | Activation sentence, "bias toward caution over speed" | Session start | Primacy |
-| 2 | Context Familiarity rule | Domain transitions only | Stop false confidence |
-| 3 | Write-first capture plus `Capture:` statement | Task end | Recency |
-| 4 | Scope-triggered rules | During work | On-demand injection |
-| 5 | `stop.sh`, `session-end.sh` | Lifecycle events | LLM-independent checks |
-| 6 | `compact-recovery.sh` | After compaction | Re-inject routing directive |
+At a task boundary, the model asks whether the finding has cross-session action
+value:
 
 ```text
-SessionStart
-  -> AGENTS.md activation sentence
-  -> Context Familiarity check on domain changes
-  -> scope-triggered rules during work
-  -> write-first capture at task end
-  -> hooks run outside model memory
-  -> compact recovery if context is compressed
+known destination and valuable
+  -> correct Guide or Decision directly
+
+valuable but destination unclear
+  -> write Observation
+
+no clear future action
+  -> no knowledge write
 ```
 
-## 8. Main Data Flow
+Routine implementation details, temporary logs, one-time command output, and
+facts already expressed clearly in code or tests do not enter the knowledge
+base by default.
+
+## Deterministic CLI Boundary
+
+The bundled Node.js CLI may:
+
+- initialize minimal files;
+- parse and validate frontmatter;
+- generate the retrieval index and optional rules;
+- check paths, local links, scopes, IDs, and adapter state;
+- compare declared local source baselines;
+- perform atomic writes and staged migration.
+
+It may report `SOURCE_CHANGED`, `SOURCE_MISSING`, or
+`SOURCE_BASELINE_UNAVAILABLE`. It may not declare knowledge incorrect, valuable,
+complete, conflicting in meaning, or ready for abstraction.
+
+## Optional Adapter Boundary
+
+Adapters are explicit and project-scoped. Context recovery reminds the agent to
+reload `AGENTS.md` and relevant knowledge after compaction. The post-task
+reminder asks whether a correction, Observation, or no write is appropriate.
+
+Neither feature writes knowledge, checks health thresholds, or blocks the host
+tool. Adapter configuration is parsed, backed up, written atomically, verified,
+and removed by ownership so unrelated settings survive.
+
+## Migration Architecture
+
+Migration uses a prepare-review-apply-rollback state machine:
 
 ```text
-Session starts
-  -> reads AGENTS.md
-  -> routes to domain files
-  -> work happens
-  -> scope rules push relevant knowledge
-  -> task completes
-  -> write-first capture
-  -> inbox
-  -> "Capture:" statement
+v1 input
+  -> prepare: hashes + candidate conversion + semantic checklist
+  -> model/human review
+  -> apply: validate inputs + backup + journaled switch + index/check
+  -> rollback: byte-identical restore only if controlled paths still match the
+     post-apply baseline; otherwise refuse without overwriting later work
 ```
 
-Branches from captured entries:
+The converter performs safe structural mappings but does not decide whether to
+merge, delete, split, downgrade, or supersede content. It never dual-writes v1
+and v2 or retrieves both by default.
+
+## Maintainer Architecture
+
+The distributed skill is improved outside user projects:
 
 ```text
-[DOMAIN-FIX]  -> deferred to task end -> batch apply
-[SKILL-FIX]   -> deferred to Mode 7
-[SKILL-IDEA]  -> deferred to Mode 7
-[SKILL-COMPAT]-> deferred to Mode 7
+observed failure
+  -> failure case with replayable evidence
+  -> proposal when the public mechanism must change
+  -> deterministic and integrated evaluations
+  -> maintainer decision
+  -> changelog and release
 ```
 
-Lifecycle events:
-
-```text
-Session ends     -> session-end.sh       -> inbox reminder
-Stop event       -> stop.sh              -> manifest health check
-Context compacted-> compact-recovery.sh  -> re-read AGENTS.md directive
-```
-
-User-triggered maintenance:
-
-```text
-User triggers evolve
-  -> inbox compressed
-  -> knowledge promoted
-  -> health scored
-
-User triggers skill maintenance
-  -> [SKILL-FIX/IDEA/COMPAT] triaged
-  -> repairs applied
-  -> Capability Radar updated
-```
-
-## 9. EVOLUTION-SPEC Dual Architecture
-
-`EVOLUTION-SPEC.md` has a distributable root copy and a local working copy.
-
-```text
-Root EVOLUTION-SPEC.md
-  -> distributable template, about 130 lines
-  -> copied on first use
-  -> never modified after distribution
-
-references/EVOLUTION-SPEC.md
-  -> local working copy
-  -> gains Backlog + Review Log
-  -> gitignored and user-local
-```
-
-| File | Role | Mutation rule |
-|---|---|---|
-| Root `EVOLUTION-SPEC.md` | Distributed template | Never modified after distribution |
-| `references/EVOLUTION-SPEC.md` | Local operating spec | May gain Backlog and Review Log |
-
-## 10. Confidence Model
-
-```text
-observed (seen once) -> verified (2+ sources) -> canonical (human-approved)
-```
-
-| Level | Evidence | Typical location |
-|---|---|---|
-| `observed` | One session, one source, or one inference | `inbox/`, `domains/` |
-| `verified` | Two sources or current-source verification | `domains/`, `reference/`, `patterns/` |
-| `canonical` | Human-approved or governance-level decision | `AGENTS.md`, decisions |
-
-Rules:
-
-1. All AI-generated knowledge starts as `observed`.
-2. Promotion is based on evidence.
-3. Conflicts are surfaced, not silently resolved.
-4. Local specialization can't override architectural invariants.
-
-## 11. Script Architecture
-
-| Script | Current size | Role |
-|---|---:|---|
-| `init-scaffold.sh` | 555 lines | Creates directories, boilerplate, hooks (copied from `references/hooks/`), and `AGENTS.md` |
-| `scan-project.sh` | 334 lines | Collects structural metadata, detected technologies, and heuristic gap analysis |
-| `audit-agents.sh` | 242 lines | AGENTS.md quality audit for Mode 2B, with audit limitations section |
-
-`init-scaffold.sh` creates:
-
-```text
-.agents/
-  knowledge/
-    inbox/
-    domains/
-    reference/
-    decisions/
-    patterns/
-    crystallized/
-    archive/
-  rules/
-  hooks/
-AGENTS.md
-```
-
-`scan-project.sh` collects project name, repository metadata, language signals, framework signals, manifest files, tests, docs, CI, build signals, directory summaries, extension counts, and detected technologies for Layer 2. It also outputs a `HEURISTIC GAPS` section listing what the scanner could not detect, guiding the LLM to fill gaps manually.
-
-`init-scaffold.sh` copies hook scripts from `references/hooks/` instead of embedding them, ensuring hooks stay in sync with the skill package. It outputs `POST-SCAFFOLD HINTS` guiding the LLM to adapt generic content to the project.
-
-## 12. Hook Architecture
-
-Hooks use tool-agnostic shell scripts with tool-specific integration layers. Claude Code, Cursor, and Augment use JSON adapters. OpenCode uses a native ESM plugin.
-
-```text
-tool lifecycle event
-  -> tool-specific integration layer
-     -> JSON adapter for Claude Code, Cursor, or Augment
-     -> native ESM plugin for OpenCode
-  -> tool-agnostic script
-  -> reminder, health check, or recovery directive
-```
-
-OpenCode uses a native plugin because the `hooks.json` bridge doesn't expose SessionStart and SessionEnd equivalents reliably. The plugin subscribes to `session.idle`, `session.deleted`, and `experimental.session.compacting`, then maps those events to the shared scripts. The installer copies the global `opencode.json` to project level before adding the plugin reference, because project-level config overrides global config entirely.
-
-| Script | Event | Behavior |
-|---|---|---|
-| `session-end.sh` | `SessionEnd` | Appends inbox reminder |
-| `stop.sh` | `Stop` | Checks manifest health |
-| `compact-recovery.sh` | `SessionStart`, matcher `compact` | Prints re-read directive |
-
-Hooks remind and check. They don't make unsafe edits, and they don't replace write-first capture.
-
-## 13. Meta-Skill Architecture
-
-```text
-Self-Evolution skill
-  -> find-skills for discovery
-  -> skill-creator for creation
-  -> runtime-discovered task skills for everything else
-```
-
-| Concern | Mechanism |
-|---|---|
-| Discover task skills | `find-skills` |
-| Create or improve skills | `skill-creator` |
-| Avoid hard-coded skill lists | Delegate discovery at runtime |
-| Avoid surprise installs | Queue in `skills.pending_review` |
-| Capture skill bugs | `[SKILL-FIX]` |
-| Capture skill ideas | `[SKILL-IDEA]` |
-| Capture compatibility issues | `[SKILL-COMPAT]` |
-
-## 14. Stable Invariants
-
-| Invariant | Area |
-|---|---|
-| AI-generated knowledge starts as `observed` | Confidence model |
-| Inbox entry is written before capture is claimed | Capture protocol |
-| `Capture:` is stated after the post-task decision | Attention defense |
-| Skill repair tags defer to Mode 7 | Self-improvement |
-| `find-skills` handles runtime skill discovery | Task wisdom |
-| `skill-creator` handles skill creation | Meta-skill architecture |
-| Root `EVOLUTION-SPEC.md` is not modified after distribution | EVOLUTION-SPEC |
-| `references/EVOLUTION-SPEC.md` is local and may gain logs | EVOLUTION-SPEC |
-| Active overrides can't change architectural invariants | Specialization |
-| Hooks stay deterministic and LLM-independent | Hook architecture |
-| Initialization follows Quality Contract with 6 rules | Initialization |
-| CODING DISCIPLINE includes 7 rules including infrastructure verification and no partial delivery | Execution quality |
-| Metadata requiring global consistency must be script-generated or omitted | Capture protocol |
-| All knowledge is internal by default; public docs require explicit review | Security |
-| Capture channel markers are optional, never required | Capture protocol |
-| Hook scripts are copied from skill package, not embedded in scaffold | Hook architecture |
-
-## 15. Initialization Quality Contract
-
-Initialization must produce usable project knowledge, not placeholders.
-
-| Rule | Requirement |
-|---|---|
-| Read-Before-Write | Read 15 to 20 files before writing knowledge. |
-| Placeholder Rejection | Reject TODO, TBD, placeholder, skeleton, or demo content. |
-| Concurrent Exploration | Scale exploration to project size before synthesis. |
-| Verification | Run structure checks and semantic self-audit before reporting completion. |
-| Anti-Shallow-Work Patterns | Do not ship shallow, generic, or placeholder versions. |
-| Minimum Content Thresholds | Domain files need at least 3 sections, 3 citations, and 5 project facts. |
-
-## 16. Mode 2B Deep Brownfield Onboarding
-
-Mode 2B handles projects with extensive existing `AGENTS.md` or knowledge artifacts. It is resumable through `onboarding-state.json`.
-
-Pipeline:
-
-1. Audit Existing AGENTS.md.
-2. Inventory All Knowledge Artifacts.
-3. Extract Implicit Project Knowledge.
-4. Migrate Existing Knowledge.
-5. Restructure AGENTS.md.
-6. Discover Skills and Report.
+A field or mechanism without an identified consumer, changed action,
+measurement, and removal condition is rejected. See
+`maintainer/DESIGN.md` and `maintainer/evals/SPEC.md`.

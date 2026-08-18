@@ -1,0 +1,277 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://self-evolution.invalid/evals/external/campaign.schema.json",
+  "title": "External campaign binding",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "created_at",
+    "campaign_id",
+    "campaign_root",
+    "diagnostic",
+    "repository_root_sha256",
+    "execution_root",
+    "opencode_version",
+    "execution_model",
+    "review_model",
+    "attempts",
+    "onboarding",
+    "repair",
+    "environment",
+    "toolchain",
+    "execution_assurance",
+    "toolchain_shim_enforcement",
+    "workspace_edit_runtime_sha256",
+    "tasks",
+    "subjects",
+    "smoke",
+    "toolchain_sha256",
+    "stop_rules_sha256",
+    "release_gate_effect"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "campaign_id": { "type": "string", "minLength": 1 },
+    "campaign_root": {
+      "$ref": "#/$defs/absolutePath",
+      "description": "Absolute coordinator evidence root for this campaign."
+    },
+    "diagnostic": { "type": "boolean" },
+    "repository_root_sha256": { "$ref": "#/$defs/sha256" },
+    "execution_root": {
+      "$ref": "#/$defs/absolutePath",
+      "description": "Absolute external execution root for Agent-visible workspaces."
+    },
+    "opencode_version": { "const": "1.17.10" },
+    "execution_model": { "const": "zeo/gpt-5.5-high" },
+    "review_model": {
+      "const": "dev-claude/claude-sonnet-4-6-thinking-high"
+    },
+    "attempts": { "const": 3 },
+    "onboarding": {
+      "const": { "max_tool_calls": 90, "timeout_ms": 2700000 }
+    },
+    "repair": {
+      "const": { "max_tool_calls": 60, "timeout_ms": 2700000 }
+    },
+    "environment": {
+      "const": {
+        "OPENCODE_PURE": "1",
+        "OPENCODE_DISABLE_EXTERNAL_SKILLS": "1",
+        "OPENCODE_DISABLE_PROJECT_CONFIG": "1",
+        "OPENCODE_DISABLE_DEFAULT_PLUGINS": "1",
+        "OPENCODE_DISABLE_CLAUDE_CODE_SKILLS": "1"
+      }
+    },
+    "toolchain": {
+      "const": {
+        "distro": "Ubuntu",
+        "root": "/home/d26fo/.local/share/self-evolution-toolchains/node-v22.13.1",
+        "node": "22.13.1",
+        "npm": "10.9.2"
+      }
+    },
+    "execution_assurance": {
+      "const": {
+        "network_enforcement": "windows-restricted-token+wsl-bwrap-user-net+deny-first-command-allowlist",
+        "network_namespace": "wsl-bwrap-unshare-user-net",
+        "network_canaries": "node+python+shell-wrapper+interop",
+        "filesystem_enforcement": "windows-restricted-token+reversible-forbidden-acl+wsl-bwrap-bind-map",
+        "windows_confinement": "codex-windows-restricted-token+reversible-coordinator-acl",
+        "codex_sandbox_profile": "external-opencode",
+        "credential_transport": "isolated-disk-only"
+      }
+    },
+    "toolchain_shim_enforcement": {
+      "const": "opencode-config-shell-to-wsl-bwrap-unshare-user-net"
+    },
+    "workspace_edit_runtime_sha256": { "$ref": "#/$defs/sha256" },
+    "toolchain_sha256": { "$ref": "#/$defs/sha256" },
+    "stop_rules_sha256": { "$ref": "#/$defs/sha256" },
+    "release_gate_effect": { "const": "none" },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/taskBinding" }
+    },
+    "subjects": { "$ref": "#/$defs/subjects" },
+    "smoke": { "$ref": "#/$defs/smokeBinding" }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "sha1": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "nullableSha256": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/sha256" }]
+    },
+    "absolutePath": {
+      "type": "string",
+      "pattern": "^(?:[A-Za-z]:[\\\\/]|/|\\\\\\\\).+"
+    },
+    "taskBinding": {
+      "type": "object",
+      "required": ["id", "contract_sha256"],
+      "properties": {
+        "id": {
+          "enum": [
+            "p-limit-detached-map",
+            "qs-surrogate-boundary",
+            "request-primitive-json-error"
+          ]
+        },
+        "contract_sha256": { "$ref": "#/$defs/sha256" }
+      },
+      "additionalProperties": false
+    },
+    "subjects": {
+      "type": "object",
+      "required": ["v1", "v2"],
+      "properties": {
+        "v1": { "$ref": "#/$defs/v1Subject" },
+        "v2": { "$ref": "#/$defs/v2Subject" }
+      },
+      "additionalProperties": false
+    },
+    "v1Subject": {
+      "type": "object",
+      "required": [
+        "sha256",
+        "archive_ref",
+        "archive_sha256",
+        "skill_sha256",
+        "source_commit_sha"
+      ],
+      "properties": {
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "archive_ref": { "const": "legacy/v1/skill" },
+        "archive_sha256": {
+          "const": "eac9735861901e4bc349de01683e8044dce691aafa65023f3d083fdb9fb9aa00"
+        },
+        "skill_sha256": {
+          "const": "7932635910b288182ebbb93ad0c8b9c66111a1e794b4f6d2cde39e2a2a1eb443"
+        },
+        "source_commit_sha": {
+          "const": "3b28dd2cedf44e1273e2b78c2660a5a045daef39"
+        }
+      },
+      "additionalProperties": false
+    },
+    "v2Subject": {
+      "type": "object",
+      "required": ["sha256", "skill_tree_sha256", "bundle_sha256"],
+      "properties": {
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "skill_tree_sha256": { "$ref": "#/$defs/sha256" },
+        "bundle_sha256": { "$ref": "#/$defs/sha256" }
+      },
+      "additionalProperties": false
+    },
+    "smokeBinding": {
+      "type": "object",
+      "required": [
+        "status",
+        "artifact",
+        "sha256",
+        "environment_artifact",
+        "environment_sha256"
+      ],
+      "properties": {
+        "status": { "enum": ["pending", "passed", "blocked"] },
+        "artifact": { "const": "smoke/smoke.json" },
+        "sha256": { "$ref": "#/$defs/nullableSha256" },
+        "environment_artifact": { "const": "smoke/environment.json" },
+        "environment_sha256": { "$ref": "#/$defs/nullableSha256" },
+        "error": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "pending" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "sha256": { "type": "null" },
+              "environment_sha256": { "type": "null" }
+            },
+            "not": { "required": ["error"] }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "passed" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "sha256": { "$ref": "#/$defs/sha256" },
+              "environment_sha256": { "$ref": "#/$defs/sha256" }
+            },
+            "not": { "required": ["error"] }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "blocked" } },
+            "required": ["status"]
+          },
+          "then": { "required": ["error"] }
+        }
+      ],
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "diagnostic": { "const": false } },
+        "required": ["diagnostic"]
+      },
+      "then": {
+        "properties": {
+          "tasks": {
+            "minItems": 3,
+            "maxItems": 3,
+            "allOf": [
+              {
+                "contains": {
+                  "properties": { "id": { "const": "p-limit-detached-map" } },
+                  "required": ["id"]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": { "id": { "const": "qs-surrogate-boundary" } },
+                  "required": ["id"]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": { "const": "request-primitive-json-error" }
+                  },
+                  "required": ["id"]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

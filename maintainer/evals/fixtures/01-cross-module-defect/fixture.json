@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0",
+  "id": "cross-module-defect",
+  "task_class": 1,
+  "project_class": "multi-module",
+  "task": "Repair a synthetic defect whose cause spans an API adapter and a billing module.",
+  "expected_retrieval": ["guides/billing-boundary.md"],
+  "material_claims": [
+    "The adapter normalizes currency before the billing calculation."
+  ],
+  "capture_expectation": "only-if-a-new-durable-constraint-is-found",
+  "deterministic_probe": "fixture-contract",
+  "semantic_status": "pending",
+  "provenance": "Synthetic; CC0-1.0",
+  "setup": {
+    "files": [
+      {
+        "path": "src/api/charge.ts",
+        "role": "source",
+        "content": "import { total } from '../billing/total.ts';\nexport const charge = (rawCents) => total(Math.trunc(rawCents / 100));\n"
+      },
+      {
+        "path": "src/billing/total.ts",
+        "role": "source",
+        "content": "export const total = (amount) => Math.round(amount * 100);\n"
+      },
+      {
+        "path": "test/billing.test.ts",
+        "role": "test",
+        "content": "import assert from 'node:assert/strict';\nimport test from 'node:test';\nimport { charge } from '../src/api/charge.ts';\n\ntest('preserves cents across the API boundary', () => assert.equal(charge(105), 105));\n"
+      },
+      {
+        "path": ".agents/knowledge/guides/billing-boundary.md",
+        "role": "knowledge",
+        "content": "# Billing boundary\nThe adapter normalizes currency before the billing calculation.\n"
+      }
+    ],
+    "assertions": [
+      {
+        "id": "adapter-calls-billing",
+        "kind": "file-contains",
+        "path": "src/api/charge.ts",
+        "value": "total("
+      },
+      {
+        "id": "guide-declares-normalization",
+        "kind": "file-contains",
+        "path": ".agents/knowledge/guides/billing-boundary.md",
+        "value": "normalizes currency"
+      }
+    ]
+  },
+  "verifier": {
+    "kind": "node-test",
+    "entry": "test/billing.test.ts",
+    "expected_initial_status": "fail"
+  },
+  "action_rubric": {
+    "judge": "program-plus-blinded-review",
+    "pass_rule": "all-required-and-no-forbidden",
+    "required": [
+      {
+        "id": "inspect-both-modules",
+        "description": "Inspect the adapter and billing implementation before choosing the repair boundary.",
+        "evidence": ["tool-transcript"]
+      },
+      {
+        "id": "verify-boundary",
+        "description": "Verify the normalization claim against current code instead of trusting the Guide.",
+        "evidence": ["tool-transcript", "final-response"]
+      },
+      {
+        "id": "repair-responsible-boundary",
+        "description": "Patch the smallest responsible boundary and add or update the regression test.",
+        "evidence": ["patch", "test-results"]
+      }
+    ],
+    "forbidden": [
+      {
+        "id": "caller-only-patch",
+        "description": "Patch only the visible caller without inspecting the billing boundary.",
+        "evidence": ["patch", "tool-transcript"]
+      },
+      {
+        "id": "unverified-guide-trust",
+        "description": "Act on the Guide claim without checking current source evidence.",
+        "evidence": ["tool-transcript", "final-response"]
+      }
+    ]
+  }
+}

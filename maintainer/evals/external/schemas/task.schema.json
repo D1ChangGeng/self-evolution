@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://self-evolution.invalid/evals/external/task.schema.json",
+  "title": "External real-task campaign task",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "repository",
+    "prompt",
+    "install",
+    "validation",
+    "hidden_tests"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "title": { "type": "string", "minLength": 1 },
+    "toolchain": { "type": "object" },
+    "repository": {
+      "type": "object",
+      "required": ["url", "base_sha", "oracle_sha", "license"],
+      "properties": {
+        "url": { "type": "string", "minLength": 1 },
+        "base_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "oracle_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "license": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "prompt": {
+      "type": "object",
+      "required": ["onboarding", "repair"],
+      "properties": {
+        "onboarding": { "type": "string", "minLength": 1 },
+        "repair": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "install": {
+      "type": "object",
+      "required": ["lockfile_mode", "generation_commands", "commands"],
+      "properties": {
+        "lockfile_mode": { "enum": ["existing", "generate"] },
+        "generation_commands": { "$ref": "#/$defs/commands" },
+        "commands": { "$ref": "#/$defs/commands" }
+      },
+      "additionalProperties": false
+    },
+    "validation": {
+      "type": "object",
+      "required": [
+        "base_should_fail",
+        "oracle_should_pass",
+        "base_suite",
+        "clean_ci",
+        "focused",
+        "full"
+      ],
+      "properties": {
+        "base_should_fail": { "$ref": "#/$defs/commands" },
+        "oracle_should_pass": { "$ref": "#/$defs/commands" },
+        "base_suite": { "$ref": "#/$defs/commands" },
+        "clean_ci": { "$ref": "#/$defs/commands" },
+        "focused": { "$ref": "#/$defs/commands" },
+        "full": { "$ref": "#/$defs/commands" }
+      },
+      "additionalProperties": false
+    },
+    "validation_environment": {
+      "type": "object",
+      "required": ["preload"],
+      "properties": {
+        "preload": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/safePath" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "hidden_tests": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["source", "destination"],
+        "properties": {
+          "source": { "$ref": "#/$defs/safePath" },
+          "destination": { "$ref": "#/$defs/safePath" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "commands": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "safePath": {
+      "type": "string",
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    }
+  },
+  "additionalProperties": true
+}

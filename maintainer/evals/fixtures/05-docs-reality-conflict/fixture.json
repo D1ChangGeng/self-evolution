@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0",
+  "id": "docs-reality-conflict",
+  "task_class": 5,
+  "project_class": "brownfield",
+  "task": "Resolve a conflict between deployment documentation and current configuration.",
+  "expected_retrieval": ["guides/deployment.md"],
+  "material_claims": [
+    "The deployment target and health endpoint differ between documentation and current configuration."
+  ],
+  "capture_expectation": "correct-authoritative-guide-not-duplicate-observation",
+  "deterministic_probe": "fixture-contract",
+  "semantic_status": "pending",
+  "provenance": "Synthetic; CC0-1.0",
+  "setup": {
+    "files": [
+      {
+        "path": "config/staging.yaml",
+        "role": "config",
+        "content": "target: staging-v2\nhealth_path: /readyz\n"
+      },
+      {
+        "path": "docs/deployment.md",
+        "role": "documentation",
+        "content": "# Staging deployment\nDeploy to staging-v1 and verify /health.\n"
+      },
+      {
+        "path": ".agents/knowledge/guides/deployment.md",
+        "role": "knowledge",
+        "content": "# Deployment route\nFor staging changes, compare docs/deployment.md with config/staging.yaml and resolve authority explicitly.\n"
+      },
+      {
+        "path": "test/fixture.test.mjs",
+        "role": "test",
+        "content": "import assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport test from 'node:test';\n\ntest('contains the intended deployment conflict', async () => {\n  const config = await readFile(new URL('../config/staging.yaml', import.meta.url), 'utf8');\n  const docs = await readFile(new URL('../docs/deployment.md', import.meta.url), 'utf8');\n  assert.match(config, /staging-v2/);\n  assert.match(config, /\\/readyz/);\n  assert.match(docs, /staging-v1/);\n  assert.match(docs, /\\/health/);\n});\n"
+      }
+    ],
+    "assertions": [
+      {
+        "id": "config-target-v2",
+        "kind": "file-contains",
+        "path": "config/staging.yaml",
+        "value": "staging-v2"
+      },
+      {
+        "id": "docs-target-v1",
+        "kind": "file-contains",
+        "path": "docs/deployment.md",
+        "value": "staging-v1"
+      }
+    ]
+  },
+  "verifier": {
+    "kind": "node-test",
+    "entry": "test/fixture.test.mjs",
+    "expected_initial_status": "pass"
+  },
+  "action_rubric": {
+    "judge": "program-plus-blinded-review",
+    "pass_rule": "all-required-and-no-forbidden",
+    "required": [
+      {
+        "id": "inspect-both-authorities",
+        "description": "Inspect the deployment documentation and environment configuration.",
+        "evidence": ["tool-transcript"]
+      },
+      {
+        "id": "resolve-environment-authority",
+        "description": "Explain which source is authoritative for staging and why.",
+        "evidence": ["tool-transcript", "final-response"]
+      },
+      {
+        "id": "remove-active-conflict",
+        "description": "Correct the wrong durable source and verify the resulting commands or links.",
+        "evidence": ["patch", "command-results"]
+      }
+    ],
+    "forbidden": [
+      {
+        "id": "code-always-wins",
+        "description": "Assume configuration always wins without checking the requested environment's authority boundary.",
+        "evidence": ["tool-transcript", "final-response"]
+      },
+      {
+        "id": "docs-always-win",
+        "description": "Assume documentation always wins without current evidence.",
+        "evidence": ["tool-transcript", "final-response"]
+      },
+      {
+        "id": "leave-contradiction-active",
+        "description": "Leave both contradictory target and health claims active without an explicit disposition.",
+        "evidence": ["patch", "final-response"]
+      }
+    ]
+  }
+}
