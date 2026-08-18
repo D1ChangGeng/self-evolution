@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://self-evolution.invalid/evals/external/verdict.schema.json",
+  "title": "External real-task blinded verdict",
+  "$defs": {
+    "captureItemLabel": {
+      "type": "object",
+      "required": ["id", "verdict"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "verdict": {
+          "enum": ["low-value", "not-low-value", "unresolved"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "armScore": {
+      "type": "object",
+      "required": [
+        "correctness",
+        "regression_safety",
+        "scope_discipline",
+        "knowledge_retrieval_credibility",
+        "capture_value",
+        "test_evidence",
+        "final_delivery"
+      ],
+      "properties": {
+        "correctness": { "enum": ["pass", "fail", "uncertain"] },
+        "regression_safety": { "enum": ["pass", "fail", "uncertain"] },
+        "scope_discipline": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "knowledge_retrieval_credibility": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "capture_value": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "test_evidence": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "final_delivery": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "capture_item_labels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/captureItemLabel" }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "required": [
+    "schema_version",
+    "task_id",
+    "attempt",
+    "arms",
+    "winner",
+    "scores",
+    "rationale"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "task_id": { "type": "string", "minLength": 1 },
+    "attempt": { "type": "integer", "minimum": 1, "maximum": 3 },
+    "arms": {
+      "type": "object",
+      "required": ["A", "B"],
+      "properties": {
+        "A": { "type": "string", "pattern": "^arm-[0-9a-f]{12}$" },
+        "B": { "type": "string", "pattern": "^arm-[0-9a-f]{12}$" }
+      },
+      "additionalProperties": false
+    },
+    "winner": { "enum": ["A", "B", "tie"] },
+    "scores": {
+      "type": "object",
+      "required": ["A", "B"],
+      "properties": {
+        "A": { "$ref": "#/$defs/armScore" },
+        "B": { "$ref": "#/$defs/armScore" }
+      },
+      "additionalProperties": false
+    },
+    "rationale": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

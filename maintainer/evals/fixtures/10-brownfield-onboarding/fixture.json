@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0",
+  "id": "brownfield-onboarding",
+  "task_class": 10,
+  "project_class": "brownfield",
+  "task": "Onboard a repository that already contains rich architecture and operations documentation.",
+  "expected_retrieval": [
+    "existing authoritative docs",
+    "minimal AGENTS.md routes"
+  ],
+  "material_claims": [
+    "Existing documentation should be reused rather than copied into generated Guides."
+  ],
+  "capture_expectation": "only-high-value-gaps",
+  "deterministic_probe": "default-init",
+  "semantic_status": "pending",
+  "provenance": "Synthetic; CC0-1.0",
+  "setup": {
+    "files": [
+      {
+        "path": "AGENTS.md",
+        "role": "agents",
+        "content": "# Existing project instructions\nPreserve this owner-maintained section.\n"
+      },
+      {
+        "path": "docs/architecture.md",
+        "role": "documentation",
+        "content": "# Architecture\nServices communicate through the documented event boundary.\n"
+      },
+      {
+        "path": "docs/operations.md",
+        "role": "documentation",
+        "content": "# Operations\nDeployment and rollback procedures live here.\n"
+      },
+      {
+        "path": "src/service/index.ts",
+        "role": "source",
+        "content": "export const service = 'events';\n"
+      },
+      {
+        "path": "test/fixture.test.mjs",
+        "role": "test",
+        "content": "import assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport test from 'node:test';\n\ntest('starts with owner instructions and rich documentation', async () => {\n  const agents = await readFile(new URL('../AGENTS.md', import.meta.url), 'utf8');\n  const architecture = await readFile(new URL('../docs/architecture.md', import.meta.url), 'utf8');\n  const operations = await readFile(new URL('../docs/operations.md', import.meta.url), 'utf8');\n  assert.match(agents, /owner-maintained/);\n  assert.match(architecture, /event boundary/);\n  assert.match(operations, /Deployment and rollback/);\n});\n"
+      }
+    ],
+    "assertions": [
+      {
+        "id": "existing-agents-present",
+        "kind": "file-contains",
+        "path": "AGENTS.md",
+        "value": "owner-maintained"
+      },
+      {
+        "id": "rich-architecture-present",
+        "kind": "file-contains",
+        "path": "docs/architecture.md",
+        "value": "event boundary"
+      }
+    ]
+  },
+  "verifier": {
+    "kind": "node-test",
+    "entry": "test/fixture.test.mjs",
+    "expected_initial_status": "pass"
+  },
+  "action_rubric": {
+    "judge": "blinded-review",
+    "pass_rule": "all-required-and-no-forbidden",
+    "required": [
+      {
+        "id": "inventory-existing-authority",
+        "description": "Inspect existing architecture, operations, source, and AGENTS instructions before generating knowledge.",
+        "evidence": ["tool-transcript"]
+      },
+      {
+        "id": "preserve-owner-agents",
+        "description": "Preserve the owner-maintained AGENTS content and add only minimal routing if needed.",
+        "evidence": ["patch"]
+      },
+      {
+        "id": "reuse-rich-docs",
+        "description": "Route to existing authoritative documentation rather than copying it into generated Guides.",
+        "evidence": ["patch", "retrieval-log"]
+      }
+    ],
+    "forbidden": [
+      {
+        "id": "guide-per-directory",
+        "description": "Generate one Guide per directory without demonstrated action value.",
+        "evidence": ["knowledge-diff"]
+      },
+      {
+        "id": "overwrite-agents",
+        "description": "Overwrite or discard the existing AGENTS instructions.",
+        "evidence": ["patch"]
+      },
+      {
+        "id": "duplicate-rich-docs",
+        "description": "Copy rich architecture or operations documentation into redundant generated Guides.",
+        "evidence": ["knowledge-diff"]
+      }
+    ]
+  }
+}

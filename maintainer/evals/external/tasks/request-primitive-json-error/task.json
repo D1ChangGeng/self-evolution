@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "id": "request-primitive-json-error",
+  "title": "request.js preserves RequestError metadata for primitive JSON errors",
+  "repository": {
+    "url": "https://github.com/octokit/request.js.git",
+    "base_sha": "14cf14444a5032bf0d89b1fd07d88b63860fb77b",
+    "oracle_sha": "d32cab15393ec6a2402ae4da146cfe701fb932eb",
+    "license": "MIT"
+  },
+  "toolchain": {
+    "node": "22.13.1",
+    "npm": "10.9.2"
+  },
+  "prompt": {
+    "onboarding": "Prepare this repository for future maintenance by using the available self-evolution workflow to establish project knowledge. Do not diagnose or fix a specific defect. Do not change product source files, tests, fixtures, dependency manifests, or lockfiles. Do not install third-party skills or connect optional adapters. Complete the workflow's own validation, report the evidence you gathered, and stop.",
+    "repair": "Fix error handling for HTTP responses whose Content-Type is JSON but whose parsed error body is a JSON primitive such as null, a number, or a boolean. These responses currently escape as a raw TypeError. They must instead reject through the library's normal RequestError/HttpError path, retaining the HTTP status plus request and response metadata and producing a useful message for each primitive. Preserve existing object, string, ArrayBuffer, and successful-response behavior. Add an appropriate visible regression test, run focused and full project checks including the build, follow the available project-knowledge workflow, and report the evidence. Do not install dependencies or access the network."
+  },
+  "install": {
+    "lockfile_mode": "existing",
+    "generation_commands": [],
+    "commands": ["npm ci"]
+  },
+  "validation": {
+    "base_should_fail": [
+      "npx vitest run test/external-primitive-json-error.test.ts --coverage.enabled=false"
+    ],
+    "oracle_should_pass": [
+      "npx vitest run test/external-primitive-json-error.test.ts --coverage.enabled=false"
+    ],
+    "base_suite": ["npm test", "npm run build"],
+    "clean_ci": ["npm test", "npm run build"],
+    "focused": [
+      "npx vitest run test/external-primitive-json-error.test.ts --coverage.enabled=false"
+    ],
+    "full": ["npm test", "npm run build"]
+  },
+  "hidden_tests": [
+    {
+      "source": "hidden/external-primitive-json-error.test.ts",
+      "destination": "test/external-primitive-json-error.test.ts"
+    }
+  ]
+}

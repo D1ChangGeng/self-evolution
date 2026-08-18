@@ -1,188 +1,179 @@
-# Self-Evolution Skill
+# Self-Evolution v2
 
-An agent skill for creating and maintaining a project-local knowledge base under `.agents/knowledge/`.
+Self-Evolution is a lightweight project context skill for coding agents. It
+keeps the small amount of repository-local knowledge that will change a future
+engineering action, routes agents to it at the right time, and requires
+material claims to be checked against current reality.
 
-## What This Does
+It is not a session log, project encyclopedia, health dashboard, task manager,
+or self-modifying skill system.
 
-Self-Evolution gives coding agents a persistent memory system for a repository. It initializes project knowledge, captures lessons during work, evolves raw notes into structured documentation, checks knowledge health, and crystallizes repeated workflows into reusable skill material.
+## Why Use It
 
-The current skill has a 1360-line `SKILL.md` with 7 explicit modes plus 1 ambient mode, 29 skill files, 3 lifecycle hooks, 4 tool integration layers, 3 POSIX scripts, and 10 templates.
+Project documentation often fails in three different ways:
 
-## Why This Exists
+- the useful fact was never preserved;
+- the fact exists but the next agent cannot find it;
+- the fact is found and trusted after the code, configuration, or runtime has
+  changed.
 
-| Gap | Problem | Response |
-|-----|---------|----------|
-| Reality gap | The code changes faster than the docs. | Capture observations during real work, then evolve them into domain files. |
-| Access gap | Useful knowledge exists but isn't loaded when needed. | Route from `AGENTS.md` to scope rules, domain files, references, and local overlays. |
-| Trust gap | Old guesses and proven facts can look the same. | Track confidence as `observed`, `verified`, or `canonical`, with cited sources. |
+v2 addresses all three without making knowledge maintenance a second project.
+It preserves high-value Guides and Decisions, uses a thin `AGENTS.md` router,
+and treats every document as guidance that may need present-day verification.
 
-## Quick Start
-
-Install the skill:
-
-```bash
-npx skills add D1ChangGeng/self-evolution --skill self-evolution -g -y
-```
-
-Update an existing installation to the latest version:
-
-```bash
-npx skills add D1ChangGeng/self-evolution --skill self-evolution -g -y
-```
-
-The install command is also the update command — it overwrites the skill files with the latest version. Project knowledge under `.agents/knowledge/` is never affected because the skill and project data live in separate directories.
-
-Initialize a project by telling your agent:
-
-```text
-Initialize the knowledge base for this project.
-```
-
-The skill auto-detects project state:
-
-- Empty project: creates a skeleton knowledge system.
-- Existing project: scans the codebase, records detected technologies, creates initial domain knowledge, and writes `AGENTS.md`.
-
-## What Gets Created
+## Project Layout
 
 ```text
 your-project/
-├── AGENTS.md
-└── .agents/
-    ├── knowledge/
-    │   ├── README.md
-    │   ├── manifest.json
-    │   ├── SKILL-LOCAL.md
-    │   ├── inbox/
-    │   ├── domains/
-    │   ├── reference/
-    │   ├── decisions/
-    │   ├── patterns/
-    │   ├── crystallized/
-    │   └── archive/
-    ├── rules/
-    └── hooks/
-        ├── session-end.sh
-        ├── stop.sh
-        └── compact-recovery.sh
+|-- AGENTS.md
+`-- .agents/
+    |-- settings.yaml
+    |-- knowledge/
+    |   |-- index.yaml
+    |   |-- guides/
+    |   |-- decisions/
+    |   |-- observations/
+    |   `-- archive/
+    `-- generated/
+        |-- rules/
+        `-- adapters/
 ```
 
-`SKILL-LOCAL.md` is a project-local specialization overlay. It acts like fine-tuning for this skill inside one repository without changing the distributed skill.
+Only the minimal files are created during onboarding. Knowledge directories
+and generated integration files appear when needed; adapters are off by
+default.
 
-## Modes
+| Artifact | Purpose |
+|---|---|
+| `AGENTS.md` | Project purpose, essential commands, critical rules, and routing |
+| Guides | Knowledge that changes how a future task is understood or performed |
+| Decisions | Adopted choices, rationale, consequences, and reconsideration triggers |
+| Observations | Temporary high-value findings whose final destination is unclear |
+| Archive | Superseded material retained for real historical value |
+| `index.yaml` | Deterministic retrieval index generated from Guides and Decisions |
+| `.agents/settings.yaml` | Explicit user choices for optional routing and adapters |
 
-| User says | Mode | What happens |
-|-----------|------|--------------|
-| "initialize", "init", "set up knowledge base" | Initialize | Auto-detects empty vs existing project, then creates the knowledge system. |
-| "deep init", "brownfield onboarding" | Deep Brownfield Init | 6-phase audit-extract-migrate-restructure for projects with extensive existing `AGENTS.md` or knowledge. |
-| "evolve", "update knowledge", "compress inbox" | Evolve | Processes inbox notes, fixes tagged domain corrections, promotes stable knowledge, and updates health metadata. |
-| "check health", "KB health" | Health Check | Reports inbox load, staleness, source quality, routing quality, and priority actions. |
-| "crystallize", "turn this into a workflow" | Crystallize | Converts repeated workflows into reusable executable documentation or skill material. |
-| "improve the skill", "skill maintenance" | Skill Maintenance | Runs Capability Radar with 3 searches, up to 5 candidates, and a 30 minute budget. |
-| Explicit project knowledge correction | Targeted Correction | Updates the right knowledge file while preserving source evidence and confidence state. |
-| Explicit local specialization request | Project-Local Specialization | Updates `.agents/knowledge/SKILL-LOCAL.md` for repository-specific behavior. |
-| Completing a non-trivial task | Capture (ambient) | Writes useful lessons to inbox before reporting the capture decision. |
+Guides use `kind: guide | runbook | map | policy`. This classifies their use,
+not a maturity level.
 
-## Key Features
+## Core Behavior
 
-### Knowledge Management
+Self-Evolution has four explicit operations:
 
-- Write-first capture protocol: write the inbox entry now, then state `Capture:` after the write.
-- `[DOMAIN-FIX: domains/X.md]` tags mark corrections that should be applied at a natural task boundary.
-- Confidence ladder keeps raw observations separate from verified and canonical knowledge.
-- `skills.pending_review` stores skill-discovery candidates as a write-ahead record during immersive work.
-- Optional capture channel markers: `[ERROR]`, `[DECISION]`, `[INCIDENT]` prefixes when the entry type is obvious. Never required.
-- Security default: all knowledge is internal by default. Public-facing documents require explicit review before including knowledge content.
-- Recurring theme detection during evolve: themes appearing 3+ times across sessions are reported as promotion or crystallization signals.
+- **Onboard** reuses existing documentation, finds high-cost understanding
+  gaps, and creates the smallest useful routing system.
+- **Capture or Correct** updates the known authoritative document, records a
+  valuable Observation when placement is unclear, or intentionally saves
+  nothing.
+- **Maintain** fixes the highest-impact correctness, source-change, retrieval,
+  duplication, or supersession problem.
+- **Audit** reports evidence-backed Critical, High, Medium, and Low risks with
+  actions. It never emits a composite health score.
 
-### Execution Quality
+**Retrieve** is the standing behavior for every development task: use
+`AGENTS.md`, `scope`, and `use_when` to load the smallest relevant set, then
+verify material claims against code, tests, configuration, runtime evidence,
+project documentation, or an explicit human decision.
 
-- Context Familiarity rule: if the agent cannot cite the file and line that govern the behavior, it doesn't know enough yet.
-- The rule fires on domain transitions, not trivial local edits.
-- Activation sentence: bias toward caution over speed, for trivial, local tasks, use judgment.
-- Infrastructure verification rule: before external-system operations, verify the domain file, target, version consistency, planned action, and result.
-- No partial delivery rule: complete every requested step before final response unless blocked or explicitly asked for incremental work.
-- Initialization Quality Contract enforces Read-Before-Write, Placeholder Rejection, Concurrent Exploration, Verification, Anti-Shallow-Work patterns, and minimum content thresholds.
-- `scan-project.sh` outputs tech stack facts and repository structure, not skill recommendations.
-- Script Adaptation Protocol: scripts output HEURISTIC GAPS sections listing what they could not detect, guiding the LLM to fill gaps manually and feed improvements back via `[SKILL-IDEA]`.
-- Metadata Discipline rule: no global-consistency metadata unless script-generated. Classification happens during evolve, not during capture.
+## Quick Start
 
-### Self-Improvement
+Install or update the skill:
 
-- Skill Feedback tags route improvements back into the skill: `[SKILL-FIX]`, `[SKILL-IDEA]`, and `[SKILL-COMPAT]`.
-- Mode 7, Skill Maintenance, includes Capability Radar with 3 searches, 5 candidates, and a 30 minute budget.
-- Meta-skills only: `find-skills` for discovery and `skill-creator` for creation. No concrete implementation skill names are referenced.
-- EVOLUTION-SPEC covers 9 dimensions for checking whether the skill design still fits current agent practice.
+```bash
+npx skills add D1ChangGeng/self-evolution --skill self-evolution -g -y
+```
 
-### Automation
+Node.js 22 or later is required for the bundled deterministic CLI.
 
-- 3 lifecycle hooks: `session-end.sh`, `stop.sh`, and `compact-recovery.sh`.
-- `compact-recovery.sh` provides a post-compaction re-read directive so the agent reloads project routing after context compression.
-- `init-scaffold.sh` copies hook scripts from `references/hooks/` instead of embedding them, ensuring hooks stay in sync with the skill package.
-- **Hook integration is an explicit decision, not a silent default.** Every Mode 1 / Mode 2 / Mode 2B run executes the Hook Integration Decision Point and asks you to pick among opencode / claude-code / cursor / augment-code / custom. The choice is recorded in `manifest.json` `hooks.integration` so it never re-prompts unless you defer or the adapter goes stale. "Hook scripts on disk" and "hooks active" are reported as distinct states.
-- 4 tool integration layers: JSON adapters for Claude Code, Cursor, and Augment, native ESM plugin for OpenCode. Or pick `custom` to integrate manually.
-- 3 POSIX scripts: `init-scaffold.sh`, `scan-project.sh`, and `audit-agents.sh`.
-- EVOLUTION-SPEC uses a dual-file architecture: a 130-line root template for distribution and a 228-line `references/` runtime version that is user-local and gitignored when installed into projects.
+From a project root, ask your agent:
 
-## Documentation Links
+```text
+Onboard this project with self-evolution.
+```
 
-| Document | What it covers |
-|----------|----------------|
-| [Architecture](docs/ARCHITECTURE.md) | Skill structure, data flow, lifecycle, and extension points. |
-| [Usage Guide](docs/USAGE-GUIDE.md) | Mode-by-mode usage and examples. |
-| [Hooks Guide](docs/HOOKS-GUIDE.md) | Hook installation, adapters, and automation behavior. |
-| [Philosophy](skills/self-evolution/references/philosophy.md) | The three gaps, failure modes, and design rationale. |
-| [Lifecycle](skills/self-evolution/references/lifecycle.md) | Capture, organize, verify, promote, compress, and retire flow. |
-| [Health Check](skills/self-evolution/references/health-check.md) | Knowledge base metrics and scoring. |
-| [Evolution Spec](skills/self-evolution/EVOLUTION-SPEC.md) | Distributable 9-dimension template. |
-| [Runtime Evolution Spec](skills/self-evolution/references/EVOLUTION-SPEC.md) | Runtime 9-dimension spec used during skill operation. |
+For an existing v1 project, ask for migration rather than initialization:
 
-## Skill File Reference
+```text
+Prepare a self-evolution v1 to v2 migration for review.
+```
 
-| File | Role |
-|------|------|
-| `SKILL.md` | 1360-line operating manual with 7 explicit modes plus 1 ambient mode. |
-| `EVOLUTION-SPEC.md` | 130-line distributable template for the 9-dimension evolution check. |
-| `references/EVOLUTION-SPEC.md` | 228-line runtime evolution spec for user-local skill operation. |
-| `references/philosophy.md` | Rationale for the knowledge system and its trust model. |
-| `references/lifecycle.md` | Detailed lifecycle rules for capture through retirement. |
-| `references/health-check.md` | Health metrics, thresholds, and reporting format. |
-| `references/init-deep-reference.md` | Deep initialization and project scanning reference. |
-| `references/scripts/init-scaffold.sh` | POSIX scaffold generator for directories and boilerplate files. |
-| `references/scripts/scan-project.sh` | POSIX project scanner that reports tech facts and structure. |
-| `references/scripts/audit-agents.sh` | AGENTS.md quality audit for brownfield onboarding. |
-| `references/hooks/README.md` | Hook system overview. |
-| `references/hooks/install-hooks.sh` | Hook installer. |
-| `references/hooks/session-end.sh` | Session-end capture reminder hook. |
-| `references/hooks/stop.sh` | Stop hook for health and capture checks. |
-| `references/hooks/compact-recovery.sh` | Compaction recovery hook with re-read directive. |
-| `references/hooks/adapters/claude-code.json` | Claude Code hook adapter. |
-| `references/hooks/adapters/cursor.json` | Cursor hook adapter. |
-| `references/hooks/adapters/opencode.json` | OpenCode hook adapter (legacy hooks.json format). |
-| `references/hooks/adapters/opencode-plugin.mjs` | OpenCode native ESM plugin (recommended — all 3 hooks supported). |
-| `references/hooks/adapters/augment.json` | Augment Code hook adapter. |
-| `references/templates/root-agents-empty.md` | `AGENTS.md` template for empty projects. |
-| `references/templates/root-agents-existing.md` | `AGENTS.md` template for existing projects. |
-| `references/templates/knowledge-readme.md` | Knowledge base README template. |
-| `references/templates/manifest-schema.json` | Manifest schema template. |
-| `references/templates/topic-template.md` | Domain topic template. |
-| `references/templates/reference-template.md` | Stable reference template. |
-| `references/templates/decision-template.md` | Decision record template. |
-| `references/templates/pattern-template.md` | Reusable pattern template. |
-| `references/templates/crystallized-template.md` | Crystallized workflow template. |
-| `references/templates/skill-local-template.md` | Project-local specialization template. |
+Migration is staged and reversible. Preparation does not change the active
+system; apply requires reviewed semantic decisions and unchanged inputs;
+rollback restores the recorded backup only while controlled paths still match
+the post-apply baseline, otherwise it refuses without overwriting later work. v1
+migration support remains throughout the complete `2.x` release line.
+
+## Deterministic CLI
+
+The skill routes deterministic work through its bundled `kb.mjs` executable:
+
+```text
+kb init
+kb index
+kb check
+kb migrate prepare|apply|rollback
+kb adapter install <tool> [--features context-recovery,post-task-reminder]
+kb adapter status [tool]
+kb adapter remove <tool>
+```
+
+Supported tool values are `claude-code`, `cursor`, `opencode`, and `augment-code`.
+
+The CLI creates and validates structure, generates the index, checks paths and
+links, reports source-change signals, edits supported adapter configuration,
+and executes migration mechanics. It does not decide whether knowledge is
+correct, valuable, complete, or worth retaining, routing, or retiring.
+
+Normal skill use resolves the executable relative to the installed skill. A
+global `kb` command is not assumed after `npx skills add`.
+
+## Optional Adapters
+
+No Hook or adapter is installed during onboarding. Explicit adapter commands
+can enable context recovery after compaction and a non-writing post-task
+Capture reminder for supported tools.
+
+Adapters never write project knowledge, never compute health thresholds, and
+must preserve unrelated tool configuration. See
+[Optional Adapters](docs/OPTIONAL-ADAPTERS.md).
+
+## What Changed from v1
+
+v2 removes the confidence ladder, promotion pipeline, health score,
+application/refinement counters, mandatory seven-directory scaffold, runtime
+EVOLUTION-SPEC review, skill recommendation queue, project-local skill
+overrides, session-end inbox writer, and mandatory Hook decision point.
+
+The final v1 distribution is preserved under `legacy/v1/` for migration
+evidence and is intentionally not discoverable as another skill.
+
+## Documentation
+
+| Document | Purpose |
+|---|---|
+| [Architecture](docs/ARCHITECTURE.md) | Runtime layers, data ownership, and boundaries |
+| [Usage Guide](docs/USAGE-GUIDE.md) | Onboard, Retrieve, Capture or Correct, Maintain, Audit, and CLI use |
+| [Migration Guide](docs/MIGRATION.md) | Reviewable v1 to v2 prepare/apply/rollback workflow |
+| [Optional Adapters](docs/OPTIONAL-ADAPTERS.md) | Opt-in tool integration and safety contract |
+| [Maintainer Design](maintainer/DESIGN.md) | Accepted v2 product contract |
+| [Evaluation Spec](maintainer/evals/SPEC.md) | Outcome-based release gates |
 
 ## Design Principles
 
-1. Write useful notes before structuring them.
-2. Keep project memory local to the repository.
-3. Make confidence visible and evidence-based.
-4. Route agents to the smallest relevant knowledge file.
-5. Treat skill improvement as normal knowledge work.
-6. Automate reminders, not judgment.
-7. Enforce deep work quality at initialization boundaries.
-8. Use technology-neutral examples in all templates.
+1. Save knowledge only when a future consumer and action are clear.
+2. Route to the smallest relevant context.
+3. Correct the authoritative document instead of copying through lifecycle
+   layers.
+4. Match evidence strength to the cost of being wrong.
+5. Let programs verify deterministic facts and models interpret their meaning.
+6. Keep optional tool integration explicit, isolated, reversible, and off by
+   default.
+7. Improve the skill through observed failures and evaluations, not runtime
+   self-review.
 
 ## License
 
-[Business Source License 1.1](LICENSE) — Free for personal use, open-source, education, and small teams (<10 employees). Commercial use by organizations with 10+ employees requires a [commercial license](mailto:D1ChangGeng@users.noreply.github.com). Converts to Apache 2.0 on 2030-04-27.
+[Business Source License 1.1](LICENSE) - free for personal use, open-source,
+education, and small teams with fewer than 10 employees. Commercial use by
+larger organizations requires a commercial license. The project converts to
+Apache 2.0 on 2030-04-27.

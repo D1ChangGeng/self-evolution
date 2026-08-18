@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://self-evolution.invalid/evals/external/summary.schema.json",
+  "title": "External campaign summary",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "release_gate_effect",
+    "complete",
+    "winner",
+    "basis",
+    "versions",
+    "blind_reviews"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "release_gate_effect": { "const": "none" },
+    "complete": { "type": "boolean" },
+    "winner": { "enum": ["v1", "v2", "no-clear-winner"] },
+    "basis": { "type": "string", "minLength": 1 },
+    "versions": {
+      "type": "object",
+      "required": ["v1", "v2"],
+      "properties": {
+        "v1": { "$ref": "#/$defs/version" },
+        "v2": { "$ref": "#/$defs/version" }
+      },
+      "additionalProperties": false
+    },
+    "blind_reviews": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/blindReview" }
+    }
+  },
+  "$defs": {
+    "measurement": {
+      "type": "object",
+      "required": ["status", "unit", "value", "measured_runs", "expected_runs"],
+      "properties": {
+        "status": { "enum": ["measured", "not-measured"] },
+        "unit": { "enum": ["tokens", "ms", "bytes", "items"] },
+        "value": {
+          "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }]
+        },
+        "measured_runs": { "type": "integer", "minimum": 0 },
+        "expected_runs": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "efficiency": {
+      "type": "object",
+      "required": [
+        "onboarding_tokens",
+        "onboarding_input_tokens",
+        "onboarding_output_tokens",
+        "total_tokens",
+        "total_input_tokens",
+        "total_output_tokens",
+        "duration_ms",
+        "selected_context_bytes",
+        "knowledge_bytes",
+        "capture_items",
+        "low_value_captures"
+      ],
+      "properties": {
+        "onboarding_tokens": { "$ref": "#/$defs/measurement" },
+        "onboarding_input_tokens": { "$ref": "#/$defs/measurement" },
+        "onboarding_output_tokens": { "$ref": "#/$defs/measurement" },
+        "total_tokens": { "$ref": "#/$defs/measurement" },
+        "total_input_tokens": { "$ref": "#/$defs/measurement" },
+        "total_output_tokens": { "$ref": "#/$defs/measurement" },
+        "duration_ms": { "$ref": "#/$defs/measurement" },
+        "selected_context_bytes": { "$ref": "#/$defs/measurement" },
+        "knowledge_bytes": { "$ref": "#/$defs/measurement" },
+        "capture_items": { "$ref": "#/$defs/measurement" },
+        "low_value_captures": { "$ref": "#/$defs/measurement" }
+      },
+      "additionalProperties": false
+    },
+    "blindReview": {
+      "type": "object",
+      "required": [
+        "task_id",
+        "attempt",
+        "winner",
+        "winner_version",
+        "verdict_path",
+        "verdict_sha256"
+      ],
+      "properties": {
+        "task_id": { "type": "string", "minLength": 1 },
+        "attempt": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "winner": { "enum": ["A", "B", "tie"] },
+        "winner_version": { "enum": ["v1", "v2", "tie", "not-measured"] },
+        "verdict_path": {
+          "oneOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "verdict_sha256": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            { "type": "null" }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "version": {
+      "type": "object",
+      "required": [
+        "task_passes",
+        "correct_runs",
+        "severe_regressions",
+        "tasks",
+        "efficiency"
+      ],
+      "properties": {
+        "task_passes": { "type": "integer", "minimum": 0 },
+        "correct_runs": { "type": "integer", "minimum": 0 },
+        "severe_regressions": { "type": "integer", "minimum": 0 },
+        "tasks": { "type": "object" },
+        "efficiency": { "$ref": "#/$defs/efficiency" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

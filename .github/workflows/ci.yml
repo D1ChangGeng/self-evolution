@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install --global npm@10.9.2
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run test
+      - run: npm run check:bundle
+      - run: npm run eval
+      - name: Installed skill CLI smoke test
+        shell: bash
+        run: |
+          tmp="$(mktemp -d)"
+          node skills/self-evolution/references/bin/kb.mjs init --project-root "$tmp"
+          node skills/self-evolution/references/bin/kb.mjs check --project-root "$tmp"

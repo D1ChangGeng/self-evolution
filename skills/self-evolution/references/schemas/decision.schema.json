@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Self-Evolution v2 Decision frontmatter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "id", "status", "date", "scope", "supersedes"],
+  "properties": {
+    "kind": { "const": "decision" },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "status": { "enum": ["proposed", "accepted", "superseded", "rejected"] },
+    "date": { "type": "string", "format": "date" },
+    "scope": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/projectPath" }
+    },
+    "supersedes": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/decisionId" },
+        {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/decisionId" }
+        }
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/source" }
+    }
+  },
+  "$defs": {
+    "decisionId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "projectPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "checked_at"],
+      "properties": {
+        "path": { "$ref": "#/$defs/projectPath" },
+        "checked_at": {
+          "type": "string",
+          "pattern": "^(git:[0-9A-Fa-f]{7,64}|sha256:[0-9a-f]{64})$"
+        }
+      }
+    }
+  }
+}

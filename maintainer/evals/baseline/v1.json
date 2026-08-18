@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "baseline_id": "v1-archive-3b28dd2",
+  "status": "partially_recorded",
+  "source": {
+    "source_commit_sha": "3b28dd2cedf44e1273e2b78c2660a5a045daef39",
+    "source_tree_path": "skills/self-evolution",
+    "archive_root": "legacy/v1/skill",
+    "archive_tree_sha256": "eac9735861901e4bc349de01683e8044dce691aafa65023f3d083fdb9fb9aa00",
+    "renames": {
+      "SKILL.md": "SKILL.v1.md"
+    },
+    "skill_path": "legacy/v1/skill/SKILL.v1.md",
+    "skill_sha256": "7932635910b288182ebbb93ad0c8b9c66111a1e794b4f6d2cde39e2a2a1eb443",
+    "skill_lines": 1498,
+    "skill_utf8_bytes": 84303,
+    "init_script_path": "legacy/v1/skill/references/scripts/init-scaffold.sh",
+    "init_script_sha256": "ae69951e356958d03fc005a511ce00596d542a40fd97ab4d2149f034ac433441"
+  },
+  "empty_init": {
+    "execution_status": "observed-failure-after-write",
+    "observed_exit_code": 2,
+    "observed_error_markers": ["printf", "option"],
+    "created_files": [
+      "AGENTS.md",
+      ".agents/knowledge/README.md",
+      ".agents/knowledge/manifest.json",
+      ".agents/rules/knowledge-protocol.md",
+      ".agents/hooks/session-end.sh",
+      ".agents/hooks/stop.sh",
+      ".agents/hooks/compact-recovery.sh"
+    ],
+    "created_file_count": 7,
+    "created_directory_count": 10,
+    "default_hook_payload_count": 3
+  },
+  "integrated_runs": {
+    "status": "pending",
+    "required_runs_per_task": 3,
+    "reason": "No frozen v1 run records with prompts, transcripts, token accounting, patches, and blinded judgments have been added yet."
+  }
+}

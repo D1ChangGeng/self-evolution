@@ -1,0 +1,37 @@
+{
+  "name": "self-evolution",
+  "version": "2.0.0-rc.1",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "kb": "skills/self-evolution/references/bin/kb.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node tools/kb/build.mjs",
+    "check:bundle": "node tools/kb/build.mjs --check",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "format": "prettier --write tools/kb maintainer/evals package.json tsconfig.json .github",
+    "format:check": "prettier --check tools/kb maintainer/evals package.json tsconfig.json .github",
+    "test": "vitest run",
+    "test:coverage": "vitest run",
+    "eval": "node --test maintainer/evals/contract-check.mjs maintainer/evals/evidence-check.mjs && node maintainer/evals/run.mjs --verify",
+    "eval:record": "node maintainer/evals/run.mjs --record",
+    "eval:release": "node maintainer/evals/run.mjs --release",
+    "eval:external": "node maintainer/evals/external/cli.mjs",
+    "eval:external:test": "node --test maintainer/evals/external/test/*.test.mjs",
+    "ci": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run check:bundle && npm run eval"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.14",
+    "esbuild": "^0.25.9",
+    "picomatch": "^4.0.3",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.5",
+    "yaml": "^2.8.1"
+  }
+}

@@ -1,0 +1,314 @@
+{
+  "artifact": {
+    "bundle": {
+      "path": "skills/self-evolution/references/bin/kb.mjs",
+      "sha256": "6eccbda3da357dc9c4024f0bf338601c206f08bf021cc0d151390a40bc9e15ad"
+    },
+    "empty_init": {
+      "created_file_count": 3,
+      "created_files": [
+        ".agents/knowledge/index.yaml",
+        ".agents/settings.yaml",
+        "AGENTS.md"
+      ],
+      "reduction_vs_v1": 0.571429
+    },
+    "skill": {
+      "lines": 450,
+      "path": "skills/self-evolution/SKILL.md",
+      "sha256": "2f3c045501508441f3eb89431b4feea2126a9ea04b9006951605aee849b7f8e2",
+      "utf8_bytes": 19930
+    },
+    "version": "2.0.0-rc.1"
+  },
+  "deterministic_probes": {
+    "adapter": {
+      "pass": true,
+      "tools": {
+        "augment-code": {
+          "downgrade_applied": true,
+          "downgrade_payloads": ["context-recovery.mjs", "features.json"],
+          "pass": true,
+          "repeated_downgrade_changed": false,
+          "repeated_install_changed": false,
+          "repeated_remove_changed": false,
+          "unrelated_config_preserved": true
+        },
+        "claude-code": {
+          "downgrade_applied": true,
+          "downgrade_payloads": ["context-recovery.mjs", "features.json"],
+          "pass": true,
+          "repeated_downgrade_changed": false,
+          "repeated_install_changed": false,
+          "repeated_remove_changed": false,
+          "unrelated_config_preserved": true
+        },
+        "cursor": {
+          "downgrade_applied": true,
+          "downgrade_payloads": ["context-recovery.mjs", "features.json"],
+          "pass": true,
+          "repeated_downgrade_changed": false,
+          "repeated_install_changed": false,
+          "repeated_remove_changed": false,
+          "unrelated_config_preserved": true
+        },
+        "opencode": {
+          "downgrade_applied": true,
+          "downgrade_payloads": [
+            "context-recovery.mjs",
+            "features.json",
+            "opencode-plugin.mjs"
+          ],
+          "pass": true,
+          "repeated_downgrade_changed": false,
+          "repeated_install_changed": false,
+          "repeated_remove_changed": false,
+          "unrelated_config_preserved": true
+        }
+      }
+    },
+    "default_init": {
+      "created_file_count": 3,
+      "created_files": [
+        ".agents/knowledge/index.yaml",
+        ".agents/settings.yaml",
+        "AGENTS.md"
+      ],
+      "default_adapter_count": 0,
+      "default_optional_payloads": [],
+      "pass": true,
+      "repeated_init_changed": false
+    },
+    "frozen_v1_init": {
+      "created_files": [
+        ".agents/hooks/compact-recovery.sh",
+        ".agents/hooks/session-end.sh",
+        ".agents/hooks/stop.sh",
+        ".agents/knowledge/manifest.json",
+        ".agents/knowledge/README.md",
+        ".agents/rules/knowledge-protocol.md",
+        "AGENTS.md"
+      ],
+      "error_markers_present": true,
+      "exit_code": 2,
+      "observed": true,
+      "pass": true
+    },
+    "migration": {
+      "applied_trace_matches": true,
+      "input_snapshot_sha256": "954db767fc7c91bc2e168b5ff769bcd223fe607184edfdf4ed0c25488dd2212d",
+      "pass": true,
+      "repeated_apply_changed": false,
+      "repeated_prepare_changed": false,
+      "repeated_rollback_changed": false,
+      "rollback_project_input_snapshot_restored": true,
+      "rollback_snapshot_sha256": "954db767fc7c91bc2e168b5ff769bcd223fe607184edfdf4ed0c25488dd2212d",
+      "trace_coverage_exact": true,
+      "trace_review_links_valid": true,
+      "trace_source_count": 12
+    },
+    "migration_input_changed": {
+      "diagnostic_codes": ["MIGRATION_INPUT_CHANGED"],
+      "pass": true
+    },
+    "migration_malformed": {
+      "diagnostic_codes": ["MIGRATION_V1_INVALID"],
+      "pass": true
+    },
+    "source_change": {
+      "diagnostic_codes": ["SOURCE_CHANGED"],
+      "pass": true
+    },
+    "wrong_knowledge_boundary": {
+      "boundary": "Passing deterministic checks does not certify that the Guide's prose is correct.",
+      "deterministic_check_ok": true,
+      "pass": true,
+      "semantic_judgment_emitted": false
+    }
+  },
+  "eval_contract_sha256": "94233d2dfc6c4549f98671e97fd4d7556a2265e32e56e5abe6d8b1b15b8f0e19",
+  "fixture_contracts": [
+    {
+      "id": "cross-module-defect",
+      "sha256": "4c4e4d81c489cf22da65367c04266472d71feffd6d08e9cf9db297ac8c48b3fe"
+    },
+    {
+      "id": "decision-constrained-feature",
+      "sha256": "55c8abd65b771eba31a1658afd5b34658a53996d6332140df8522da08953b6d5"
+    },
+    {
+      "id": "migration-runbook",
+      "sha256": "38d2b99a29e2f6476c57f8e1f058515dab52ea7253b698cf60fd9766ce1ebad7"
+    },
+    {
+      "id": "tests-pass-behavior-wrong",
+      "sha256": "45334edf9bad756fb6e6c9eaea79bbe9de049cea3c728bba2ba52e0d08446864"
+    },
+    {
+      "id": "docs-reality-conflict",
+      "sha256": "6612840776d00a882f77be5b543e65025779bee6a979d2440ea1427329caba35"
+    },
+    {
+      "id": "source-changing-refactor",
+      "sha256": "3cff1177a3ac64bf4b2be5075e0078265e2387646c2511e43fdfd3b717ab48ff"
+    },
+    {
+      "id": "context-recovery",
+      "sha256": "4239b9b08ac18fc6855ed8592515e5828304da3a9046d92e940900adf9d43c87"
+    },
+    {
+      "id": "uncovered-scope",
+      "sha256": "4811aeba70cc6dd6cdbd44098a062f57cc1a08811db0889ea45fd47b7603ddbf"
+    },
+    {
+      "id": "wrong-knowledge",
+      "sha256": "c7b76d1b96f928b56b4ea868d7b3697bc0ae493bbe62add3f5c8e27621a8b8dd"
+    },
+    {
+      "id": "brownfield-onboarding",
+      "sha256": "77c4e98a9e4bbbe2b2ee317dae26795e55205ca6a1b6229c3ae18ca5688d3118"
+    },
+    {
+      "id": "optional-adapters",
+      "sha256": "af81db9407b54eef2711d3e8cb11664fcfddb5bbaaf10296058870f601e35e60"
+    },
+    {
+      "id": "no-capture",
+      "sha256": "3bf58dbe9dfd16e14f54488219697e7db157c2fd2c9abce5e86f47fae3aee38f"
+    },
+    {
+      "id": "migration-semantic-corpus",
+      "sha256": "be97cd8139ec1c17fa51d74a96d073096c4e58d5a83b3c9b4d1970120911a246"
+    }
+  ],
+  "fixture_count": 13,
+  "fixture_ids": [
+    "cross-module-defect",
+    "decision-constrained-feature",
+    "migration-runbook",
+    "tests-pass-behavior-wrong",
+    "docs-reality-conflict",
+    "source-changing-refactor",
+    "context-recovery",
+    "uncovered-scope",
+    "wrong-knowledge",
+    "brownfield-onboarding",
+    "optional-adapters",
+    "no-capture",
+    "migration-semantic-corpus"
+  ],
+  "gates": [
+    {
+      "evidence": "450 lines; maximum 450",
+      "id": "skill-lines",
+      "judge": "program",
+      "status": "pass"
+    },
+    {
+      "evidence": "7 -> 3 files (57.1% reduction)",
+      "id": "initialized-file-count",
+      "judge": "program",
+      "status": "pass"
+    },
+    {
+      "evidence": "Exact, versioned tokenizer counts for the complete v1 and v2 onboarding protocols have not been recorded.",
+      "id": "initialization-protocol-tokens",
+      "judge": "program-plus-maintainer",
+      "status": "pending"
+    },
+    {
+      "evidence": "Integrated task transcripts are required to count task-time metadata writes.",
+      "id": "metadata-writes",
+      "judge": "program-plus-maintainer",
+      "status": "pending"
+    },
+    {
+      "evidence": "Three-run v1/v2 Capture judgments have not been recorded.",
+      "id": "low-value-capture",
+      "judge": "program-plus-blinded-review",
+      "status": "pending"
+    },
+    {
+      "evidence": "Three-run selected-context records have not been recorded.",
+      "id": "irrelevant-context",
+      "judge": "program-plus-blinded-review",
+      "status": "pending"
+    },
+    {
+      "evidence": "Frozen v1 and v2 model runs plus blinded judgments are missing.",
+      "id": "retrieval-and-task-quality",
+      "judge": "blinded-review",
+      "status": "pending"
+    },
+    {
+      "evidence": "The fixture contract is executable, but three v1 and v2 routine-task runs must prove that the agent completes the task without writing project knowledge.",
+      "id": "no-capture-write-free",
+      "judge": "program-plus-blinded-review",
+      "status": "pending"
+    },
+    {
+      "evidence": "SOURCE_CHANGED emitted: true",
+      "id": "source-change-detection",
+      "judge": "program",
+      "status": "pass"
+    },
+    {
+      "evidence": "The deterministic boundary probe confirms that kb check does not judge prose correctness; three integrated model runs must prove that wrong knowledge is detected and not acted upon.",
+      "id": "wrong-knowledge-detection",
+      "judge": "model-plus-blinded-review",
+      "status": "pending"
+    },
+    {
+      "evidence": "Migration safety is probed, but three integrated high-risk agent runs are not recorded.",
+      "id": "high-risk-material-verification",
+      "judge": "model-plus-blinded-review",
+      "status": "pending"
+    },
+    {
+      "evidence": "Exact input-to-trace coverage: true; semantic review links valid: true; applied rule/Hook bytes match reviewed targets: true; changed and malformed inputs are refused before apply.",
+      "id": "migration-input-accounting",
+      "judge": "program",
+      "status": "pass"
+    },
+    {
+      "evidence": "Complete pre-migration project snapshot restored: true; changed input and malformed v1 are refused",
+      "id": "migration-rollback-identity",
+      "judge": "program",
+      "status": "pass"
+    },
+    {
+      "evidence": "Applied-state traceability and semantic preservation require a reviewed migration corpus; rollback identity does not prove them.",
+      "id": "migration-semantic-preservation",
+      "judge": "maintainer-review",
+      "status": "pending"
+    },
+    {
+      "evidence": "Repeated init/install/remove/prepare/apply/rollback operations are unchanged.",
+      "id": "cli-and-adapter-idempotency",
+      "judge": "program",
+      "status": "pass"
+    },
+    {
+      "evidence": "0 active adapters and 0 optional payloads after init",
+      "id": "default-adapters-off",
+      "judge": "program",
+      "status": "pass"
+    },
+    {
+      "evidence": "Default v2 init contains AGENTS.md, settings.yaml, and index.yaml only; no hooks, rules, manifest, counters, or confidence state.",
+      "id": "removed-v1-default-mechanisms",
+      "judge": "program-plus-code-review",
+      "status": "pass"
+    }
+  ],
+  "integrated_evidence_sha256": null,
+  "schema_version": "1.0",
+  "suite_version": "2.0.0-rc.1",
+  "summary": {
+    "blocked": 0,
+    "fail": 0,
+    "pass": 8,
+    "pending": 9,
+    "release_ready": false
+  }
+}

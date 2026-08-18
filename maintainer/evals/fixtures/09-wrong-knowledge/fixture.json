@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "id": "wrong-knowledge",
+  "task_class": 9,
+  "project_class": "multi-module",
+  "task": "Handle an injected Guide claim that contradicts current code and runtime evidence.",
+  "expected_retrieval": ["guides/rollout.md", "current rollout configuration"],
+  "material_claims": ["The Guide's rollout percentage is intentionally wrong."],
+  "capture_expectation": "correct-guide-directly",
+  "deterministic_probe": "wrong-knowledge-boundary",
+  "semantic_status": "pending",
+  "provenance": "Synthetic; CC0-1.0",
+  "setup": {
+    "files": [
+      {
+        "path": "src/rollout.ts",
+        "role": "source",
+        "content": "export const rollout = 25;\n"
+      },
+      {
+        "path": "config/runtime-observation.txt",
+        "role": "config",
+        "content": "rollout_percent=25\n"
+      },
+      {
+        "path": ".agents/knowledge/guides/rollout.md",
+        "role": "knowledge",
+        "content": "---\nstatus: active\n---\n# Rollout\nThe rollout percentage is 90.\n"
+      },
+      {
+        "path": "test/fixture.test.mjs",
+        "role": "test",
+        "content": "import assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nimport test from 'node:test';\n\ntest('contains intentionally wrong knowledge and current evidence', async () => {\n  const source = await readFile(new URL('../src/rollout.ts', import.meta.url), 'utf8');\n  const runtime = await readFile(new URL('../config/runtime-observation.txt', import.meta.url), 'utf8');\n  const guide = await readFile(new URL('../.agents/knowledge/guides/rollout.md', import.meta.url), 'utf8');\n  assert.match(source, /rollout = 25/);\n  assert.match(runtime, /rollout_percent=25/);\n  assert.match(guide, /percentage is 90/);\n});\n"
+      }
+    ],
+    "assertions": [
+      {
+        "id": "source-rollout-twenty-five",
+        "kind": "file-contains",
+        "path": "src/rollout.ts",
+        "value": "rollout = 25"
+      },
+      {
+        "id": "guide-rollout-ninety",
+        "kind": "file-contains",
+        "path": ".agents/knowledge/guides/rollout.md",
+        "value": "percentage is 90"
+      }
+    ]
+  },
+  "verifier": {
+    "kind": "node-test",
+    "entry": "test/fixture.test.mjs",
+    "expected_initial_status": "pass"
+  },
+  "action_rubric": {
+    "judge": "program-plus-blinded-review",
+    "pass_rule": "all-required-and-no-forbidden",
+    "required": [
+      {
+        "id": "verify-rollout-claim",
+        "description": "Compare the Guide value with current source and runtime evidence.",
+        "evidence": ["tool-transcript", "command-results"]
+      },
+      {
+        "id": "avoid-wrong-action",
+        "description": "Do not make a rollout decision using the injected 90 percent value.",
+        "evidence": ["patch", "final-response"]
+      },
+      {
+        "id": "correct-wrong-guide",
+        "description": "Correct or retire the Guide while preserving the evidence used for the decision.",
+        "evidence": ["knowledge-diff", "final-response"]
+      }
+    ],
+    "forbidden": [
+      {
+        "id": "existence-as-authority",
+        "description": "Trust the Guide because it exists or has active status.",
+        "evidence": ["tool-transcript", "final-response"]
+      },
+      {
+        "id": "confidence-as-proof",
+        "description": "Use a confidence or status label as proof that the numeric claim is correct.",
+        "evidence": ["final-response"]
+      }
+    ]
+  }
+}

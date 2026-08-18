@@ -9,8 +9,19 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Test artifacts
+# Test and build artifacts
 /tmp/
+/coverage/
+/.cache/
+*.tsbuildinfo
 
-# User-local evolution state (created from the skill's EVOLUTION-SPEC.md template on first use)
-skills/self-evolution/references/EVOLUTION-SPEC.md
+# Local package-manager and migration scratch state
+node_modules/
+.agents/.migrations/
+
+# Local evaluation and agent scratch state
+/.tmp-codex-home/
+/.tmp-isolated-probe/
+/.tmp-shim/
+/.tmp-acl-path/
+/.pnpm-store/
