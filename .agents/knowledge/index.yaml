@@ -1,0 +1,23 @@
+schema_version: "2.0"
+documents:
+  - path: guides/evaluation-and-release.md
+    kind: guide
+    status: active
+    scope:
+      - maintainer/evals/**
+      - .github/workflows/**
+      - legacy/v1/**
+    use_when:
+      - changing evaluation contracts, evidence derivation, CI, or release gates
+      - running or interpreting external real-task campaigns
+  - path: guides/project-architecture.md
+    kind: map
+    status: active
+    scope:
+      - README.md
+      - docs/**
+      - skills/self-evolution/**
+      - tools/kb/**
+    use_when:
+      - changing the v2 runtime contract, knowledge model, retrieval flow, or CLI
+      - deciding where project knowledge or optional integration belongs
