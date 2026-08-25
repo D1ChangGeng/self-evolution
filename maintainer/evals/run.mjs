@@ -747,7 +747,7 @@ function lowValueCaptureGate(integratedEvidence) {
     return gate(
       id,
       "pending",
-      "Three-run v1/v2 Capture judgments have not been recorded.",
+      "Three paired Capture judgments are required for this gate.",
       judge,
     );
   if (recorded.status !== "pass")
@@ -915,7 +915,7 @@ function buildGates(baseline, artifact, probes, integratedEvidence) {
       "initialization-protocol-tokens",
       "input_tokens",
       0.4,
-      "Exact, versioned tokenizer counts for the complete v1 and v2 onboarding protocols have not been recorded.",
+      "This gate requires exact, versioned tokenizer counts for both onboarding protocols.",
       "program-plus-maintainer",
     ),
     reductionGate(
@@ -923,7 +923,7 @@ function buildGates(baseline, artifact, probes, integratedEvidence) {
       "metadata-writes",
       "metadata_writes",
       0.6,
-      "Integrated task transcripts are required to count task-time metadata writes.",
+      "This gate requires integrated task transcripts with task-time metadata writes.",
       "program-plus-maintainer",
     ),
     lowValueCaptureGate(integratedEvidence),
@@ -932,20 +932,20 @@ function buildGates(baseline, artifact, probes, integratedEvidence) {
       "irrelevant-context",
       "irrelevant_context_bytes",
       0.25,
-      "Three-run selected-context records have not been recorded.",
+      "This gate requires selected-context records for three paired attempts.",
       "program-plus-blinded-review",
       median,
     ),
     evidenceGate(
       integratedEvidence,
       "retrieval-and-task-quality",
-      "Frozen v1 and v2 model runs plus blinded judgments are missing.",
+      "This gate requires frozen v1/v2 model runs with blinded judgments.",
       "blinded-review",
     ),
     evidenceGate(
       integratedEvidence,
       "no-capture-write-free",
-      "The fixture contract is executable, but three v1 and v2 routine-task runs must prove that the agent completes the task without writing project knowledge.",
+      "This gate requires three paired routine-task runs whose workspace traces contain no project-knowledge writes.",
       "program-plus-blinded-review",
     ),
     gate(
@@ -957,13 +957,13 @@ function buildGates(baseline, artifact, probes, integratedEvidence) {
     evidenceGate(
       integratedEvidence,
       "wrong-knowledge-detection",
-      "The deterministic boundary probe confirms that kb check does not judge prose correctness; three integrated model runs must prove that wrong knowledge is detected and not acted upon.",
+      "The deterministic boundary probe covers CLI semantics; three integrated model runs provide the wrong-knowledge judgment.",
       "model-plus-blinded-review",
     ),
     evidenceGate(
       integratedEvidence,
       "high-risk-material-verification",
-      "Migration safety is probed, but three integrated high-risk agent runs are not recorded.",
+      "This gate requires three integrated high-risk agent runs with material-claim verification.",
       "model-plus-blinded-review",
     ),
     gate(
@@ -975,7 +975,7 @@ function buildGates(baseline, artifact, probes, integratedEvidence) {
         probes.migration_malformed.pass
         ? "pass"
         : "fail",
-      `Exact input-to-trace coverage: ${probes.migration.trace_coverage_exact}; semantic review links valid: ${probes.migration.trace_review_links_valid}; applied rule/Hook bytes match reviewed targets: ${probes.migration.applied_trace_matches}; changed and malformed inputs are refused before apply.`,
+      `Input-to-trace coverage: ${probes.migration.trace_coverage_exact}; semantic review links: ${probes.migration.trace_review_links_valid}; applied rule/Hook bytes match reviewed targets: ${probes.migration.applied_trace_matches}; apply input validation: ${probes.migration_input_changed.pass && probes.migration_malformed.pass}.`,
       "program",
     ),
     gate(
@@ -985,13 +985,13 @@ function buildGates(baseline, artifact, probes, integratedEvidence) {
         probes.migration_malformed.pass
         ? "pass"
         : "fail",
-      `Complete pre-migration project snapshot restored: ${probes.migration.rollback_project_input_snapshot_restored}; changed input and malformed v1 are refused`,
+      `Pre-migration project snapshot restored: ${probes.migration.rollback_project_input_snapshot_restored}; input-integrity checks: ${probes.migration_input_changed.pass && probes.migration_malformed.pass}`,
       "program",
     ),
     evidenceGate(
       integratedEvidence,
       "migration-semantic-preservation",
-      "Applied-state traceability and semantic preservation require a reviewed migration corpus; rollback identity does not prove them.",
+      "This gate requires a reviewed migration corpus covering applied-state traceability and semantic preservation.",
       "maintainer-review",
     ),
     gate(
@@ -999,7 +999,7 @@ function buildGates(baseline, artifact, probes, integratedEvidence) {
       probes.default_init.pass && probes.adapter.pass && probes.migration.pass
         ? "pass"
         : "fail",
-      "Repeated init/install/remove/prepare/apply/rollback operations are unchanged.",
+      "Repeated init/install/remove/prepare/apply/rollback operations preserve their configured state.",
       "program",
     ),
     gate(
@@ -1011,7 +1011,7 @@ function buildGates(baseline, artifact, probes, integratedEvidence) {
     gate(
       "removed-v1-default-mechanisms",
       probes.default_init.pass ? "pass" : "fail",
-      "Default v2 init contains AGENTS.md, settings.yaml, and index.yaml only; no hooks, rules, manifest, counters, or confidence state.",
+      "Default v2 init contains the three-file contract: AGENTS.md, settings.yaml, and index.yaml.",
       "program-plus-code-review",
     ),
   ];
@@ -1158,9 +1158,9 @@ function markdown(result) {
     "",
     "## Interpretation",
     "",
-    "Deterministic probes establish artifact and safety facts only. Pending gates",
-    "require the frozen three-run v1/v2 task evidence and blinded judgments defined",
-    "in `README.md`; they are release blockers, not assumed passes.",
+    "Deterministic probes establish artifact and safety facts. Outcome gates",
+    "use the frozen three-run v1/v2 task evidence and blinded judgments defined",
+    "in `README.md`; each gate advances when its evidence is complete.",
     "",
   ];
   return lines.join("\n");

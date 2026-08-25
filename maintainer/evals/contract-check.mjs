@@ -115,7 +115,7 @@ test("contract rejects self-certified setup and prose-only rubrics", async () =>
   );
 });
 
-test("runner keeps wrong-knowledge judgment pending and separates source change", async () => {
+test("runner keeps source-change and wrong-knowledge judgments distinct", async () => {
   const runner = await readFile(
     resolve(import.meta.dirname, "run.mjs"),
     "utf8",
@@ -123,7 +123,7 @@ test("runner keeps wrong-knowledge judgment pending and separates source change"
   assert.match(runner, /"source-change-detection"/);
   assert.match(
     runner,
-    /evidenceGate\(\s*integratedEvidence,\s*"wrong-knowledge-detection",\s*"The deterministic boundary probe/s,
+    /evidenceGate\(\s*integratedEvidence,\s*"wrong-knowledge-detection",\s*"The deterministic boundary probe covers CLI semantics/s,
   );
   assert.doesNotMatch(runner, /"wrong-knowledge-and-source-change"/);
 });

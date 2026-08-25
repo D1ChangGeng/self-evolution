@@ -5,7 +5,15 @@ recorded here. Versions follow semantic versioning.
 
 ## [Unreleased]
 
-No changes recorded yet.
+- Established the root README as the v1-to-v2 migration entry point and
+  `docs/MIGRATION.md` as the authoritative procedure.
+- Defined the runtime Skill around Onboard, Retrieve, Capture or Correct,
+  Maintain, and Audit.
+- Retained v1 migration through the bundled CLI and the documented preparation,
+  semantic review, apply, verification, and rollback workflow.
+- Documented input freezing, hash-gated apply, SHA-256 backups, journaled atomic
+  switching, automatic recovery, controlled rollback, and single-system
+  activation as migration safety requirements.
 
 ## [2.0.0-rc.1] - 2026-08-18
 

@@ -1,8 +1,7 @@
 # Usage Guide
 
 Use Self-Evolution from the project root. The skill combines model judgment
-with a bundled deterministic CLI; ordinary users do not need a globally
-installed `kb` command.
+with a bundled deterministic CLI invoked from its installation directory.
 
 ## Onboard
 
@@ -12,30 +11,26 @@ Ask:
 Onboard this project with self-evolution.
 ```
 
-Onboarding first reads existing `AGENTS.md`, README and docs, ADRs, build and
-test configuration, tool rules, operational documentation, and key entry
-points. It reuses useful documentation rather than generating an equivalent
-knowledge encyclopedia.
+Onboarding first reads existing project documentation, configuration, tool rules,
+operational material, and key entry points. It builds the initial routing system
+from that evidence and adds knowledge only for gaps with a credible future cost.
 
-It then identifies only gaps with a credible future cost, such as a hidden
-architecture constraint, hazardous release step, misleading existing document,
-or project command that is easy to misuse. A normal result is:
+A normal result is:
 
 - a short `AGENTS.md` router;
 - `.agents/settings.yaml` and generated `index.yaml`;
 - zero to five high-value Guides for an existing project;
 - routes to important existing Decisions or documentation;
-- no adapters unless explicitly requested.
+- adapters remain disabled until explicitly requested.
 
-An empty project receives only the minimal router and settings/index files. It
-does not receive empty knowledge templates or speculative project facts.
+An empty project receives the minimal router and settings/index files.
 
 Before completion, verify that commands come from actual manifests, CI, or
 scripts; routed paths exist; material claims have evidence; and every new Guide
 has a clear future task and action.
 
-If v1 artifacts are detected, onboarding stops and routes to migration. It does
-not mix v1 and v2 structures.
+If v1 artifacts are detected, onboarding routes to the Migration Guide and keeps
+v1 active until the reviewed migration is applied.
 
 ## Retrieve During Work
 
@@ -49,13 +44,12 @@ Retrieve is part of every engineering task:
    or runtime/configuration may differ from repository code.
 6. Use current evidence to perform and verify the task.
 
-Do not load the whole knowledge directory. Do not trust a statement merely
-because it is in a Guide. Depending on the claim, current evidence may be code,
-tests, deployed configuration, runtime behavior, logs, official documentation,
-or an explicit human decision.
+Load the smallest relevant knowledge set, then validate material claims against
+current code, tests, deployed configuration, runtime behavior, logs, official
+documentation, or an explicit human decision.
 
-When routing misses, use repository search. Create a Guide only if the completed
-investigation passes the future-action value test.
+When routing misses, use repository search. Create a Guide when the completed
+investigation establishes durable future-action value.
 
 ## Capture or Correct
 
@@ -72,14 +66,13 @@ Update the existing authoritative Guide or Decision when its destination is
 clear. Typical cases are a wrong constraint, a missing runbook step, a changed
 reconsideration condition, or a Decision that has been superseded.
 
-Do not preserve the old claim in multiple active layers. Keep correction
-history only when the prior mistake itself has future diagnostic or audit
-value.
+Keep one active authoritative claim. Retain correction history when the prior
+mistake has future diagnostic or audit value.
 
 ### Write an Observation
 
-Use a monthly Observation only when the finding is valuable but its final home
-is unclear or current task scope does not justify restructuring. Include:
+Use a monthly Observation when the finding is valuable and its final home is
+unclear or the current task scope calls for a temporary holding place. Include:
 
 ```markdown
 ## 2026-07-31 - Refund retry behavior
@@ -90,14 +83,15 @@ is unclear or current task scope does not justify restructuring. Include:
 - Likely destination: `guides/payments.md`.
 ```
 
-### Save Nothing
+### Keep the Source of Truth
 
-Do not persist ordinary local implementation details, temporary debugging
-output, one-time command results, facts immediately visible in nearby code, or
-information with no identifiable future consumer.
+Capture records knowledge with a concrete future consumer and action. Keep
+routine implementation details, temporary debugging output, one-time command
+results, and facts already clear in nearby code in their existing source of
+truth.
 
-Optional post-task reminders ask the same decision questions but never write an
-Observation automatically.
+Optional post-task reminders ask the same decision questions and leave all
+knowledge writes to the model's explicit action.
 
 ## Maintain
 
@@ -116,9 +110,8 @@ Prioritize in this order:
 5. duplicate or unconsumed documentation;
 6. a superseded Guide, Decision, or Runbook still routed as current.
 
-Maintain is a bounded repair, not a requirement to empty observations or
-recalculate a dashboard. Run deterministic checks, interpret each signal, make
-the smallest semantic correction, rebuild the index, and re-check.
+Maintain performs the smallest semantic repair for the highest-impact issue,
+then rebuilds the index and reruns deterministic checks.
 
 ## Audit
 
@@ -133,8 +126,8 @@ includes the file or claim, evidence, required action, and why the priority is
 warranted. Cover correctness, retrieval, authority, maintenance, security or
 publication risk, and missing high-value knowledge.
 
-Do not emit a numeric health score. Counts and source-change signals may support
-a finding but never replace its evidence or action.
+Audit reports evidence-backed findings and actions by severity. Counts and
+source-change signals may support each finding.
 
 ## Guides and Decisions
 
@@ -144,9 +137,8 @@ its kind, status, non-empty scope, and non-empty use conditions. Add structured
 source baselines only when change detection is useful.
 
 Use a Decision for an important adopted choice whose rationale, alternatives,
-consequences, or reconsideration conditions matter. Supersede rather than
-rewriting history. Proposed or rejected Decisions are not routed as current
-authority.
+consequences, or reconsideration conditions matter. Retain decision history
+and route adopted, current Decisions as authority.
 
 ## CLI Workflows
 
@@ -167,11 +159,11 @@ Supported tool values are `claude-code`, `cursor`, `opencode`, and `augment-code
 
 Use `init` for minimal deterministic scaffold creation, `index` after knowledge
 metadata changes, and `check` before claiming the system is consistent. A
-source-change result is a prompt to inspect impact, not permission for automatic
-prose rewriting.
+source-change result prompts impact inspection and semantic review before any
+prose change.
 
 Commands support selecting a project root and machine-readable output. Treat
-non-success results as actionable; do not hide check findings in a successful
+non-success results as actionable and include every check finding in the
 onboarding or migration report.
 
 ## Migrate v1
@@ -182,15 +174,8 @@ Start with:
 Prepare a self-evolution v1 to v2 migration for review.
 ```
 
-Preparation is read-only with respect to the active system. Review candidate
-Guide/Decision/Observation mappings, duplicate or empty content, uncertainties,
-the proposed `AGENTS.md`, and each previously enabled Hook decision.
-
-Apply only after inputs remain unchanged and every semantic review item is
-resolved. Verify the generated index and checks. Use rollback when verification
-fails or the result is rejected, but expect it to refuse if any controlled path
-changed after apply; it never force-overwrites later work. See
-[Migration](MIGRATION.md).
+For a v1 migration, follow the complete [Migration Guide](MIGRATION.md) through
+preparation, semantic review, apply, verification, and rollback.
 
 ## Enable an Adapter
 
@@ -200,10 +185,9 @@ Ask explicitly for the tool and feature, for example:
 Install the context-recovery adapter for this project's OpenCode setup.
 ```
 
-Inspect status after installation and confirm unrelated configuration remains.
-The optional post-task reminder is non-writing; neither feature blocks the tool
-or turns adapters into a prerequisite for onboarding. See
-[Optional Adapters](OPTIONAL-ADAPTERS.md).
+Inspect status after installation and confirm that unrelated configuration
+remains. Both adapter features are optional, and the post-task reminder is
+non-writing. See [Optional Adapters](OPTIONAL-ADAPTERS.md).
 
 ## Practical Decision Tests
 
@@ -215,5 +199,5 @@ Before writing durable knowledge, be able to answer:
 - What evidence supports it?
 - What would cause it to be reviewed or retired?
 
-If those answers are unclear, save nothing or use a temporary Observation only
-when the future value is still concrete.
+When those answers are open, keep the finding in its current source of truth or
+use a temporary Observation while its future destination is established.

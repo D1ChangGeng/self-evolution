@@ -1,20 +1,19 @@
 ---
 name: self-evolution
-description: "Initialize, retrieve, correct, maintain, audit, or migrate a lightweight project knowledge system built around AGENTS.md and .agents/knowledge. Use when Codex needs to set up project memory or a project brain, onboard to a repository, create or repair project knowledge, document a durable decision or runbook, audit knowledge correctness or retrieval risk, migrate a v1 self-evolution knowledge base, or install and inspect optional self-evolution tool adapters."
+description: "Initialize, retrieve, correct, maintain, or audit a lightweight project knowledge system built around AGENTS.md and .agents/knowledge. Use for onboarding, durable knowledge capture or correction, maintenance, audits, optional adapters, and explicitly requested v1-to-v2 migrations routed through the repository Migration Guide."
 ---
 
 # Project Self-Evolution v2
 
-Preserve only project knowledge that a future task can retrieve, verify against current
-reality, and use to improve a decision, implementation, or check. Optimize for correct
-outcomes and low maintenance cost, not knowledge volume or activity.
+Preserve project knowledge that a future task can retrieve, verify against current
+reality, and use to improve a decision, implementation, or check. Measure success
+through correct outcomes, future-task value, and low maintenance cost.
 
 ## Resolve the Bundled CLI
 
 The deterministic helper is `references/bin/kb.mjs` relative to this installed
-skill. Resolve the installed skill directory before invoking it. Do not assume a
-global `kb` command exists, and do not run a relative `references/...` path from the
-project root.
+skill. Resolve the installed skill directory and invoke the helper through its
+absolute path.
 
 Use the resolved absolute path in every invocation:
 
@@ -26,12 +25,14 @@ node "<absolute-skill-dir>/references/bin/kb.mjs" <command> \
 Require Node.js 22 or newer. Use `--format json` when consuming results
 programmatically and `--format text` for user-facing diagnostics.
 
-The CLI performs mechanics; the model owns relevance, value, correctness, conflicts,
+The CLI handles deterministic structure, indexes, paths, links, source signals,
+adapter configuration, atomic writes, and migration mechanics. Human or model
+review determines relevance, correctness, authority, future value, conflicts,
 abstraction, and safe action.
 
 ## Standing Behavior: Retrieve
 
-Retrieve is not a fifth explicit operation. Apply it at every project task start.
+Retrieve is the standing behavior applied at every project task start.
 
 1. Read the applicable `AGENTS.md` files for project rules and routing.
 2. Understand the task's files, subsystem, operation, and risk before choosing
@@ -45,19 +46,26 @@ Retrieve is not a fifth explicit operation. Apply it at every project task start
    the knowledge is old relative to the system, or observed reality disagrees.
 7. Execute the task using current reality as the final factual boundary.
 
-Do not load the entire knowledge base. A matching Guide is guidance, not proof;
-missing one is not by itself a reason to create one.
+Load the smallest matching set of Guides and Decisions. Treat each Guide as a
+route to evidence, and create a new Guide when the completed work establishes
+durable future-action value.
 
 ## Choose One Explicit Operation
 
-| User intent | Operation |
-|---|---|
-| Initialize project memory, onboard, set up AGENTS.md | Onboard |
+| User intent                                                 | Operation          |
+| ----------------------------------------------------------- | ------------------ |
+| Initialize project memory, onboard, set up AGENTS.md        | Onboard            |
 | Save a durable finding, update knowledge, record a decision | Capture or Correct |
-| Clean up, reconcile, refresh, or repair existing knowledge | Maintain |
-| Review knowledge quality, risk, correctness, or usefulness | Audit |
+| Clean up, reconcile, refresh, or repair existing knowledge  | Maintain           |
+| Review knowledge quality, risk, correctness, or usefulness  | Audit              |
 
 If a request combines operations, Retrieve first, then order them by dependency.
+
+v1-to-v2 migration follows the repository Migration Guide. When v1 artifacts are
+detected or migration is requested, route to the repository README and
+`docs/MIGRATION.md` before making changes. The guide defines prepare, semantic
+review, apply, verification, and rollback; the bundled CLI provides the
+migration commands. If the guide cannot be located, request it before proceeding.
 
 ## Filesystem Contract
 
@@ -79,24 +87,23 @@ project/
         `-- adapters/
 ```
 
-`kb init` creates only the minimum scaffold. Create knowledge directories on demand;
-do not add empty knowledge content to complete the tree. Generated rules and
-adapters exist only after explicit opt-in.
+`kb init` creates the minimum scaffold. Create knowledge directories on demand.
+Generated rules and adapters appear after explicit opt-in.
 
 - `guides/`: knowledge that changes future action. A Guide may have kind `guide`,
   `runbook`, `map`, or `policy`.
 - `decisions/`: important choices, rationale, alternatives, consequences, and
   reconsideration conditions.
-- `observations/`: temporary monthly holding files for valuable findings that do
-  not yet have a clear authoritative destination.
+- `observations/`: temporary monthly holding files for valuable findings whose
+  authoritative destination is still being established.
 - `archive/`: superseded or retired content retained for genuine historical use.
-- `index.yaml`: generated retrieval metadata. Rebuild it; never hand-edit it.
-- `settings.yaml`: user choices that cannot be inferred from files. Do not put
-  knowledge health, counts, or semantic judgments in settings.
+- `index.yaml`: generated retrieval metadata rebuilt from source documents.
+- `settings.yaml`: explicit user choices for routing and adapters. Knowledge
+  evidence and semantic judgments remain in their authoritative documents.
 
-Do not recreate v1 `inbox`, `domains`, `reference`, `patterns`, `crystallized`,
-`manifest.json`, confidence levels, health scores, promotion counters, skill queues,
-or project-local Skill overlays.
+The v2 knowledge model uses Guides, Decisions, Observations, Archive, generated
+index metadata, and explicit project settings. Reviewed migration records retain
+historical v1 material when its future value is established.
 
 ## Knowledge Contracts
 
@@ -117,9 +124,9 @@ Prefer this content:
 - a compact `Where to Look` table;
 - the reality-verification and correction rule.
 
-Do not copy Guide bodies, initialization guesses, adapter state, metrics, skill
-recommendations, generic advice, or task status into AGENTS.md. Never overwrite it
-blindly; preserve applicable human rules and route to their existing source.
+Keep Guide bodies, adapter state, metrics, recommendations, and task status in
+their authoritative locations. Preserve applicable human rules in AGENTS.md and
+route detailed material to its source.
 
 ### Guides
 
@@ -131,20 +138,19 @@ Allow optional `review_when` and structured `sources`. Use:
 - `map` for stable navigation with little interpretation;
 - `policy` only for rules the project has explicitly adopted.
 
-Use only the body sections the subject needs. Never fill empty template sections
-with placeholders, boilerplate, generic best practices, or manufactured questions.
+Use the body sections the subject needs and fill each included section with
+substantive project-specific content.
 
 ### Decisions
 
 Require a unique `id`, `kind: decision`, `status`, `date`, nonempty `scope`, and a
 `supersedes` field. Use `proposed`, `accepted`, `superseded`, or `rejected` status.
 Record why the choice was made, alternatives, consequences, evidence, and when to
-reconsider it. A Decision's authority comes from explicit adoption, not a
-confidence label.
+reconsider it. A Decision's authority comes from explicit adoption.
 
 When replacing a Decision, set the old record to `superseded`, link the replacement
-prominently in its body, and set the new record's `supersedes` to the old ID. Do not
-rewrite history to make the new choice appear original.
+prominently in its body, and set the new record's `supersedes` to the old ID. This
+relationship preserves the decision history.
 
 ### Observations
 
@@ -156,13 +162,13 @@ Use a monthly Markdown file such as
 - the evidence;
 - the likely destination, or why no destination is known.
 
-Observations do not enter `index.yaml`. Integrate, correct, archive, or delete them
-when they no longer justify maintenance.
+Observations remain outside `index.yaml`. Integrate, correct, archive, or retire
+them as their authoritative destination and future value become clear.
 
 ### Evidence Boundary
 
-Never use file-level confidence labels. Match evidence strength to the cost of an
-incorrect claim.
+Match evidence strength to the cost of an incorrect claim and record evidence at
+the declaration level.
 
 For high-impact claims, record the precise claim, scope, basis, checked commit or
 digest when practical, and known limitations or unverified boundaries.
@@ -177,13 +183,12 @@ sources:
 
 For a non-Git single file, `checked_at` may be `sha256:<digest>`. Put runtime
 observations, test names, symbols, external documentation, and nuanced limitations
-in the body. Do not expose secrets, credentials, private personal data, or
-unnecessary internal infrastructure details.
+in the body. Keep secrets, credentials, private personal data, and unrelated
+internal infrastructure details in their protected systems of record.
 
 ## Operation: Onboard
 
-Onboard replaces v1 Initialize and Deep Brownfield modes. Its goal is a minimum
-useful route into the project, not a generated encyclopedia.
+Onboard creates the minimum useful route into the project from current evidence.
 
 ### 1. Discover Existing Knowledge
 
@@ -198,8 +203,9 @@ Reuse good existing documentation. Route to it rather than copying it. Treat doc
 as candidate knowledge and compare high-impact claims with code, tests, config, or
 runtime behavior.
 
-If v1 artifacts are detected, stop normal initialization. Do not mix v1 and v2 or
-silently copy data. Follow `references/migration.md` and use `kb migrate prepare`.
+When v1 artifacts are detected, keep the active v1 system unchanged and route the
+user to the repository README's Migration Guide. Parse `docs/MIGRATION.md`,
+complete the documented review, and apply the migration through that workflow.
 
 ### 2. Find High-Value Gaps
 
@@ -212,7 +218,8 @@ Identify only gaps that can materially affect future work:
 - a conflict between existing documentation and current reality;
 - useful documentation that lacks a retrieval route.
 
-Do not use fixed quotas. Existing documentation may make zero new Guides correct.
+Let evidence and future-task value determine the number of new Guides; existing
+documentation may already provide complete coverage.
 
 ### 3. Create the Minimum System
 
@@ -223,10 +230,10 @@ node "<absolute-skill-dir>/references/bin/kb.mjs" init \
   --project-root "<absolute-project-root>" --format text
 ```
 
-`kb init` must be idempotent, must not overwrite AGENTS.md, must not install an
-adapter, and must not fabricate project knowledge. Create or augment routing only
-after inspecting current content. Add zero to five high-value Guides when justified
-and route important existing Decisions.
+`kb init` is idempotent and preserves an existing AGENTS.md. Adapter installation
+remains an explicit operation, and project knowledge comes from inspected evidence.
+Create or augment routing after inspecting current content. Add zero to five
+high-value Guides when justified and route important existing Decisions.
 
 ### 4. Verify the Result
 
@@ -234,9 +241,9 @@ and route important existing Decisions.
 - every routed path exists;
 - every Guide has a clear future consumer and actionable `scope`/`use_when`;
 - material claims have proportionate evidence and uncertainties are explicit;
-- inferred facts were not presented as policy;
+- inferred facts retain their evidentiary status;
 - removing each new Guide would create observable rediscovery cost or risk;
-- no optional adapter or generated rule appeared without opt-in.
+- optional adapters and generated rules match explicit settings.
 
 Then rebuild and check:
 
@@ -254,7 +261,7 @@ understanding. Prefer correction over accumulation.
 
 ### Future-Action Value Test
 
-Persist knowledge only when every answer is yes:
+Persist knowledge when every answer is yes:
 
 1. Will a plausible future task need this again?
 2. Is rediscovery materially more expensive than saving and maintaining it?
@@ -265,23 +272,23 @@ Persist knowledge only when every answer is yes:
 5. Can its scope be stated clearly?
 6. Is there traceable evidence?
 
-If any answer is no, do not capture it. Do not save routine implementation details,
-temporary debugging logs, one-off command output, facts obvious from adjacent code,
-session summaries, or information without a future action.
+The project source of truth retains routine implementation details, temporary
+debugging logs, one-off command output, adjacent-code facts, and information
+without a future action.
 
 ### Choose the Destination
 
 1. Correct an existing Guide or Decision when the destination is clear.
 2. Create a Decision directly for a newly adopted consequential choice.
 3. Create or update a Guide directly for durable scoped knowledge or a runbook.
-4. Write an Observation only when the finding is valuable but its destination is
-   genuinely unclear or current task scope does not permit responsible integration.
-5. Encode enforceable truths in code, tests, types, CI, or config instead of
-   documentation when those are better controls; route to that source if useful.
+4. Write an Observation when the finding is valuable and its destination is
+   genuinely unclear or the current task scope calls for a temporary holding place.
+5. Encode enforceable truths in code, tests, types, CI, or config when those are
+   the strongest controls; route to that source when useful.
 
 When reality contradicts knowledge, verify the disagreement, correct the knowledge
-in the same task when safe, and preserve meaningful decision history. Do not append
-a second contradictory claim and defer an obvious repair.
+in the same task when safe, and preserve meaningful decision history. Keep one
+authoritative current claim.
 
 After edits, run `kb index` and `kb check`. Report `Capture: none`, `Capture:
 corrected <path>`, `Capture: decision <path>`, `Capture: guide <path>`, or `Capture:
@@ -289,7 +296,7 @@ observation <path>` only after the corresponding action is complete.
 
 ## Operation: Maintain
 
-Maintain is impact-driven repair, not a requirement to process every Observation or refresh metrics.
+Maintain is impact-driven repair focused on the highest-return knowledge work.
 
 1. Run `kb check`, inspect current evidence, and rank issues by likely harm and
    maintenance return.
@@ -303,18 +310,17 @@ Maintain is impact-driven repair, not a requirement to process every Observation
    - broken routes, links, scope, schema, or adapter state.
 3. Verify reality before changing semantic content.
 4. Prefer one authoritative location and links over copied summaries.
-5. Archive only when historical lookup is valuable; otherwise remove low-value
-   content through the project's normal reviewed workflow.
+5. Archive material history and retire content whose future consumer has ended
+   through the project's normal reviewed workflow.
 6. Rebuild the index and rerun checks.
 
-Do not process every Observation by default. Do not create categories, recurrence
-counts, application counts, refinement counts, confidence transitions, or health
-scores. Repetition may signal a code defect rather than a documentation need.
+Process Observations by future-action value. Keep the knowledge model focused on
+evidence, consumers, actions, and maintenance return.
 
 ## Operation: Audit
 
-Audit reports evidence-backed risks, never a 0-100 score. Read
-`references/audit.md` before a broad or formal audit.
+Audit reports evidence-backed risks by severity. Read `references/audit.md`
+before a broad or formal audit.
 
 Run `kb check` for deterministic signals, then evaluate six categories:
 
@@ -332,8 +338,8 @@ specific file or claim, supporting evidence, risk, recommended action, expected
 benefit, and priority rationale. If no findings exist, state that and name residual
 testing or sampling limits.
 
-Do not infer semantic correctness from schema validity. Do not call every changed
-source stale; `SOURCE_CHANGED` is a request for model review, not a verdict.
+Schema validity establishes structure. The model reviews semantic correctness and
+interprets `SOURCE_CHANGED` against current evidence.
 
 ## Deterministic CLI Boundary
 
@@ -346,18 +352,18 @@ The CLI may:
 - compare declared Git or SHA-256 source baselines;
 - generate optional scope rules when enabled;
 - install, inspect, and remove explicitly selected adapters;
-- prepare, apply, and roll back a journaled v1 migration;
+- prepare, apply, and roll back a staged v1 migration through the reviewed workflow;
 - use atomic writes and reject unsafe paths or concurrent input changes.
 
-The CLI must not:
+Human or model review owns:
 
-- decide whether knowledge is correct, valuable, complete, stale, or necessary;
-- create project-specific Guides or Decisions from guesses;
-- score health or coverage;
-- classify content by confidence;
-- promote knowledge or turn repeated work into a Skill;
-- resolve semantic conflicts;
-- use counts or age thresholds as semantic decisions.
+- knowledge correctness, value, completeness, and necessity;
+- project-specific Guides and Decisions;
+- semantic risk and coverage judgments;
+- authority and evidence interpretation;
+- abstraction and workflow crystallization;
+- semantic conflict resolution;
+- the action triggered by counts, source signals, or elapsed time.
 
 Interpret source signals precisely:
 
@@ -379,72 +385,51 @@ Core onboarding installs none. Supported tool values are `claude-code`, `cursor`
 
 - context recovery: after compaction, remind the agent to reread AGENTS.md and the
   relevant Guide;
-- post-task reminder: ask the three Capture questions without writing knowledge.
+- post-task reminder: ask the three Capture questions while leaving knowledge
+  writes to the model's explicit action.
 
-Adapters must remain non-blocking, project-scoped, and free of semantic decisions.
-They must not write Observations, inspect a health score, or trigger maintenance.
+Adapters are non-blocking, project-scoped, and free of semantic decisions. They
+leave Observations, health assessment, and maintenance under the core workflow's
+control.
 Configuration lives in `.agents/settings.yaml`; generated integration files live
 under `.agents/generated/adapters/` or the tool's documented project config.
 
-Generate scope rules only when `routing.generate_scope_rules` is explicitly enabled.
-Rules route to the source Guide and must not copy the Guide's substantive content.
-
-## Migration Boundary
-
-Read `references/migration.md` before any v1 migration. Keep its mechanical and
-semantic phases separate.
-
-1. `kb migrate prepare` reads v1 without changing the active system. It creates a
-   run directory with input hashes, candidate v2 files, a plan, traceability report,
-   and semantic review checklist.
-2. The model reviews every candidate for merge, deletion, split, uncertainty,
-   authority, future value, and supersession. The CLI must not make these judgments.
-3. The user approves the proposed AGENTS.md and all adapter conversions or disables.
-4. `kb migrate apply <run-id>` refuses changed inputs or unresolved semantic items,
-   backs up every affected file, switches using the journal, rebuilds the index, and
-   checks the result.
-5. On failure, restore automatically. `kb migrate rollback <run-id>` must restore backed-up
-   bytes exactly, but must refuse to overwrite controlled paths that changed after apply.
-
-Do not dual-write, retrieve from v1 and v2 simultaneously, edit the active v1 tree
-during prepare, or automatically preserve empty templates, duplicated knowledge,
-health state, skill queues, confidence metadata, counters, or session markers.
+Generate scope rules when `routing.generate_scope_rules` is explicitly enabled.
+Rules route to the source Guide, while substantive knowledge remains in that Guide.
 
 ## Reality and Authority Rules
 
 - Read a source before citing or summarizing it.
-- Scope claims narrowly; do not generalize from one file to the whole project.
+- Scope claims to the evidence that supports them.
 - Separate observed behavior, adopted policy, accepted decision, external contract,
   and hypothesis; each has a different authority source.
-- Treat code as evidence of implementation, not necessarily product intent or safe
-  operational policy.
+- Treat code as implementation evidence and use adopted project sources for intent
+  and operational policy.
 - Prefer tests and runtime evidence for behavior, adopted project documents for
   governance, Decisions for rationale, and current official docs plus actual calls
   for external systems.
-- Surface unresolved contradictions. Never silently choose the more convenient
-  source.
+- Surface unresolved contradictions with their evidence and authority sources.
 - Preserve rollback data and unrelated project or tool configuration.
-- Never put credentials, tokens, private keys, or personal data in knowledge files.
+- Keep credentials, tokens, private keys, and personal data in their protected
+  systems of record.
 
 ## Completion Contract
 
 Before reporting any operation complete:
 
 1. Confirm only intended project files changed.
-2. Confirm no placeholders or generic filler were introduced.
+2. Confirm every written section contains project-specific, actionable content.
 3. Verify every new route and local link exists.
 4. Run `kb index` after semantic knowledge changes.
 5. Run `kb check` and distinguish deterministic issues from semantic judgments.
-6. For migration, verify traceability, backups, hashes, and rollback readiness.
-7. State optional adapter and generated-rule status accurately; absence is the
-   default, not an incomplete installation.
-8. Summarize what future task behavior now improves, not how many artifacts exist.
+6. State optional adapter and generated-rule status accurately; the default state
+   is disabled and generated output appears only after explicit enablement.
+7. Summarize the future task behavior that now improves.
 
 ## References
 
 - Read `references/data-model.md` for complete fields, examples, and source rules.
 - Read `references/audit.md` for the formal risk-audit method and report shape.
-- Read `references/migration.md` for v1 mapping, semantic review, and safety gates.
 - Use `references/templates/` for minimal project artifacts.
 - Use `references/schemas/` for deterministic validation contracts.
 - Use the resolved `references/bin/kb.mjs` for all CLI operations.

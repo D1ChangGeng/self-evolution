@@ -256,7 +256,7 @@ function candidatePath(v1Path: string): {
       path: relativePath,
       kind: "decision",
       review:
-        "Convert v1 Decision frontmatter to the required v2 id, scope, supersedes, and status fields.",
+        "Review v1 Decision frontmatter and record the required v2 id, scope, supersedes, and status fields.",
     };
   if (relativePath.startsWith("inbox/"))
     return {
@@ -274,13 +274,13 @@ function candidatePath(v1Path: string): {
     return {
       path: `archive/v1/rules/${v1Path.slice(".agents/rules/".length)}`,
       review:
-        "Classify this v1 rule as generated routing or user-owned policy before removing the active v1 rules tree.",
+        "Review this v1 rule as generated routing or user-owned policy and record its approved destination.",
     };
   if (v1Path.startsWith(".agents/hooks/"))
     return {
       path: `archive/v1/hooks/${v1Path.slice(".agents/hooks/".length)}`,
       review:
-        "Classify this v1 Hook as generated lifecycle code or user-owned automation before removing the active v1 hooks tree.",
+        "Review this v1 Hook as generated lifecycle code or user-owned automation and record its approved integration state.",
     };
   return { path: `archive/v1/${relativePath}` };
 }
@@ -297,7 +297,7 @@ function convertKnowledge(
       .map((item) => `${item.code}: ${item.message}`)
       .join("; ");
     throw new KbError(
-      `Cannot migrate malformed v1 knowledge ${source}: ${detail}`,
+      `v1 knowledge ${source} requires correction before conversion: ${detail}`,
       2,
       "MIGRATION_V1_INVALID",
     );
@@ -498,7 +498,7 @@ export async function prepareMigration(
       proposed: "index/settings or intentionally omitted fields",
       review_id: null,
       disposition:
-        "inventory is regenerated; hooks require review; health, counters, and skill queues are not migrated",
+        "regenerate the inventory; record Hook treatment; retain lifecycle metadata in the migration trace",
     });
   }
   const legacyAdapters = [
@@ -512,7 +512,7 @@ export async function prepareMigration(
       source: adapterConfigPaths[tool],
       proposed: `adapter review for ${tool}`,
       review_id: null,
-      disposition: "legacy v1 registration requires convert or disable",
+      disposition: "review the v1 registration and select convert or disable",
     });
   const proposedAgents = resolve(runRoot, "AGENTS.md.v2-proposed");
   const { loadAsset } = await import("./assets.js");
@@ -523,7 +523,7 @@ export async function prepareMigration(
       source: "AGENTS.md",
       proposed: "AGENTS.md.v2-proposed",
       review_id: null,
-      disposition: "separate human approval required",
+      disposition: "AGENTS.md proposal awaits human approval",
     });
   const plan: MigrationPlan = {
     schema_version: "2.0",
@@ -705,7 +705,7 @@ export async function applyMigration(
         backup_root: expected,
       });
       throw new KbError(
-        "Recovered an interrupted migration. Review state and run prepare again.",
+        "Interrupted migration was restored. Review the run and create a refreshed prepare.",
         3,
         "MIGRATION_INTERRUPTED_RECOVERED",
       );
@@ -720,7 +720,7 @@ export async function applyMigration(
     };
   if (plan.state !== "prepared")
     throw new KbError(
-      `Migration is not prepared: ${plan.state}`,
+      `Migration run requires prepared state before apply: ${plan.state}`,
       3,
       "MIGRATION_STATE_CONFLICT",
     );
@@ -762,7 +762,7 @@ export async function applyMigration(
     (await hashFiles(projectRoot, actualFiles)) !== plan.source_hash
   )
     throw new KbError(
-      "v1 inputs changed after prepare; run prepare again.",
+      "Prepared input set changed; create a refreshed prepare run.",
       3,
       "MIGRATION_INPUT_CHANGED",
     );
@@ -828,7 +828,7 @@ export async function applyMigration(
       error: (error as Error).message,
     });
     throw new KbError(
-      `Migration failed and was restored: ${(error as Error).message}`,
+      `Migration apply restored the backup after verification reported: ${(error as Error).message}`,
       3,
       "MIGRATION_APPLY_FAILED",
     );
@@ -864,13 +864,13 @@ export async function rollbackMigration(
     };
   if (plan.state !== "applied" || !plan.backup_root)
     throw new KbError(
-      "Only an applied migration can be rolled back.",
+      "Rollback starts from an applied migration run.",
       3,
       "MIGRATION_STATE_CONFLICT",
     );
   if (!plan.applied_hashes)
     throw new KbError(
-      "Migration lacks an applied-state baseline; rollback cannot safely overwrite current files.",
+      "Rollback requires the applied-state baseline to compare controlled files before restoration.",
       3,
       "ROLLBACK_BASELINE_MISSING",
     );

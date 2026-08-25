@@ -9409,7 +9409,7 @@ async function hasV1(projectRoot) {
 async function initCommand(projectRoot) {
   if (await hasV1(projectRoot)) {
     throw new KbError(
-      "A v1 knowledge base was detected. Run `kb migrate prepare` before initializing v2.",
+      "Detected a v1 knowledge base. Begin with `kb migrate prepare` to review the v2 conversion.",
       3,
       "V1_DETECTED"
     );
@@ -10921,7 +10921,7 @@ function candidatePath(v1Path) {
     return {
       path: relativePath,
       kind: "decision",
-      review: "Convert v1 Decision frontmatter to the required v2 id, scope, supersedes, and status fields."
+      review: "Review v1 Decision frontmatter and record the required v2 id, scope, supersedes, and status fields."
     };
   if (relativePath.startsWith("inbox/"))
     return {
@@ -10937,12 +10937,12 @@ function candidatePath(v1Path) {
   if (v1Path.startsWith(".agents/rules/"))
     return {
       path: `archive/v1/rules/${v1Path.slice(".agents/rules/".length)}`,
-      review: "Classify this v1 rule as generated routing or user-owned policy before removing the active v1 rules tree."
+      review: "Review this v1 rule as generated routing or user-owned policy and record its approved destination."
     };
   if (v1Path.startsWith(".agents/hooks/"))
     return {
       path: `archive/v1/hooks/${v1Path.slice(".agents/hooks/".length)}`,
-      review: "Classify this v1 Hook as generated lifecycle code or user-owned automation before removing the active v1 hooks tree."
+      review: "Review this v1 Hook as generated lifecycle code or user-owned automation and record its approved integration state."
     };
   return { path: `archive/v1/${relativePath}` };
 }
@@ -10952,7 +10952,7 @@ function convertKnowledge(content, kind, source) {
   if (parsed.diagnostics.some((item) => item.severity === "error")) {
     const detail = parsed.diagnostics.map((item) => `${item.code}: ${item.message}`).join("; ");
     throw new KbError(
-      `Cannot migrate malformed v1 knowledge ${source}: ${detail}`,
+      `v1 knowledge ${source} requires correction before conversion: ${detail}`,
       2,
       "MIGRATION_V1_INVALID"
     );
@@ -11087,7 +11087,7 @@ async function prepareMigration(projectRoot) {
       source: ".agents/knowledge/manifest.json",
       proposed: "index/settings or intentionally omitted fields",
       review_id: null,
-      disposition: "inventory is regenerated; hooks require review; health, counters, and skill queues are not migrated"
+      disposition: "regenerate the inventory; record Hook treatment; retain lifecycle metadata in the migration trace"
     });
   }
   const legacyAdapters = [
@@ -11101,7 +11101,7 @@ async function prepareMigration(projectRoot) {
       source: adapterConfigPaths[tool],
       proposed: `adapter review for ${tool}`,
       review_id: null,
-      disposition: "legacy v1 registration requires convert or disable"
+      disposition: "review the v1 registration and select convert or disable"
     });
   const proposedAgents = resolve9(runRoot, "AGENTS.md.v2-proposed");
   const { loadAsset: loadAsset2 } = await Promise.resolve().then(() => (init_assets(), assets_exports));
@@ -11112,7 +11112,7 @@ async function prepareMigration(projectRoot) {
       source: "AGENTS.md",
       proposed: "AGENTS.md.v2-proposed",
       review_id: null,
-      disposition: "separate human approval required"
+      disposition: "AGENTS.md proposal awaits human approval"
     });
   const plan = {
     schema_version: "2.0",
@@ -11262,7 +11262,7 @@ async function applyMigration(projectRoot, runId) {
         backup_root: expected
       });
       throw new KbError(
-        "Recovered an interrupted migration. Review state and run prepare again.",
+        "Interrupted migration was restored. Review the run and create a refreshed prepare.",
         3,
         "MIGRATION_INTERRUPTED_RECOVERED"
       );
@@ -11277,7 +11277,7 @@ async function applyMigration(projectRoot, runId) {
     };
   if (plan.state !== "prepared")
     throw new KbError(
-      `Migration is not prepared: ${plan.state}`,
+      `Migration run requires prepared state before apply: ${plan.state}`,
       3,
       "MIGRATION_STATE_CONFLICT"
     );
@@ -11313,7 +11313,7 @@ async function applyMigration(projectRoot, runId) {
   const actualFiles = await sourceFiles(projectRoot);
   if (JSON.stringify(actualFiles) !== JSON.stringify(plan.source_files) || await hashFiles(projectRoot, actualFiles) !== plan.source_hash)
     throw new KbError(
-      "v1 inputs changed after prepare; run prepare again.",
+      "Prepared input set changed; create a refreshed prepare run.",
       3,
       "MIGRATION_INPUT_CHANGED"
     );
@@ -11378,7 +11378,7 @@ async function applyMigration(projectRoot, runId) {
       error: error2.message
     });
     throw new KbError(
-      `Migration failed and was restored: ${error2.message}`,
+      `Migration apply restored the backup after verification reported: ${error2.message}`,
       3,
       "MIGRATION_APPLY_FAILED"
     );
@@ -11410,13 +11410,13 @@ async function rollbackMigration(projectRoot, runId) {
     };
   if (plan.state !== "applied" || !plan.backup_root)
     throw new KbError(
-      "Only an applied migration can be rolled back.",
+      "Rollback starts from an applied migration run.",
       3,
       "MIGRATION_STATE_CONFLICT"
     );
   if (!plan.applied_hashes)
     throw new KbError(
-      "Migration lacks an applied-state baseline; rollback cannot safely overwrite current files.",
+      "Rollback requires the applied-state baseline to compare controlled files before restoration.",
       3,
       "ROLLBACK_BASELINE_MISSING"
     );

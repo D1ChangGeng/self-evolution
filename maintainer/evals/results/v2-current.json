@@ -2,7 +2,7 @@
   "artifact": {
     "bundle": {
       "path": "skills/self-evolution/references/bin/kb.mjs",
-      "sha256": "6eccbda3da357dc9c4024f0bf338601c206f08bf021cc0d151390a40bc9e15ad"
+      "sha256": "0b720b6a4a82b3f23dda70cfdafaf33c365201b564b63c208e18bef0954a95ad"
     },
     "empty_init": {
       "created_file_count": 3,
@@ -14,10 +14,10 @@
       "reduction_vs_v1": 0.571429
     },
     "skill": {
-      "lines": 450,
+      "lines": 435,
       "path": "skills/self-evolution/SKILL.md",
-      "sha256": "2f3c045501508441f3eb89431b4feea2126a9ea04b9006951605aee849b7f8e2",
-      "utf8_bytes": 19930
+      "sha256": "9696e2867224983de9a2f848831c0f43846cc7996b8c53fa9aec338218260cd6",
+      "utf8_bytes": 18882
     },
     "version": "2.0.0-rc.1"
   },
@@ -126,7 +126,7 @@
       "semantic_judgment_emitted": false
     }
   },
-  "eval_contract_sha256": "94233d2dfc6c4549f98671e97fd4d7556a2265e32e56e5abe6d8b1b15b8f0e19",
+  "eval_contract_sha256": "9569d99d7d697adc124dd88ee8cdec628036bf3f926e45ce543d4e82a4c7cb64",
   "fixture_contracts": [
     {
       "id": "cross-module-defect",
@@ -199,7 +199,7 @@
   ],
   "gates": [
     {
-      "evidence": "450 lines; maximum 450",
+      "evidence": "435 lines; maximum 450",
       "id": "skill-lines",
       "judge": "program",
       "status": "pass"
@@ -211,37 +211,37 @@
       "status": "pass"
     },
     {
-      "evidence": "Exact, versioned tokenizer counts for the complete v1 and v2 onboarding protocols have not been recorded.",
+      "evidence": "This gate requires exact, versioned tokenizer counts for both onboarding protocols.",
       "id": "initialization-protocol-tokens",
       "judge": "program-plus-maintainer",
       "status": "pending"
     },
     {
-      "evidence": "Integrated task transcripts are required to count task-time metadata writes.",
+      "evidence": "This gate requires integrated task transcripts with task-time metadata writes.",
       "id": "metadata-writes",
       "judge": "program-plus-maintainer",
       "status": "pending"
     },
     {
-      "evidence": "Three-run v1/v2 Capture judgments have not been recorded.",
+      "evidence": "Three paired Capture judgments are required for this gate.",
       "id": "low-value-capture",
       "judge": "program-plus-blinded-review",
       "status": "pending"
     },
     {
-      "evidence": "Three-run selected-context records have not been recorded.",
+      "evidence": "This gate requires selected-context records for three paired attempts.",
       "id": "irrelevant-context",
       "judge": "program-plus-blinded-review",
       "status": "pending"
     },
     {
-      "evidence": "Frozen v1 and v2 model runs plus blinded judgments are missing.",
+      "evidence": "This gate requires frozen v1/v2 model runs with blinded judgments.",
       "id": "retrieval-and-task-quality",
       "judge": "blinded-review",
       "status": "pending"
     },
     {
-      "evidence": "The fixture contract is executable, but three v1 and v2 routine-task runs must prove that the agent completes the task without writing project knowledge.",
+      "evidence": "This gate requires three paired routine-task runs whose workspace traces contain no project-knowledge writes.",
       "id": "no-capture-write-free",
       "judge": "program-plus-blinded-review",
       "status": "pending"
@@ -253,37 +253,37 @@
       "status": "pass"
     },
     {
-      "evidence": "The deterministic boundary probe confirms that kb check does not judge prose correctness; three integrated model runs must prove that wrong knowledge is detected and not acted upon.",
+      "evidence": "The deterministic boundary probe covers CLI semantics; three integrated model runs provide the wrong-knowledge judgment.",
       "id": "wrong-knowledge-detection",
       "judge": "model-plus-blinded-review",
       "status": "pending"
     },
     {
-      "evidence": "Migration safety is probed, but three integrated high-risk agent runs are not recorded.",
+      "evidence": "This gate requires three integrated high-risk agent runs with material-claim verification.",
       "id": "high-risk-material-verification",
       "judge": "model-plus-blinded-review",
       "status": "pending"
     },
     {
-      "evidence": "Exact input-to-trace coverage: true; semantic review links valid: true; applied rule/Hook bytes match reviewed targets: true; changed and malformed inputs are refused before apply.",
+      "evidence": "Input-to-trace coverage: true; semantic review links: true; applied rule/Hook bytes match reviewed targets: true; apply input validation: true.",
       "id": "migration-input-accounting",
       "judge": "program",
       "status": "pass"
     },
     {
-      "evidence": "Complete pre-migration project snapshot restored: true; changed input and malformed v1 are refused",
+      "evidence": "Pre-migration project snapshot restored: true; input-integrity checks: true",
       "id": "migration-rollback-identity",
       "judge": "program",
       "status": "pass"
     },
     {
-      "evidence": "Applied-state traceability and semantic preservation require a reviewed migration corpus; rollback identity does not prove them.",
+      "evidence": "This gate requires a reviewed migration corpus covering applied-state traceability and semantic preservation.",
       "id": "migration-semantic-preservation",
       "judge": "maintainer-review",
       "status": "pending"
     },
     {
-      "evidence": "Repeated init/install/remove/prepare/apply/rollback operations are unchanged.",
+      "evidence": "Repeated init/install/remove/prepare/apply/rollback operations preserve their configured state.",
       "id": "cli-and-adapter-idempotency",
       "judge": "program",
       "status": "pass"
@@ -295,7 +295,7 @@
       "status": "pass"
     },
     {
-      "evidence": "Default v2 init contains AGENTS.md, settings.yaml, and index.yaml only; no hooks, rules, manifest, counters, or confidence state.",
+      "evidence": "Default v2 init contains the three-file contract: AGENTS.md, settings.yaml, and index.yaml.",
       "id": "removed-v1-default-mechanisms",
       "judge": "program-plus-code-review",
       "status": "pass"
