@@ -52,8 +52,8 @@ Relative to the frozen v1 baseline:
 - applied-state semantic preservation remains a separate reviewed corpus gate;
 - CLI commands and adapters are idempotent;
 - zero adapters or hooks are enabled by default;
-- no confidence, health-score, promotion-counter, or default v1/v2 copy
-  mechanism remains.
+- the default v2 contract contains AGENTS.md, settings.yaml, and index.yaml;
+  optional mechanisms activate through explicit configuration.
 
 A threshold may change only through an evidence-backed proposal approved before
 release. An implementer may not relax a gate because a result is inconvenient.

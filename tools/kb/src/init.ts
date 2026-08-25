@@ -25,7 +25,7 @@ export async function hasV1(projectRoot: string): Promise<boolean> {
 export async function initCommand(projectRoot: string): Promise<CommandResult> {
   if (await hasV1(projectRoot)) {
     throw new KbError(
-      "A v1 knowledge base was detected. Run `kb migrate prepare` before initializing v2.",
+      "Detected a v1 knowledge base. Begin with `kb migrate prepare` to review the v2 conversion.",
       3,
       "V1_DETECTED",
     );

@@ -4,11 +4,11 @@
 
 Self-Evolution v2 is a project context system with three separate surfaces:
 
-| Surface | Owns | Does not own |
-|---|---|---|
-| Project Knowledge Core | Durable project knowledge and retrieval | Task state, skill discovery, global settings |
-| Optional Tool Integration | Explicit reminders and generated routing | Knowledge content or semantic judgment |
-| Maintainer System | Failure cases, proposals, evaluations, releases | User-project runtime behavior |
+| Surface                   | Responsibility                                      |
+| ------------------------- | --------------------------------------------------- |
+| Project Knowledge Core    | Durable project knowledge and retrieval             |
+| Optional Tool Integration | Explicit reminders and generated routing            |
+| Maintainer System         | Failure cases, proposals, evaluations, and releases |
 
 The separation prevents a project knowledge system from becoming a control
 plane for the entire agent environment.
@@ -37,10 +37,10 @@ plane for the entire agent environment.
 +----------------------------------------------------------+
 ```
 
-The arrows are evidence flow, not authority inheritance. A generated index can
-prove that a file was parsed; it cannot prove the document should guide a
-decision. Code can show implemented behavior; it may not prove deployed state
-or business intent. The model selects evidence appropriate to the risk.
+The arrows show evidence flow. A generated index proves that a file was parsed;
+the model determines whether the document should guide a decision. Code shows
+implemented behavior, while deployed state and business intent use their own
+current evidence. The model selects evidence appropriate to the risk.
 
 ## Filesystem Contract
 
@@ -60,9 +60,9 @@ project/
         `-- adapters/
 ```
 
-The tree describes possible locations, not mandatory empty directories.
-Onboarding creates the minimal root files and adds knowledge directories on
-demand. `generated/` is disposable output derived from knowledge or settings.
+The tree describes available locations. Onboarding creates the minimal root files
+and adds knowledge directories on demand. `generated/` is disposable output
+derived from knowledge or settings.
 
 ### AGENTS.md
 
@@ -76,8 +76,8 @@ contain only:
 - the rule to verify material knowledge against current evidence and correct it
   when reality disagrees.
 
-It does not summarize every Guide, expose adapter state, report knowledge
-health, or host project history.
+Detailed Guides, adapter state, project history, and maintenance evidence remain
+in their authoritative locations.
 
 ### Guides
 
@@ -130,9 +130,8 @@ no obvious authoritative destination. They state:
 3. the evidence;
 4. the likely destination.
 
-They are not indexed for normal retrieval and are not append-only forever.
-Maintain may integrate, archive, or delete entries that no longer have future
-value.
+Observations stay outside routine retrieval. Maintain integrates, archives, or
+retires entries as their future value becomes clear.
 
 ### Archive
 
@@ -174,8 +173,8 @@ understand task
   -> perform and verify the task
 ```
 
-Full-text search is the fallback when routing misses. A missing Guide is not in
-itself a reason to create one.
+Full-text search is the fallback when routing misses. A new Guide follows from
+durable future-action value established by the completed work.
 
 ## Write Flow
 
@@ -189,13 +188,13 @@ known destination and valuable
 valuable but destination unclear
   -> write Observation
 
-no clear future action
-  -> no knowledge write
+future action remains unestablished
+  -> leave the source of truth unchanged
 ```
 
 Routine implementation details, temporary logs, one-time command output, and
-facts already expressed clearly in code or tests do not enter the knowledge
-base by default.
+facts already expressed clearly in code or tests remain in their current source
+of truth.
 
 ## Deterministic CLI Boundary
 
@@ -209,18 +208,19 @@ The bundled Node.js CLI may:
 - perform atomic writes and staged migration.
 
 It may report `SOURCE_CHANGED`, `SOURCE_MISSING`, or
-`SOURCE_BASELINE_UNAVAILABLE`. It may not declare knowledge incorrect, valuable,
-complete, conflicting in meaning, or ready for abstraction.
+`SOURCE_BASELINE_UNAVAILABLE`. Semantic interpretation of correctness, value,
+completeness, conflict, and abstraction remains with the model and reviewer.
 
 ## Optional Adapter Boundary
 
 Adapters are explicit and project-scoped. Context recovery reminds the agent to
 reload `AGENTS.md` and relevant knowledge after compaction. The post-task
-reminder asks whether a correction, Observation, or no write is appropriate.
+reminder asks whether a correction, Observation, or source-of-truth update is appropriate.
 
-Neither feature writes knowledge, checks health thresholds, or blocks the host
-tool. Adapter configuration is parsed, backed up, written atomically, verified,
-and removed by ownership so unrelated settings survive.
+Both features are advisory and non-blocking. Adapter configuration is parsed,
+backed up, written atomically, verified, and removed by ownership so unrelated
+settings survive. Knowledge writes and health assessment remain in the core
+workflow.
 
 ## Migration Architecture
 
@@ -231,13 +231,13 @@ v1 input
   -> prepare: hashes + candidate conversion + semantic checklist
   -> model/human review
   -> apply: validate inputs + backup + journaled switch + index/check
-  -> rollback: byte-identical restore only if controlled paths still match the
-     post-apply baseline; otherwise refuse without overwriting later work
+  -> rollback: compare controlled paths with the post-apply baseline, then
+     restore the byte-identical backup when the recorded state matches
 ```
 
-The converter performs safe structural mappings but does not decide whether to
-merge, delete, split, downgrade, or supersede content. It never dual-writes v1
-and v2 or retrieves both by default.
+The converter performs structural mappings. A model or reviewer decides merge,
+delete, split, downgrade, and supersession dispositions. After apply, v2 is the
+single active retrieval and write target.
 
 ## Maintainer Architecture
 
