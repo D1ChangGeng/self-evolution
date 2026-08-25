@@ -18,6 +18,7 @@ Thumbs.db
 # Local package-manager and migration scratch state
 node_modules/
 .agents/.migrations/
+.agents/legacy/
 
 # Local evaluation and agent scratch state
 /.tmp-codex-home/
