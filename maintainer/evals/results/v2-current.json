@@ -2,7 +2,7 @@
   "artifact": {
     "bundle": {
       "path": "skills/self-evolution/references/bin/kb.mjs",
-      "sha256": "0b720b6a4a82b3f23dda70cfdafaf33c365201b564b63c208e18bef0954a95ad"
+      "sha256": "96ad0fde0c34535f29115199f24440e16fa74506dea47c120e3df37bb9b84daf"
     },
     "empty_init": {
       "created_file_count": 3,
@@ -14,12 +14,13 @@
       "reduction_vs_v1": 0.571429
     },
     "skill": {
-      "lines": 435,
+      "lines": 311,
       "path": "skills/self-evolution/SKILL.md",
-      "sha256": "9696e2867224983de9a2f848831c0f43846cc7996b8c53fa9aec338218260cd6",
-      "utf8_bytes": 18882
+      "sha256": "ea35af4ef962b7b7eff63699d11dcda4f48602d387fbe5291d96bc8049e8dbab",
+      "tree_sha256": "5770a16b2ff31217fafa079f7af3557b90350f22a16d258604b50ed962e9e38d",
+      "utf8_bytes": 14899
     },
-    "version": "2.0.0-rc.1"
+    "version": "2.0.0"
   },
   "deterministic_probes": {
     "adapter": {
@@ -126,7 +127,7 @@
       "semantic_judgment_emitted": false
     }
   },
-  "eval_contract_sha256": "9569d99d7d697adc124dd88ee8cdec628036bf3f926e45ce543d4e82a4c7cb64",
+  "eval_contract_sha256": "572cdef1170d0734ff63aeb8fd34e119063c8a69bb008e77e677cfa0ceb0fa7b",
   "fixture_contracts": [
     {
       "id": "cross-module-defect",
@@ -199,7 +200,7 @@
   ],
   "gates": [
     {
-      "evidence": "435 lines; maximum 450",
+      "evidence": "311 lines; maximum 450",
       "id": "skill-lines",
       "judge": "program",
       "status": "pass"
@@ -302,8 +303,18 @@
     }
   ],
   "integrated_evidence_sha256": null,
+  "public_evaluation": {
+    "benchmark_reason": "evidence file is missing",
+    "benchmark_status": "blocked",
+    "change_class": "core",
+    "engineering_sample_status": "blocked",
+    "historical_integrated_status": "not-applicable",
+    "profile": "standard",
+    "required_deterministic_failures": [],
+    "subject_sha256": "c1def93b2307d52eeefb2551603cb013a6d6b500d1a9445c3f9a4750662980bb"
+  },
   "schema_version": "1.0",
-  "suite_version": "2.0.0-rc.1",
+  "suite_version": "2.0.0",
   "summary": {
     "blocked": 0,
     "fail": 0,

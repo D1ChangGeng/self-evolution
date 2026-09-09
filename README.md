@@ -152,6 +152,7 @@ Optional adapters are explicitly enabled and isolated under
 | [Usage Guide](docs/USAGE-GUIDE.md)             | Onboard, Retrieve, Capture or Correct, Maintain, Audit, and CLI use |
 | [Migration Guide](docs/MIGRATION.md)           | Reviewable v1 to v2 prepare/apply/rollback workflow                 |
 | [Optional Adapters](docs/OPTIONAL-ADAPTERS.md) | Opt-in tool integration and safety contract                         |
+| [Harness Integration](docs/HARNESS-INTEGRATION.md) | Codex, Claude Code, OpenCode boundaries, continuity, and fallbacks |
 | [Maintainer Design](maintainer/DESIGN.md)      | Accepted v2 product contract                                        |
 | [Evaluation Spec](maintainer/evals/SPEC.md)    | Outcome-based release gates                                         |
 

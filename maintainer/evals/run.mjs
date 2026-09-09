@@ -19,15 +19,23 @@ import {
   validateFixtureContract,
 } from "./contract.mjs";
 import { integratedGateFixtures, loadIntegratedEvidence } from "./evidence.mjs";
+import {
+  loadPublicEvidence,
+  PUBLIC_RELEASE_PROFILES,
+} from "./public/public.mjs";
 
 const exec = promisify(execFile);
 const repoRoot = resolve(import.meta.dirname, "../..");
+const artifactVersion = JSON.parse(
+  await readFile(resolve(repoRoot, "package.json"), "utf8"),
+).version;
 const fixturesRoot = resolve(import.meta.dirname, "fixtures");
 const baselinePath = resolve(import.meta.dirname, "baseline/v1.json");
 const integratedEvidencePath = resolve(
   import.meta.dirname,
   "evidence/integrated-gates.json",
 );
+const publicEvidencePath = resolve(import.meta.dirname, "public/evidence.json");
 const resultPath = resolve(import.meta.dirname, "results/v2-current.json");
 const reportPath = resolve(import.meta.dirname, "RESULTS.md");
 const bundlePath = resolve(
@@ -35,6 +43,7 @@ const bundlePath = resolve(
   "skills/self-evolution/references/bin/kb.mjs",
 );
 const skillPath = resolve(repoRoot, "skills/self-evolution/SKILL.md");
+const publicBaselineCommit = "c998067f73620a4721367e33a31063882896d476";
 const evalPolicyPaths = [
   "SPEC.md",
   "README.md",
@@ -44,12 +53,31 @@ const evalPolicyPaths = [
   "evidence/README.md",
   "verify-fixture.mjs",
   "run.mjs",
+  "public/PUBLIC-BENCHMARKS.md",
+  "public/README.md",
+  "public/public.mjs",
 ];
 const mode = process.argv[2] ?? "--verify";
+const profileArg = process.argv.find((arg) => arg.startsWith("--profile="));
+const releaseProfile = profileArg
+  ? profileArg.slice("--profile=".length)
+  : "standard";
+const changeClassArg = process.argv.find((arg) =>
+  arg.startsWith("--change-class="),
+);
+const publicChangeClass = changeClassArg
+  ? changeClassArg.slice("--change-class=".length)
+  : "core";
 
 if (!["--verify", "--record", "--release"].includes(mode)) {
   process.stderr.write(
     "Usage: node maintainer/evals/run.mjs --verify|--record|--release\n",
+  );
+  process.exit(2);
+}
+if (!Object.hasOwn(PUBLIC_RELEASE_PROFILES, releaseProfile)) {
+  process.stderr.write(
+    `Unknown release profile ${releaseProfile}; expected ${Object.keys(PUBLIC_RELEASE_PROFILES).join(", ")}\n`,
   );
   process.exit(2);
 }
@@ -69,6 +97,58 @@ async function normalizedFilesHash(root, paths) {
       path,
       "\0",
       (await readFile(resolve(root, path), "utf8")).replace(/\r\n?/g, "\n"),
+      "\0",
+    );
+  }
+  return sha256(Buffer.from(input.join("")));
+}
+
+async function normalizedTreeHash(root) {
+  const input = [];
+  for (const path of await listFiles(root)) {
+    const content = (await readFile(resolve(root, path), "utf8")).replace(
+      /\r\n?/g,
+      "\n",
+    );
+    input.push(path, "\0", sha256(Buffer.from(content)), "\0");
+  }
+  return sha256(Buffer.from(input.join("")));
+}
+
+async function normalizedCommitTreeHash(commit, sourcePath) {
+  const { stdout } = await exec(
+    "git",
+    ["ls-tree", "-r", "--full-tree", commit, sourcePath],
+    { cwd: repoRoot, windowsHide: true, maxBuffer: 4 * 1024 * 1024 },
+  );
+  const entries = stdout
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .map((line) => {
+      const match = /^(\d+)\s+blob\s+([0-9a-f]{40})\t(.+)$/.exec(line);
+      if (!match) throw new Error(`Unexpected git ls-tree row: ${line}`);
+      return { mode: match[1], object: match[2], path: match[3] };
+    })
+    .sort((left, right) => left.path.localeCompare(right.path, "en"));
+  const input = [];
+  for (const entry of entries) {
+    const { stdout: bytes } = await exec(
+      "git",
+      ["cat-file", "blob", entry.object],
+      {
+        cwd: repoRoot,
+        windowsHide: true,
+        encoding: "buffer",
+        maxBuffer: 4 * 1024 * 1024,
+      },
+    );
+    const normalized = Buffer.from(
+      bytes.toString("utf8").replace(/\r\n?/g, "\n"),
+    );
+    input.push(
+      entry.path.slice(`${sourcePath}/`.length),
+      "\0",
+      sha256(normalized),
       "\0",
     );
   }
@@ -870,12 +950,13 @@ async function artifactFacts(baseline, probes) {
     probes.default_init.created_file_count /
       baseline.empty_init.created_file_count;
   return {
-    version: JSON.parse(
-      await readFile(resolve(repoRoot, "package.json"), "utf8"),
-    ).version,
+    version: artifactVersion,
     skill: {
       path: "skills/self-evolution/SKILL.md",
       sha256: sha256(Buffer.from(skill)),
+      tree_sha256: await normalizedTreeHash(
+        resolve(repoRoot, "skills/self-evolution"),
+      ),
       lines,
       utf8_bytes: Buffer.byteLength(skill),
     },
@@ -1075,11 +1156,55 @@ async function buildResult() {
     id: fixture.id,
     sha256: fixture.contract_sha256,
   }));
-  const suiteVersion = "2.0.0-rc.1";
+  const suiteVersion = artifactVersion;
   const currentSkillHash = sha256(
     Buffer.from((await readFile(skillPath, "utf8")).replace(/\r\n?/g, "\n")),
   );
+  const currentSkillTreeHash = await normalizedTreeHash(
+    resolve(repoRoot, "skills/self-evolution"),
+  );
+  const baselineSkillTreeHash = await normalizedCommitTreeHash(
+    publicBaselineCommit,
+    "skills/self-evolution",
+  );
   const currentBundleHash = await fileHash(bundlePath);
+  const baselineBundleObject = await exec(
+    "git",
+    [
+      "rev-parse",
+      `${publicBaselineCommit}:skills/self-evolution/references/bin/kb.mjs`,
+    ],
+    { cwd: repoRoot, windowsHide: true },
+  );
+  const { stdout: baselineBundleBytes } = await exec(
+    "git",
+    ["cat-file", "blob", baselineBundleObject.stdout.trim()],
+    {
+      cwd: repoRoot,
+      windowsHide: true,
+      encoding: "buffer",
+      maxBuffer: 4 * 1024 * 1024,
+    },
+  );
+  const baselineBundleHash = sha256(
+    Buffer.from(baselineBundleBytes.toString("utf8").replace(/\r\n?/g, "\n")),
+  );
+  const baselineSubjectSha256 = sha256(
+    Buffer.from(
+      stableJson({
+        bundle_sha256: baselineBundleHash,
+        skill_tree_sha256: baselineSkillTreeHash,
+      }),
+    ),
+  );
+  const publicSubjectSha256 = sha256(
+    Buffer.from(
+      stableJson({
+        bundle_sha256: currentBundleHash,
+        skill_tree_sha256: currentSkillTreeHash,
+      }),
+    ),
+  );
   const evalContractHash = await normalizedFilesHash(
     import.meta.dirname,
     evalPolicyPaths,
@@ -1092,6 +1217,7 @@ async function buildResult() {
       suite_version: suiteVersion,
       baseline_sha256: sha256(Buffer.from(stableJson(baseline))),
       v2_skill_sha256: currentSkillHash,
+      v2_skill_tree_sha256: currentSkillTreeHash,
       v2_bundle_sha256: currentBundleHash,
       v1_subject_sha256: baseline.source.archive_tree_sha256,
       fixture_contracts_sha256: sha256(
@@ -1111,6 +1237,11 @@ async function buildResult() {
     migration_input_changed: await migrationInputChangedProbe(),
     migration_malformed: await malformedMigrationProbe(),
   };
+  const publicEvidence = await loadPublicEvidence(publicEvidencePath, {
+    baselineSubjectSha256,
+    subjectSha256: publicSubjectSha256,
+    changeClass: publicChangeClass,
+  });
   const artifact = await artifactFacts(baseline, probes);
   const gates = buildGates(baseline, artifact, probes, integratedEvidence);
   const v1InitGate = gates.find((item) => item.id === "initialized-file-count");
@@ -1119,6 +1250,39 @@ async function buildResult() {
     v1InitGate.evidence =
       "Frozen v1 initializer no longer matches its recorded output and exit behavior.";
   }
+  const profile = PUBLIC_RELEASE_PROFILES[releaseProfile];
+  const deterministicRequired = new Set(profile.required_deterministic_gates);
+  const gateById = new Map(gates.map((item) => [item.id, item]));
+  const deterministicFailures = [...deterministicRequired]
+    .map((id) => gateById.get(id))
+    .filter((item) => !item || item.status !== "pass");
+  const publicStatus = profile.require_public_benchmark
+    ? publicEvidence.evaluation.status
+    : "not-applicable";
+  const sampleStatus = profile.require_engineering_sample_for.includes(
+    publicChangeClass,
+  )
+    ? publicEvidence.sample.status
+    : "not-applicable";
+  const historicalIntegratedGates = gates.filter(
+    (item) => !deterministicRequired.has(item.id),
+  );
+  const historicalIntegratedStatus = profile.historical_integrated_required
+    ? historicalIntegratedGates.some((item) => item.status === "fail")
+      ? "fail"
+      : historicalIntegratedGates.some((item) => item.status === "blocked")
+        ? "blocked"
+        : historicalIntegratedGates.some((item) => item.status === "pending")
+          ? "pending"
+          : "pass"
+    : "not-applicable";
+  const releaseReady =
+    deterministicFailures.length === 0 &&
+    (!profile.require_public_benchmark || publicStatus === "pass") &&
+    (!profile.require_engineering_sample_for.includes(publicChangeClass) ||
+      sampleStatus === "pass") &&
+    (!profile.historical_integrated_required ||
+      historicalIntegratedStatus === "pass");
   return {
     schema_version: "1.0",
     suite_version: suiteVersion,
@@ -1129,13 +1293,25 @@ async function buildResult() {
     eval_contract_sha256: evalContractHash,
     integrated_evidence_sha256: integratedEvidence.sha256,
     deterministic_probes: probes,
+    public_evaluation: {
+      profile: releaseProfile,
+      change_class: publicChangeClass,
+      benchmark_status: publicStatus,
+      benchmark_reason: publicEvidence.evaluation.reason,
+      subject_sha256: publicSubjectSha256,
+      engineering_sample_status: sampleStatus,
+      historical_integrated_status: historicalIntegratedStatus,
+      required_deterministic_failures: deterministicFailures.map(
+        (item) => item?.id ?? "missing",
+      ),
+    },
     gates,
     summary: {
       pass: gates.filter((item) => item.status === "pass").length,
       fail: gates.filter((item) => item.status === "fail").length,
       pending: gates.filter((item) => item.status === "pending").length,
       blocked: gates.filter((item) => item.status === "blocked").length,
-      release_ready: gates.every((item) => item.status === "pass"),
+      release_ready: releaseReady,
     },
   };
 }
@@ -1148,6 +1324,9 @@ function markdown(result) {
     `Bundle SHA-256: \`${result.artifact.bundle.sha256}\``,
     `Fixtures: ${result.fixture_count}/13`,
     `Release ready: **${result.summary.release_ready ? "yes" : "no"}**`,
+    `Public profile: \`${result.public_evaluation.profile}\` / \`${result.public_evaluation.change_class}\``,
+    `Public benchmark: **${result.public_evaluation.benchmark_status}** — ${result.public_evaluation.benchmark_reason}`,
+    `Engineering sample: **${result.public_evaluation.engineering_sample_status}**; historical integrated: **${result.public_evaluation.historical_integrated_status}**`,
     "",
     "| Gate | State | Judge | Evidence |",
     "|---|---|---|---|",
@@ -1166,15 +1345,24 @@ function markdown(result) {
   return lines.join("\n");
 }
 
+const defaultEvaluation =
+  releaseProfile === "standard" && publicChangeClass === "core";
 const result = await buildResult();
 const serialized = await format(stableJson(result), { parser: "json" });
 const rendered = await format(markdown(result), { parser: "markdown" });
+const checkRecordedResult =
+  defaultEvaluation &&
+  (mode === "--verify" || (mode === "--release" && defaultEvaluation));
 
 if (mode === "--record") {
+  if (!defaultEvaluation)
+    throw new Error(
+      "--record is reserved for the default standard/core evaluation; use --verify or --release for other profiles.",
+    );
   await mkdir(dirname(resultPath), { recursive: true });
   await writeFile(resultPath, serialized, "utf8");
   await writeFile(reportPath, rendered, "utf8");
-} else {
+} else if (checkRecordedResult) {
   if (!(await exists(resultPath)) || !(await exists(reportPath))) {
     throw new Error("Recorded eval results are missing. Run with --record.");
   }
@@ -1187,8 +1375,13 @@ if (mode === "--record") {
 }
 
 process.stdout.write(
-  `${rendered}Summary: ${result.summary.pass} pass, ${result.summary.fail} fail, ${result.summary.pending} pending, ${result.summary.blocked} blocked.\n`,
+  `${rendered}Public profile: ${result.public_evaluation.profile}; benchmark=${result.public_evaluation.benchmark_status}; engineering-sample=${result.public_evaluation.engineering_sample_status}; historical-integrated=${result.public_evaluation.historical_integrated_status}.\nSummary: ${result.summary.pass} pass, ${result.summary.fail} fail, ${result.summary.pending} pending, ${result.summary.blocked} blocked.\n`,
 );
 
-if (result.summary.fail > 0 || result.summary.blocked > 0) process.exitCode = 1;
-if (mode === "--release" && !result.summary.release_ready) process.exitCode = 1;
+if (mode === "--release") {
+  if (!result.summary.release_ready) process.exitCode = 1;
+} else if (
+  result.public_evaluation.required_deterministic_failures.length > 0
+) {
+  process.exitCode = 1;
+}

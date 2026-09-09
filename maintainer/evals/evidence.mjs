@@ -1016,6 +1016,7 @@ export async function loadIntegratedEvidence(
       "suite_version",
       "baseline_sha256",
       "v2_skill_sha256",
+      "v2_skill_tree_sha256",
       "v2_bundle_sha256",
       "fixture_contracts_sha256",
       "eval_contract_sha256",
@@ -1024,11 +1025,12 @@ export async function loadIntegratedEvidence(
     ],
     "root",
   );
-  if (evidence.schema_version !== "2.0") fail("schema_version must be 2.0");
+  if (evidence.schema_version !== "2.1") fail("schema_version must be 2.1");
   nonEmptyString(evidence.suite_version, "suite_version");
   for (const field of [
     "baseline_sha256",
     "v2_skill_sha256",
+    "v2_skill_tree_sha256",
     "v2_bundle_sha256",
     "fixture_contracts_sha256",
     "eval_contract_sha256",
@@ -1053,7 +1055,7 @@ export async function loadIntegratedEvidence(
     v2: createHash("sha256")
       .update(
         stableJson({
-          skill_sha256: evidence.v2_skill_sha256,
+          skill_tree_sha256: evidence.v2_skill_tree_sha256,
           bundle_sha256: evidence.v2_bundle_sha256,
         }),
       )

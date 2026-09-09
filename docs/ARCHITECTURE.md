@@ -176,6 +176,27 @@ understand task
 Full-text search is the fallback when routing misses. A new Guide follows from
 durable future-action value established by the completed work.
 
+## Task continuity and change boundaries
+
+The host harness owns task continuity. For a multi-stage task it carries only
+the objective, constraints, verified state, important decisions, open risks,
+and next verification; after compaction or delegation the agent rereads the
+relevant routes before acting. Short tasks do not need a separate task record.
+The wiki stores cross-task facts and adopted choices, while maintainer files
+store changes to the distributed skill and its evaluation policy.
+
+Feedback follows `orient -> plan -> execute -> verify -> adjust or roll back ->
+close`. A failed check changes the task plan or local change first. It is
+promoted to project knowledge only when the result has a future consumer and
+claim-level evidence; a skill change additionally needs an observed failure or
+measured gap, expected benefit, maintenance cost, and focused validation.
+
+When sources disagree, separate observed behavior from adopted intent. Current
+code, configuration, and runtime establish what happened; an adopted policy or
+accepted Decision establishes what the project chose. Keep the conflict and its
+evidence visible, condition a risky action until it is resolved, and converge
+through correction, supersession, retirement, or archive.
+
 ## Write Flow
 
 At a task boundary, the model asks whether the finding has cross-session action
