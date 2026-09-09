@@ -1,16 +1,19 @@
 # Integrated Evaluation Evidence
 
-`run.mjs` leaves outcome gates pending until `integrated-gates.json` and all of
-its referenced artifacts are checked in. Missing evidence is honest and keeps
-the release candidate blocked.
+`run.mjs` leaves historical outcome gates pending until
+`integrated-gates.json` and all of its referenced artifacts are checked in.
+These gates are required by the `private` release profile. The `standard`
+profile uses the public benchmark and engineering evidence specified in
+`../SPEC.md` and reports the historical gates separately.
 
 ## Binding
 
-The root manifest uses `schema_version: "2.0"` and binds evidence to:
+The root manifest uses `schema_version: "2.1"` and binds evidence to:
 
-- the suite version;
+- the suite version, sourced from the root package version;
 - the normalized frozen v1 baseline;
-- the distributed v2 `SKILL.md` and CLI bundle;
+- the v2 `SKILL.md` entry file, the complete distributed
+  `skills/self-evolution/` tree, and the CLI bundle;
 - all fixture contracts and READMEs;
 - the evaluator policy, including `SPEC.md`, schemas, gate-to-fixture mapping,
   aggregation logic, and this document.
@@ -47,7 +50,8 @@ points to a hashed JSON record containing:
 - immutable tuple: suite, version, fixture, fixture digest, and attempt;
 - unique run ID;
 - evaluated-subject digest: the complete frozen v1 archive tree for v1, or the
-  stable digest of the distributed v2 skill and bundle for v2;
+  stable digest of the complete v2 `skills/self-evolution/` distribution tree
+  together with its bundled CLI for v2;
 - execution status, exit code, and stdout/stderr hashes;
 - campaign, model, prompt hash, tool budget, task-input repository hash,
   stopping-rule
@@ -72,6 +76,12 @@ malformed source evidence becomes `not-measured`, never numeric zero.
 version-specific skill/runtime is injected; the root manifest separately binds
 the frozen v1 baseline and distributed v2 artifacts. Paired v1/v2 attempts must
 use the same protocol except for their blind label and evaluated-subject digest.
+The root manifest keeps `v2_skill_sha256` for the `SKILL.md` entry file and
+stores `v2_skill_tree_sha256` for the complete normalized skill tree. The v2
+subject binding is the SHA-256 of the stable JSON object
+`{skill_tree_sha256, bundle_sha256}`; changing any distributed skill file or the
+CLI therefore invalidates the paired v2 subject even when the entry file is
+unchanged.
 The prompt, repository input, stopping rule, and toolchain hashes each bind
 exactly one raw artifact of the same name; free-form hashes without those bytes
 are rejected. The toolchain artifact identifies the run harness, measurement

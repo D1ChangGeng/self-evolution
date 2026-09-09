@@ -1,6 +1,7 @@
 # Self-Evolution v2 Design
 
-Status: release candidate for `v2.0.0`; outcome gates remain pending
+Status: design contract for `v2.0.0`; current release evidence is recorded in
+[`evals/RESULTS.md`](evals/RESULTS.md).
 
 ## Purpose
 
@@ -162,3 +163,21 @@ failure, affected future action, why current behavior is insufficient, expected
 benefit, context and maintenance cost, false-trigger harm, default state,
 measurement method, and removal condition. New fields also name their producer,
 consumer, read point, decision effect, lifecycle, and deletion rule.
+
+## Release profiles
+
+Release evidence is matched to change impact. The standard profile requires the
+deterministic safety gates plus the independent public benchmark and changed
+path checks selected by `docs`, `routing`, `core`, or `migration`. The private
+profile preserves the original three-attempt v1/v2 integrated campaign as a
+later enhancement. A missing or unavailable public run is `blocked` and keeps
+the applicable standard release from becoming ready; it does not rewrite the
+historical gates or claim a score.
+
+The public benchmark adapter lives under `maintainer/evals/public/` and is not
+loaded by projects. LongMemEval cleaned is the primary comparable memory
+regression; pinned LongMemEval-V2 is a secondary agentic-engineering pilot for
+core changes. Both are complemented by deterministic checks and small blinded
+engineering tasks because public conversation or trajectory benchmarks do not
+measure repository routing, source-change handling, Capture value, or harness
+safety.

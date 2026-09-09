@@ -1,13 +1,16 @@
 # Current v2 Evaluation Results
 
-Artifact: `2.0.0-rc.1`
-Bundle SHA-256: `0b720b6a4a82b3f23dda70cfdafaf33c365201b564b63c208e18bef0954a95ad`
+Artifact: `2.0.0`
+Bundle SHA-256: `96ad0fde0c34535f29115199f24440e16fa74506dea47c120e3df37bb9b84daf`
 Fixtures: 13/13
 Release ready: **no**
+Public profile: `standard` / `core`
+Public benchmark: **blocked** — evidence file is missing
+Engineering sample: **blocked**; historical integrated: **not-applicable**
 
 | Gate                            | State   | Judge                       | Evidence                                                                                                                                        |
 | ------------------------------- | ------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| skill-lines                     | pass    | program                     | 435 lines; maximum 450                                                                                                                          |
+| skill-lines                     | pass    | program                     | 311 lines; maximum 450                                                                                                                          |
 | initialized-file-count          | pass    | program                     | 7 -> 3 files (57.1% reduction)                                                                                                                  |
 | initialization-protocol-tokens  | pending | program-plus-maintainer     | This gate requires exact, versioned tokenizer counts for both onboarding protocols.                                                             |
 | metadata-writes                 | pending | program-plus-maintainer     | This gate requires integrated task transcripts with task-time metadata writes.                                                                  |

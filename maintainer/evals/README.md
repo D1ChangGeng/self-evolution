@@ -10,15 +10,20 @@ metadata, and deterministic checks never certify semantic task quality.
 node maintainer/evals/run.mjs --verify
 node maintainer/evals/run.mjs --record
 node maintainer/evals/run.mjs --release
+# Narrow or strict release profiles
+node maintainer/evals/run.mjs --release --profile=standard --change-class=docs
+node maintainer/evals/run.mjs --release --profile=private
 ```
 
 - `--verify` runs deterministic probes and verifies that the checked-in result
-  files describe the current artifact. Pending blinded outcomes are allowed,
-  but they remain visible and keep the release candidate blocked.
+  files describe the current artifact. Pending evidence remains visible; the
+  selected release profile decides whether it blocks release.
 - `--record` updates `results/v2-current.json` and `RESULTS.md` after an
   intentional artifact change.
-- `--release` runs the same checks and exits non-zero unless every release gate,
-  including blinded v1/v2 task outcomes, has recorded evidence.
+- `--release` runs the selected profile. The default `standard` profile uses
+  deterministic safety, the independent public benchmark policy, and a
+  changed-path engineering sample. `--profile=private` retains the strict
+  historical v1/v2 integrated campaign as a later enhancement.
 
 All three modes materialize every fixture and execute its declared initial
 verifier before evaluating gates. The direct release command therefore cannot
@@ -68,9 +73,10 @@ with a campaign-pinned tokenizer over the original input bytes. Heuristic token
 estimates are not comparable evidence.
 
 Each run also binds the evaluated subject. v1 uses the digest of every file and
-mode in the frozen archive; v2 uses the stable digest of the distributed skill
-and CLI bundle. Paired protocol equality intentionally excludes only the blind
-label and this version-specific subject digest.
+mode in the frozen archive; v2 uses the stable digest of the complete
+`skills/self-evolution/` distribution tree together with the bundled CLI. Paired
+protocol equality intentionally excludes only the blind label and this
+version-specific subject digest.
 
 Blinded reviewers classify every selected-context item and every persisted
 Capture item, with evidence references and rationale. The evaluator totals the
@@ -86,12 +92,14 @@ different tuple, or changing the record behind a shared tuple, is rejected.
 This uniqueness check does not extend to evidence manifests outside the
 repository or to campaigns that were never checked in.
 
-Until those records exist, `results/v2-current.json` must say `pending`; a
-fixture definition or deterministic CLI signal is not a substitute for a task
-run. Add the evidence manifest described in `evidence/README.md`; the runner
-requires three hashed v1 and three hashed v2 artifacts for every listed fixture
-plus a hashed maintainer or blinded-review artifact. The release gate is
-defined in `SPEC.md`. Fixture authoring rules live in `fixtures/README.md`.
+Until those records exist, the historical integrated gates in
+`results/v2-current.json` remain `pending`; a fixture definition or
+deterministic CLI signal is not a substitute for a task run. The standard
+profile does not silently reinterpret those pending historical gates as a
+failure, while the private profile still requires them. Public benchmark
+evidence follows `public/PUBLIC-BENCHMARKS.md` and is checked through the
+independent `public/public.mjs` layer. Fixture authoring rules live in
+`fixtures/README.md`.
 
 For absolute model-outcome gates, only the three v2 attempts determine pass,
 fail, or blocked; v1 attempts remain the frozen comparison baseline. A run

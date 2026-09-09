@@ -5,6 +5,20 @@ recorded here. Versions follow semantic versioning.
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-09-09
+
+The v2 project-wiki contract now separates task continuity, durable project
+knowledge, and distributed-skill evolution. Release eligibility is recorded in
+`evals/RESULTS.md` under the selected release profile.
+
+- Clarified harness-neutral task continuity, project-wiki lifecycle, conflict
+  handling, stale-source review, and No-Negative-Echo writing rules.
+- Added Codex, Claude Code, and OpenCode integration guidance with explicit
+  adapter capability states and manual fallbacks.
+- Added independent public memory evaluation profiles with LongMemEval cleaned
+  as the primary benchmark and pinned LongMemEval-V2 as a core-change pilot;
+  the historical private campaign is no longer an implicit prerequisite for
+  every release.
 - Established the root README as the v1-to-v2 migration entry point and
   `docs/MIGRATION.md` as the authoritative procedure.
 - Defined the runtime Skill around Onboard, Retrieve, Capture or Correct,

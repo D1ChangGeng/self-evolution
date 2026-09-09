@@ -8,6 +8,9 @@ import { stableJson } from "./contract.mjs";
 import { loadIntegratedEvidence } from "./evidence.mjs";
 
 const digest = (value) => createHash("sha256").update(value).digest("hex");
+const suiteVersion = JSON.parse(
+  await readFile(resolve(import.meta.dirname, "../../package.json"), "utf8"),
+).version;
 
 const fixture = {
   id: "no-capture",
@@ -46,7 +49,7 @@ function protocol(version, artifacts) {
   const v2Subject = digest(
     stableJson({
       bundle_sha256: "c".repeat(64),
-      skill_sha256: "b".repeat(64),
+      skill_tree_sha256: "2".repeat(64),
     }),
   );
   return {
@@ -218,7 +221,7 @@ async function validEvidence(root, gateId = "no-capture-write-free") {
         artifact: await artifact(root, `evidence/runs/${runId}.json`, {
           schema_version: "1.0",
           run_id: runId,
-          suite_version: "2.0.0-rc.1",
+          suite_version: suiteVersion,
           version,
           fixture_id: "no-capture",
           fixture_contract_sha256: fixture.contract_sha256,
@@ -238,7 +241,7 @@ async function validEvidence(root, gateId = "no-capture-write-free") {
   const review = await artifact(root, "evidence/reviews/no-capture.json", {
     schema_version: "1.0",
     gate_id: gateId,
-    suite_version: "2.0.0-rc.1",
+    suite_version: suiteVersion,
     reviewer: "blind-review-panel",
     reviewed_at: "2026-07-31",
     blind: true,
@@ -277,10 +280,11 @@ async function validEvidence(root, gateId = "no-capture-write-free") {
     rationale: "All blinded runs satisfy the fixture rubric.",
   });
   return {
-    schema_version: "2.0",
-    suite_version: "2.0.0-rc.1",
+    schema_version: "2.1",
+    suite_version: suiteVersion,
     baseline_sha256: "a".repeat(64),
     v2_skill_sha256: "b".repeat(64),
+    v2_skill_tree_sha256: "2".repeat(64),
     v2_bundle_sha256: "c".repeat(64),
     fixture_contracts_sha256: "d".repeat(64),
     eval_contract_sha256: "e".repeat(64),
@@ -521,7 +525,7 @@ test("rejects prose-only review, inconsistent verdicts, and protocol drift", asy
   const review = {
     schema_version: "1.0",
     gate_id: "no-capture-write-free",
-    suite_version: "2.0.0-rc.1",
+    suite_version: suiteVersion,
     reviewer: "blind-review-panel",
     reviewed_at: "2026-07-31",
     blind: true,
@@ -585,7 +589,7 @@ test("rejects prose-only review, inconsistent verdicts, and protocol drift", asy
   const value = {
     schema_version: "1.0",
     run_id: "bravo-no-capture-1",
-    suite_version: "2.0.0-rc.1",
+    suite_version: suiteVersion,
     version: "v2",
     fixture_id: "no-capture",
     fixture_contract_sha256: fixture.contract_sha256,
@@ -667,6 +671,7 @@ test("rejects evidence recorded for different evaluation policy", async () => {
       suite_version: evidence.suite_version,
       baseline_sha256: evidence.baseline_sha256,
       v2_skill_sha256: evidence.v2_skill_sha256,
+      v2_skill_tree_sha256: evidence.v2_skill_tree_sha256,
       v2_bundle_sha256: evidence.v2_bundle_sha256,
       fixture_contracts_sha256: evidence.fixture_contracts_sha256,
       eval_contract_sha256: "0".repeat(64),
@@ -707,7 +712,7 @@ test("requires unavailable or failed v2 runs to block the gate", async () => {
   const value = {
     schema_version: "1.0",
     run_id: "bravo-no-capture-1",
-    suite_version: "2.0.0-rc.1",
+    suite_version: suiteVersion,
     version: "v2",
     fixture_id: "no-capture",
     fixture_contract_sha256: fixture.contract_sha256,
@@ -1027,6 +1032,18 @@ test("binds each run to the frozen evaluated subject", async () => {
   const content = `${JSON.stringify(value, null, 2)}\n`;
   await writeFile(runPath, content, "utf8");
   run.artifact.sha256 = digest(content);
+  const path = resolve(root, "evidence/integrated-gates.json");
+  await writeFile(path, `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
+  await assert.rejects(
+    loadIntegratedEvidence(path, root, [fixture]),
+    /subject_sha256 does not match the evaluated subject/,
+  );
+});
+
+test("binds the v2 subject to the complete skill tree", async () => {
+  const root = await mkdtemp(resolve(tmpdir(), "self-evolution-evidence-"));
+  const evidence = await validEvidence(root);
+  evidence.v2_skill_tree_sha256 = "0".repeat(64);
   const path = resolve(root, "evidence/integrated-gates.json");
   await writeFile(path, `${JSON.stringify(evidence, null, 2)}\n`, "utf8");
   await assert.rejects(

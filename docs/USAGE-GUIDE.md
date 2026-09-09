@@ -51,6 +51,12 @@ documentation, or an explicit human decision.
 When routing misses, use repository search. Create a Guide when the completed
 investigation establishes durable future-action value.
 
+For a multi-stage task, keep the objective, constraints, verified state,
+important decisions, open risks, and next verification in the host harness's
+normal task state. After compaction, delegation, or a long pause, reread that
+state and the relevant Guide before continuing. Do not use the project wiki as
+a progress log or retry queue.
+
 ## Capture or Correct
 
 At a meaningful task boundary, ask:
@@ -201,3 +207,14 @@ Before writing durable knowledge, be able to answer:
 
 When those answers are open, keep the finding in its current source of truth or
 use a temporary Observation while its future destination is established.
+
+## Release and evaluation
+
+Use the change class that matches the actual impact: `docs`, `routing`,
+`core`, or `migration`. The standard release profile combines deterministic
+safety checks, the public benchmark policy, and a changed-path engineering
+sample. The strict historical v1/v2 campaign remains available as the
+`private` enhancement profile. Run `maintainer/evals/run.mjs --release` with
+`--profile` and `--change-class` as described in the maintainer evaluation
+guide. Missing benchmark data, dependencies, credentials, or a host capability
+are `blocked`/`not-measured`; they are never converted to a passing result.

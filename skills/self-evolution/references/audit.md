@@ -63,6 +63,13 @@ Find expensive recurring investigations, high-risk operations, or known failure 
 where a concise Guide or route would materially improve future outcomes. Require
 evidence of the cost or risk; do not infer a gap from directory coverage.
 
+### Continuity and Boundaries
+
+Find task state duplicated in the wiki, recovery that loses the objective or
+verified state, unaccepted work promoted to durable knowledge, or adapters that
+claim ownership of planning, retries, or knowledge writes. Require evidence from
+the host workflow, generated registration, or a replayable task trace.
+
 ## Severity
 
 - Critical: likely immediate data loss, security exposure, destructive operation, or

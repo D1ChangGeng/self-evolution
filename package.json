@@ -1,6 +1,6 @@
 {
   "name": "self-evolution",
-  "version": "2.0.0-rc.1",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "bin": {
@@ -18,7 +18,7 @@
     "format:check": "prettier --check tools/kb maintainer/evals package.json tsconfig.json .github",
     "test": "vitest run",
     "test:coverage": "vitest run",
-    "eval": "node --test maintainer/evals/contract-check.mjs maintainer/evals/evidence-check.mjs && node maintainer/evals/run.mjs --verify",
+    "eval": "node --test maintainer/evals/contract-check.mjs maintainer/evals/evidence-check.mjs maintainer/evals/public/public.test.mjs && node maintainer/evals/run.mjs --verify",
     "eval:record": "node maintainer/evals/run.mjs --record",
     "eval:release": "node maintainer/evals/run.mjs --release",
     "eval:external": "node maintainer/evals/external/cli.mjs",
@@ -27,11 +27,15 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.14",
-    "esbuild": "^0.25.9",
+    "esbuild": "^0.28.2",
     "picomatch": "^4.0.3",
     "prettier": "^3.6.2",
     "typescript": "^5.9.2",
-    "vitest": "^4.1.5",
+    "vite": "^8.2.0",
+    "vitest": "^4.1.11",
     "yaml": "^2.8.1"
+  },
+  "overrides": {
+    "nanoid": "3.3.18"
   }
 }

@@ -1,0 +1,156 @@
+# Public benchmark execution layer
+
+The benchmark layer is an independent maintainer tool. It records pinned
+upstream sources, environment probes, commands, raw outputs, and derived
+metrics; it is not loaded by `skills/self-evolution/SKILL.md` and is not part of
+project initialization.
+
+## Planned layout
+
+```text
+public/
+  PUBLIC-BENCHMARKS.md       # selection and gate policy
+  RESULTS-1302-1.md          # host-specific execution receipt
+  public.mjs                 # independent evidence validator
+  public.test.mjs            # validator regression tests
+  evidence.json              # optional checked-in run manifest
+  campaigns/<id>/             # ignored or external raw benchmark outputs
+```
+
+A campaign runner should invoke the upstream LongMemEval cleaned evaluator from
+a frozen dataset revision. For core changes it additionally runs the pinned
+LongMemEval-V2 pilot. The manifest contains:
+
+- one or both benchmark declarations: cleaned requires dataset revision and
+  V2 requires repository commit `2cc8c540bdb87fe6761629b585e727e1c4704520`;
+- dataset hashes and license;
+- host, OS, Python/Node/toolchain versions, model endpoint and model revision;
+- exact command, prompt/template, context limit, seed, and start/end times;
+- raw output paths and SHA-256 hashes;
+- per-domain/per-ability accuracy, latency p50/p95, context volume, and
+  availability states; and
+- baseline comparison and gate status (`pass`, `fail`, `blocked`, or
+  `not-comparable`).
+
+No generic agent runtime is bundled: both benchmarks require external data and
+model endpoints, while the V2 Codex module additionally requires a separately
+installed Codex binary. Maintaining a second runtime here would duplicate host
+harness behavior and distort the skill boundary. The independent validator
+checks the manifest and can be used by a host-specific runner without changing
+the distributed bundle.
+
+Until then, use the checked-in host receipt and keep all unavailable metrics
+explicitly `not-measured`.
+
+## Evidence shape
+
+The validator accepts one benchmark for docs, routing, or migration changes and
+both declarations for a core change. A minimal core manifest has this shape
+(values are illustrative and must be replaced with measured evidence):
+
+```json
+{
+  "schema_version": "2.0",
+  "campaign_id": "public-20260909-01",
+  "change_class": "core",
+  "benchmark": [
+    {
+      "id": "longmemeval-cleaned",
+      "repository": "xiaowu0162/LongMemEval",
+      "dataset": "xiaowu0162/longmemeval-cleaned",
+      "data_revision": "<HF revision>",
+      "data_sha256": "<64 hex chars>"
+    },
+    {
+      "id": "longmemeval-v2",
+      "repository": "xiaowu0162/LongMemEval-V2",
+      "commit": "2cc8c540bdb87fe6761629b585e727e1c4704520",
+      "data_sha256": "<64 hex chars>"
+    }
+  ],
+  "host": "1302-1",
+  "artifact_root": "<campaign artifact directory>",
+  "runs": [
+    {
+      "benchmark_id": "longmemeval-cleaned",
+      "tier": "full",
+      "question_manifest": {
+        "path": "manifests/cleaned-full.json",
+        "sha256": "<64 hex chars>"
+      },
+      "protocol": {
+        "path": "protocols/cleaned-full.json",
+        "sha256": "<64 hex chars>"
+      },
+      "baseline": {
+        "subject": {
+          "commit": "c998067f73620a4721367e33a31063882896d476",
+          "sha256": "<64 hex chars>"
+        },
+        "results": {
+          "path": "results/cleaned-full-baseline.json",
+          "sha256": "<64 hex chars>"
+        }
+      },
+      "candidate": {
+        "subject": {
+          "sha256": "<sha256(stable-json({skill_tree_sha256,bundle_sha256}))>"
+        },
+        "results": {
+          "path": "results/cleaned-full-candidate.json",
+          "sha256": "<64 hex chars>"
+        }
+      }
+    }
+  ],
+  "engineering": {
+    "harnesses": [
+      "<execution+review artifact refs for codex>",
+      "<execution+review artifact refs for claude-code>",
+      "<execution+review artifact refs for opencode>"
+    ],
+    "samples": ["<at least three execution+review artifact pairs>"]
+  }
+}
+```
+
+Each `results.questions[]` entry contains only its question id and references
+to three hashed raw artifacts: `prediction`, `judge`, and `trace`. It must not
+contain correctness, ability, domain, latency, context size, or aggregate
+metrics. Correctness is derived from `judge.verdict`; ability and domain come
+from the pinned official manifest; latency is the ordered
+`trace.started_at`/`trace.ended_at` duration; context size is the UTF-8 byte
+length of the trace's selected context items. The evaluator recomputes all
+aggregate metrics from these artifacts.
+
+Raw artifact contracts are intentionally small:
+
+- `prediction`: `public-prediction/1`, question id, arm, subject and protocol
+  digests, and the model answer;
+- `judge`: `public-judge/1`, question id, arm, subject and protocol digests,
+  prediction digest, evaluator identity, and `verdict: correct|incorrect`;
+- `trace`: `public-trace/1`, question id, arm, subject and protocol digests,
+  prediction digest, ordered timestamps, and `selected_context[]` entries with
+  an id and text.
+
+The loader owns its derived validation state. Evidence JSON must not contain
+internal fields such as `_validatedRuns` or `_engineering`; those fields are
+rejected before validation so a checked-in manifest cannot inject a result.
+
+Baseline and candidate subjects are both required. The baseline must use the
+frozen baseline commit and its digest must match the caller's
+`baselineSubjectSha256`; the candidate digest is bound through
+`subjectSha256`. A mismatch is `not-comparable`.
+
+Engineering evidence is optional for profiles that do not require it. When it
+is present, each review may be `pass` or `fail`; a valid `fail` review produces
+an engineering `fail` result, while missing or malformed engineering evidence
+remains `blocked`. This status is evaluated independently from public benchmark
+status. Every execution and review receipt must name its harness, campaign,
+task, and distinct executor/reviewer. Receipt bytes and task identifiers may
+not be reused across harness labels or samples.
+
+For a core release, add a second run with `benchmark_id:
+"longmemeval-v2"`, `tier: "medium"`, and both `web` and `enterprise` domains.
+Do not use zero placeholders in a real manifest; unavailable values must leave
+the run blocked or not-measured until raw evidence exists.

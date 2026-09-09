@@ -74,8 +74,51 @@ The runner records each gate as one of:
 - `blocked`: a prerequisite failed, so the gate cannot yet be evaluated.
 
 `pending` is not a soft pass. CI may verify that pending evidence is represented
-honestly, while `node maintainer/evals/run.mjs --release` must reject every
-`pending`, `blocked`, or `fail` release gate.
+honestly. The selected release profile decides which gates are required;
+`standard` excludes the historical integrated outcome gates, while `private`
+requires them. Every required `pending`, `blocked`, or `fail` gate rejects that
+profile's release.
+
+## Release profiles
+
+The evaluator supports two release profiles so validation cost matches the
+change and the project's maturity:
+
+- `standard` (the default) requires all deterministic safety and migration
+  gates, the independent public benchmark requirements in
+  `public/PUBLIC-BENCHMARKS.md`, and a changed-path engineering sample for
+  core retrieval changes. Historical three-attempt v1/v2 integrated gates may
+  remain `pending` in this profile; that state is reported separately and is
+  never converted into a pass.
+- `private` is the strict enhancement profile. It retains the complete frozen
+  v1/v2 integrated campaign and requires every historical semantic gate to be
+  `pass` before release.
+
+Use `--change-class=docs|routing|core|migration` to select the impact class;
+the default is `core`. The independent policy in
+`maintainer/evals/public/PUBLIC-BENCHMARKS.md` defines the LongMemEval cleaned
+sample/full requirements, the LongMemEval-V2 secondary pilot, latency/context
+limits, and sampling frequency for each class. Missing data, dependencies,
+credentials, or a model endpoint produce `blocked`/`not-measured`; they never
+become a passing score. A profile reports `release_ready: true` only when its
+own required evidence passes; unrelated optional evidence remains visible with
+its actual state.
+
+Invoke the selected profile explicitly when the distinction matters:
+
+```text
+node maintainer/evals/run.mjs --release --profile=standard --change-class=docs
+node maintainer/evals/run.mjs --release --profile=private
+```
+
+`--change-class` accepts `docs`, `routing`, `core`, or `migration`. The public
+benchmark layer is independent of the distributed skill and keeps unavailable
+external runs as `blocked`/`not-measured`; a missing benchmark cannot be
+interpreted as a successful score. Core changes require both the mature
+LongMemEval cleaned full set and the pinned LongMemEval-V2 medium pilot, as
+well as the changed-path engineering sample. Full private case evaluation is
+reserved for a later enhancement and does not silently gate ordinary wording,
+routing, or migration releases.
 
 The deterministic suite may establish file counts, hashes, generated settings,
 source-change diagnostics, idempotency, and rollback identity. It may not turn
