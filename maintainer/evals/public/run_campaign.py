@@ -32,6 +32,7 @@ V2_DATA_REVISION = "f152293e235517d504809563c833d7190b8c713b"
 V2_REPOSITORY_COMMIT = "2cc8c540bdb87fe6761629b585e727e1c4704520"
 LONGMEMEVAL_REPOSITORY_COMMIT = "9e0b455f4ef0e2ab8f2e582289761153549043fc"
 RUNNER_REVISION = "self-evolution-public-runner/1"
+JUDGE_RUNNER_REVISION = "self-evolution-public-judge/2"
 MAX_V2_CONTEXT_CHARS = 40_000
 MAX_V2_STATE_CHARS = 5_000
 V2_TOP_TRAJECTORIES = 12
@@ -607,11 +608,12 @@ def parse_binary_judge(text: str) -> tuple[bool, str]:
                 return bool(int(value["label"])), str(value.get("reason", ""))
         except json.JSONDecodeError:
             pass
-    lowered = text.strip().lower()
-    if lowered.startswith("yes"):
-        return True, text.strip()
-    if lowered.startswith("no"):
-        return False, text.strip()
+    without_thinking = re.sub(
+        r"<think>.*?</think>", "", text, flags=re.IGNORECASE | re.DOTALL
+    ).strip()
+    yes_no = re.findall(r"\b(yes|no)\b", without_thinking.lower())
+    if yes_no:
+        return yes_no[-1] == "yes", text.strip()
     label = re.search(r"\blabel\b\s*[:=]\s*([01])", text, flags=re.I)
     if label:
         return label.group(1) == "1", text.strip()
@@ -644,7 +646,22 @@ async def run_predictions(
         prediction_path = campaign_root / "artifacts" / benchmark / arm / "predictions" / f"{question_id}.json"
         trace_path = campaign_root / "artifacts" / benchmark / arm / "traces" / f"{question_id}.json"
         if prediction_path.exists() and trace_path.exists():
-            return
+            try:
+                existing_prediction = read_json(prediction_path)
+                existing_trace = read_json(trace_path)
+                if (
+                    existing_prediction.get("protocol_sha256") == protocol_ref["sha256"]
+                    and existing_prediction.get("subject_sha256")
+                    == subjects[arm]["subject_sha256"]
+                    and existing_trace.get("prediction_sha256")
+                    == sha256_file(prediction_path)
+                    and existing_trace.get("protocol_sha256") == protocol_ref["sha256"]
+                    and existing_trace.get("subject_sha256")
+                    == subjects[arm]["subject_sha256"]
+                ):
+                    return
+            except (OSError, ValueError, json.JSONDecodeError):
+                pass
         selected = contexts[question_id]
         started = utc_now()
         start_clock = time.perf_counter()
@@ -702,9 +719,22 @@ async def run_judges(
         question_id = item.get("question_id") or item["id"]
         prediction_path = campaign_root / "artifacts" / benchmark / arm / "predictions" / f"{question_id}.json"
         judge_path = campaign_root / "artifacts" / benchmark / arm / "judges" / f"{question_id}.json"
-        if judge_path.exists():
-            return
         prediction = read_json(prediction_path)["answer"]
+        if judge_path.exists():
+            try:
+                existing = read_json(judge_path)
+                if (
+                    existing.get("protocol_sha256") == protocol_ref["sha256"]
+                    and existing.get("subject_sha256")
+                    == subjects[arm]["subject_sha256"]
+                    and existing.get("prediction_sha256")
+                    == sha256_file(prediction_path)
+                    and existing.get("evaluator", {}).get("config_sha256")
+                    == evaluator["config_sha256"]
+                ):
+                    return
+            except (OSError, ValueError, json.JSONDecodeError):
+                pass
         raw_response: str | None = None
         reason = "official deterministic evaluator"
         if benchmark == "cleaned":
@@ -983,7 +1013,8 @@ async def main_async(args: argparse.Namespace) -> None:
     datasets = dataset_contracts(args, prepared)
     protocols = prepare_protocols(args, subjects, datasets)
     judge_config = {
-        "runner_revision": args.runner_revision,
+        "runner_revision": JUDGE_RUNNER_REVISION,
+        "runner_source_sha256": sha256_file(Path(__file__).resolve()),
         "longmemeval_commit": LONGMEMEVAL_REPOSITORY_COMMIT,
         "longmemeval_v2_commit": V2_REPOSITORY_COMMIT,
         "model": args.model,
