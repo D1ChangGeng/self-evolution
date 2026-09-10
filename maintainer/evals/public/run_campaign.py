@@ -937,6 +937,44 @@ async def main_async(args: argparse.Namespace) -> None:
         "baseline": (args.baseline_skill / "SKILL.md").read_text(encoding="utf-8"),
         "candidate": (args.candidate_skill / "SKILL.md").read_text(encoding="utf-8"),
     }
+    key = args.api_key_file.read_text(encoding="utf-8").strip()
+    if not key:
+        raise RuntimeError("API key file is empty")
+    endpoint = Endpoint(
+        args.base_url,
+        key,
+        args.model,
+        args.concurrency,
+        args.timeout,
+        args.reasoning_effort,
+    )
+    if args.endpoint_smoke:
+        try:
+            response = await endpoint.chat(
+                [
+                    {
+                        "role": "user",
+                        "content": "Return exactly SELF_EVOLUTION_PUBLIC_ENDPOINT_OK",
+                    }
+                ],
+                max_tokens=64,
+            )
+            if response["answer"] != "SELF_EVOLUTION_PUBLIC_ENDPOINT_OK":
+                raise RuntimeError("endpoint smoke returned an unexpected sentinel")
+            print(
+                json.dumps(
+                    {
+                        "status": "pass",
+                        "model": response["response_model"],
+                        "usage_recorded": response["usage"] is not None,
+                    },
+                    sort_keys=True,
+                )
+            )
+        finally:
+            await endpoint.close()
+        return
+
     prepared = prepare_contexts(args)
     datasets = dataset_contracts(args, prepared)
     protocols = prepare_protocols(args, subjects, datasets)
@@ -955,17 +993,10 @@ async def main_async(args: argparse.Namespace) -> None:
         "config_sha256": sha256_file(judge_config_path),
     }
 
-    key = args.api_key_file.read_text(encoding="utf-8").strip()
-    if not key:
-        raise RuntimeError("API key file is empty")
-    endpoint = Endpoint(
-        args.base_url,
-        key,
-        args.model,
-        args.concurrency,
-        args.timeout,
-        args.reasoning_effort,
-    )
+    if args.prepare_only:
+        await endpoint.close()
+        print(f"prepared campaign inputs: {args.campaign_root}", flush=True)
+        return
     try:
         for benchmark, content in zip(("cleaned", "v2"), prepared):
             await run_predictions(
@@ -1088,6 +1119,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--reasoning-effort", default="low")
     parser.add_argument("--concurrency", type=int, default=24)
     parser.add_argument("--timeout", type=float, default=300.0)
+    parser.add_argument("--endpoint-smoke", action="store_true")
+    parser.add_argument("--prepare-only", action="store_true")
     return parser.parse_args()
 
 
