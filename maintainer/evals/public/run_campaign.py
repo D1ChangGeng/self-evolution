@@ -461,7 +461,10 @@ class Endpoint:
         await self.client.aclose()
 
     async def chat(
-        self, messages: list[dict[str, str]], max_tokens: int = 1024
+        self,
+        messages: list[dict[str, str]],
+        max_tokens: int = 1024,
+        json_mode: bool = False,
     ) -> dict[str, Any]:
         payload: dict[str, Any] = {
             "model": self.model,
@@ -470,6 +473,8 @@ class Endpoint:
             "temperature": 0,
             "reasoning_effort": self.reasoning_effort,
         }
+        if json_mode:
+            payload["response_format"] = {"type": "json_object"}
         headers = {"Authorization": f"Bearer {self.api_key}"}
         last_error: Exception | None = None
         async with self.semaphore:
@@ -672,7 +677,21 @@ def parse_paired_judge(text: str) -> dict[str, tuple[bool, str]]:
     match = re.search(r"\{.*\}", without_thinking, flags=re.DOTALL)
     if not match:
         raise ValueError(f"cannot parse paired judge response: {text!r}")
-    payload = json.loads(match.group(0))
+    try:
+        payload = json.loads(match.group(0))
+    except json.JSONDecodeError:
+        payload = {}
+        for arm in ("A", "B"):
+            arm_match = re.search(
+                rf'["\']{arm}["\']\s*:\s*\{{.*?["\']label["\']\s*:\s*["\']?([01])["\']?',
+                match.group(0),
+                flags=re.IGNORECASE | re.DOTALL,
+            )
+            if arm_match:
+                payload[arm] = {
+                    "label": int(arm_match.group(1)),
+                    "reason": "recovered from explicit neutral-arm label",
+                }
     result: dict[str, tuple[bool, str]] = {}
     for arm in ("A", "B"):
         value = payload.get(arm)
@@ -840,8 +859,24 @@ async def run_judges(
                     item, predictions["baseline"], predictions["candidate"]
                 )
             )
-            response = await endpoint.chat(messages, max_tokens=384)
+            response = await endpoint.chat(messages, max_tokens=384, json_mode=True)
             raw_response = response["answer"]
+            raw_path = (
+                campaign_root
+                / "raw-judge-responses"
+                / benchmark
+                / f"{question_id}.json"
+            )
+            write_json(
+                raw_path,
+                {
+                    "question_id": question_id,
+                    "response": raw_response,
+                    "provider_response_id": response["response_id"],
+                    "provider_model": response["response_model"],
+                    "provider_usage": response["usage"],
+                },
+            )
             parsed = parse_paired_judge(raw_response)
             labels = {"baseline": parsed["A"], "candidate": parsed["B"]}
 
