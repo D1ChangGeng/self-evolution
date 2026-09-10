@@ -69,6 +69,19 @@ runtime dependency into the distributed skill. The generated evidence remains
 incomplete until the separate engineering execution and review receipts are
 attached.
 
+Validate a generated manifest with the subject digests from the frozen campaign:
+
+```text
+node maintainer/evals/public/validate_evidence.mjs \
+  <campaign/evidence.json> \
+  <baseline-subject-sha256> \
+  <candidate-subject-sha256> \
+  core
+```
+
+The command prints only derived summaries; the evaluator still reads and hashes
+every referenced per-question artifact.
+
 Until then, use the checked-in host receipt and keep all unavailable metrics
 explicitly `not-measured`.
 
