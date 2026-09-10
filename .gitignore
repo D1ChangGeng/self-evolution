@@ -14,6 +14,8 @@ Thumbs.db
 /coverage/
 /.cache/
 *.tsbuildinfo
+__pycache__/
+*.pyc
 
 # Local package-manager and migration scratch state
 node_modules/

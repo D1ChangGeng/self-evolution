@@ -46,7 +46,8 @@ small` reported 14,317 missing trajectory screenshots.
 Status: **blocked for the formal gate; modified-protocol smoke measured**.
 
 The complete pinned V2 file snapshot and Python environment are present, but no
-formal paired `longmemeval-v2/medium` campaign is claimed. The cleaned
+formal paired `longmemeval-v2/small` campaign covering all 451 questions is
+claimed. The cleaned
 500-question dataset was not materialized. The screenshot-dependent full data
 validation was not completed, and the Codex memory backend did not produce its
 required `memory_module_output.json` within a 240-second query timeout. These
