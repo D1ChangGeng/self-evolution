@@ -170,7 +170,11 @@ def artifact_ref(root: Path, path: Path) -> dict[str, str]:
 
 def stable_subject_tree_hash(root: Path) -> str:
     parts: list[bytes] = []
-    for path in sorted(item for item in root.rglob("*") if item.is_file()):
+    files = sorted(
+        (item for item in root.rglob("*") if item.is_file()),
+        key=lambda item: item.relative_to(root).as_posix().casefold(),
+    )
+    for path in files:
         relative = path.relative_to(root).as_posix()
         content = path.read_text(encoding="utf-8").replace("\r\n", "\n").replace(
             "\r", "\n"
