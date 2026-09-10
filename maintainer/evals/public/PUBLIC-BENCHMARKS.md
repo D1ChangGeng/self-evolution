@@ -38,8 +38,10 @@ covered by this repository's deterministic checks and small, blinded engineering
 tasks.
 
 For cleaned, use a fixed stratified sample for frequent checks and all 500
-questions for release evidence. For the V2 pilot, use `small` for smoke and
-`medium` for core-change release evidence across web and enterprise. Pin the
+questions for release evidence. For the V2 pilot, the initial core release gate
+uses all 451 questions with the official `small` 100-trajectory haystacks across
+web and enterprise. The official `medium` 500-trajectory haystacks are a later
+scale and robustness enhancement. Pin the
 benchmark commit or dataset revision, data snapshot, model(s), model endpoint,
 prompt/template, context-token limit, random seed (if supported), and
 toolchain. Preserve raw outputs, config, and SHA-256 manifests. Report answer
@@ -62,12 +64,12 @@ A first run establishes a baseline and is `not-measured`; it cannot be declared
 an improvement from an absolute score alone. Numeric gates are evaluated only
 when all required slices are measured.
 
-| Change class                                  | Required public runs                                                                                                                                      | Pass criteria                                                                                                                                                                     | Frequency            |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| Docs or wording only                          | LongMemEval cleaned stratified sample; deterministic suite                                                                                                | No deterministic failure; no measured ability bucket drops >3 percentage points; overall accuracy drop ≤2 points                                                                  | PR/commit            |
-| Routing, metadata, index, or lifecycle change | LongMemEval cleaned stratified sample; deterministic suite                                                                                                | Same regression limits; p95 latency increase ≤20%; selected context bytes increase ≤15% unless an approved rationale is recorded                                                  | PR and nightly       |
-| Core retrieval or memory-model change         | LongMemEval cleaned full 500; LongMemEval-V2 medium web + enterprise pilot; 3–5 blinded engineering fixtures covering changed paths                       | No required fixture regression; cleaned overall drop ≤2 points, per-ability drop ≤3 points; V2 pilot has no >3-point ability drop; p95 latency ≤20% worse; no safety gate failure | Release candidate    |
-| Migration, adapter, or evaluator change       | Deterministic migration/adapter suite plus cleaned affected slice and at least one harness smoke per supported tool; V2 pilot when retrieval code changes | All structural and compatibility checks pass; benchmark metrics are comparable; no changed behavior is claimed from an unavailable run                                            | Before merge/release |
+| Change class                                  | Required public runs                                                                                                                                          | Pass criteria                                                                                                                                                                     | Frequency            |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| Docs or wording only                          | LongMemEval cleaned stratified sample; deterministic suite                                                                                                    | No deterministic failure; no measured ability bucket drops >3 percentage points; overall accuracy drop ≤2 points                                                                  | PR/commit            |
+| Routing, metadata, index, or lifecycle change | LongMemEval cleaned stratified sample; deterministic suite                                                                                                    | Same regression limits; p95 latency increase ≤20%; selected context bytes increase ≤15% unless an approved rationale is recorded                                                  | PR and nightly       |
+| Core retrieval or memory-model change         | LongMemEval cleaned full 500; all 451 LongMemEval-V2 questions with small web + enterprise haystacks; 3–5 blinded engineering fixtures covering changed paths | No required fixture regression; cleaned overall drop ≤2 points, per-ability drop ≤3 points; V2 pilot has no >3-point ability drop; p95 latency ≤20% worse; no safety gate failure | Release candidate    |
+| Migration, adapter, or evaluator change       | Deterministic migration/adapter suite plus cleaned affected slice and at least one harness smoke per supported tool; V2 pilot when retrieval code changes     | All structural and compatibility checks pass; benchmark metrics are comparable; no changed behavior is claimed from an unavailable run                                            | Before merge/release |
 
 The full private 13-fixture, three-attempt-per-arm campaign remains a later
 enhancement. It is required only when maintainers explicitly promote it to a

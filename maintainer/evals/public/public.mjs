@@ -69,7 +69,7 @@ export const PUBLIC_POLICY = Object.freeze({
       Object.freeze({ id: "longmemeval-cleaned", tier: "full", min_runs: 1 }),
       Object.freeze({
         id: "longmemeval-v2",
-        tier: "medium",
+        tier: "small",
         min_runs: 1,
         domains: ["web", "enterprise"],
       }),
@@ -344,7 +344,11 @@ function validateQuestionManifest(
     fail(`${name}.question_ids must be sorted`);
   exact(manifest.question_count, ids.length, `${name}.question_count`);
   const catalogIds = catalog.map((row) => row.id);
-  if (tier === "full" || tier === "medium") {
+  const requiresCompleteCatalog =
+    tier === "full" ||
+    tier === "medium" ||
+    (benchmarkId === PUBLIC_POLICY.secondary_benchmark.id && tier === "small");
+  if (requiresCompleteCatalog) {
     if (JSON.stringify(ids) !== JSON.stringify(catalogIds))
       fail(
         `${name}.question_ids must exactly match the pinned official catalog`,
@@ -372,7 +376,7 @@ function validateQuestionManifest(
       fail(`${name}.stratified sample must be smaller than full`);
   } else {
     if (!V2_TIERS.has(tier)) fail(`${name}.tier is invalid for longmemeval-v2`);
-    if (tier === "medium")
+    if (tier === "small" || tier === "medium")
       exact(
         ids.length,
         PUBLIC_POLICY.secondary_benchmark.medium_question_count,
@@ -388,8 +392,8 @@ function validateQuestionManifest(
       exact(domain, officialRows.get(id).domain, `${name}.domains.${id}`);
       domains.add(domain);
     }
-    if (tier === "medium" && domains.size !== 2)
-      fail(`${name}.medium must cover web and enterprise`);
+    if ((tier === "small" || tier === "medium") && domains.size !== 2)
+      fail(`${name}.${tier} must cover web and enterprise`);
   }
   return {
     ids: new Set(ids),

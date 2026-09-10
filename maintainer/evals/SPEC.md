@@ -115,8 +115,10 @@ node maintainer/evals/run.mjs --release --profile=private
 benchmark layer is independent of the distributed skill and keeps unavailable
 external runs as `blocked`/`not-measured`; a missing benchmark cannot be
 interpreted as a successful score. Core changes require both the mature
-LongMemEval cleaned full set and the pinned LongMemEval-V2 medium pilot, as
-well as the changed-path engineering sample. Full private case evaluation is
+LongMemEval cleaned full set and all 451 questions from the pinned
+LongMemEval-V2 small-haystack pilot, as well as the changed-path engineering
+sample. The V2 medium-haystack run remains a later scale enhancement. Full
+private case evaluation is
 reserved for a later enhancement and does not silently gate ordinary wording,
 routing, or migration releases.
 

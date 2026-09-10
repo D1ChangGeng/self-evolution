@@ -269,10 +269,10 @@ async function addEngineeringEvidence(evidence, root, verdict = "pass") {
   return evidence;
 }
 
-test("core policy requires cleaned full and V2 medium", () => {
+test("core policy requires cleaned full and V2 small", () => {
   assert.deepEqual(
     benchmarkRequirements("core").map((item) => `${item.id}/${item.tier}`),
-    ["longmemeval-cleaned/full", "longmemeval-v2/medium"],
+    ["longmemeval-cleaned/full", "longmemeval-v2/small"],
   );
 });
 
@@ -475,7 +475,7 @@ test("trace drift and invalid timestamps remain blocked", async () => {
   assert.match(loaded.evaluation.reason, /ordered timestamps/);
 });
 
-test("official catalogs retain the pinned full and medium cardinalities", () => {
+test("official catalogs retain the pinned cleaned and V2 cardinalities", () => {
   assert.equal(officialCatalogQuestionIds("longmemeval-cleaned").length, 500);
   assert.equal(officialCatalogQuestionIds("longmemeval-v2").length, 451);
 });

@@ -13,13 +13,15 @@ public/
   RESULTS-1302-1.md          # host-specific execution receipt
   public.mjs                 # independent evidence validator
   public.test.mjs            # validator regression tests
+  run_campaign.py            # resumable paired public benchmark runner
   evidence.json              # optional checked-in run manifest
   campaigns/<id>/             # ignored or external raw benchmark outputs
 ```
 
 A campaign runner should invoke the upstream LongMemEval cleaned evaluator from
-a frozen dataset revision. For core changes it additionally runs the pinned
-LongMemEval-V2 pilot. The manifest contains:
+a frozen dataset revision. For core changes it additionally runs all 451
+questions from the pinned LongMemEval-V2 pilot with its official `small`
+100-trajectory haystacks. The manifest contains:
 
 - one or both benchmark declarations: cleaned requires dataset revision and
   V2 requires repository commit `2cc8c540bdb87fe6761629b585e727e1c4704520`;
@@ -38,6 +40,34 @@ installed Codex binary. Maintaining a second runtime here would duplicate host
 harness behavior and distort the skill boundary. The independent validator
 checks the manifest and can be used by a host-specific runner without changing
 the distributed bundle.
+
+## Run a paired campaign
+
+Freeze the baseline and candidate `skills/self-evolution/` trees before the
+run. The runner verifies their complete tree and bundle digests, uses the
+official cleaned oracle file and the V2 small haystack, and writes resumable
+per-question artifacts. Credentials stay in a host-local key file.
+
+```text
+python maintainer/evals/public/run_campaign.py \
+  --campaign-id public-20260911-01 \
+  --campaign-root <external-campaign-directory> \
+  --baseline-skill <frozen-c998067-skill-directory> \
+  --candidate-skill <frozen-candidate-skill-directory> \
+  --cleaned-data <longmemeval_oracle.json> \
+  --v2-root <longmemeval-v2-data-root> \
+  --base-url <openai-compatible-base-url> \
+  --api-key-file <host-local-key-file> \
+  --model gpt-5.6-sol \
+  --model-revision <provider-revision-or-observation-id> \
+  --toolchain-revision <python-httpx-runner-version>
+```
+
+The V2 retrieval adapter creates a local compressed trajectory cache and
+selects bounded state evidence with a fixed lexical procedure. It introduces no
+runtime dependency into the distributed skill. The generated evidence remains
+incomplete until the separate engineering execution and review receipts are
+attached.
 
 Until then, use the checked-in host receipt and keep all unavailable metrics
 explicitly `not-measured`.
@@ -151,6 +181,7 @@ task, and distinct executor/reviewer. Receipt bytes and task identifiers may
 not be reused across harness labels or samples.
 
 For a core release, add a second run with `benchmark_id:
-"longmemeval-v2"`, `tier: "medium"`, and both `web` and `enterprise` domains.
+"longmemeval-v2"`, `tier: "small"`, all 451 pinned question IDs, and both `web`
+and `enterprise` domains.
 Do not use zero placeholders in a real manifest; unavailable values must leave
 the run blocked or not-measured until raw evidence exists.
