@@ -284,6 +284,12 @@ titles, routes, examples, identifiers, or summaries merely to advertise their
 absence. Keep negative wording when required for safety, compatibility,
 migration, diagnosis, counterexamples, or adopted policy.
 
+For bounded evidence questions, match the requested granularity and state only
+the conclusion supported by current evidence. Introduce a caveat, alternate
+path, or causal label only when the cited evidence makes it material. Treat a
+crash or error as an observed symptom until evidence establishes the defect and
+cause.
+
 A useful failure record contains only: trigger, observed symptom, evidence,
 applicable conditions, corrective action, and recovery verification. Do not
 narrate the working session or repeat rejected framing. Keep security and

@@ -10,7 +10,7 @@ Engineering sample: **blocked**; historical integrated: **not-applicable**
 
 | Gate                            | State   | Judge                       | Evidence                                                                                                                                        |
 | ------------------------------- | ------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| skill-lines                     | pass    | program                     | 311 lines; maximum 450                                                                                                                          |
+| skill-lines                     | pass    | program                     | 317 lines; maximum 450                                                                                                                          |
 | initialized-file-count          | pass    | program                     | 7 -> 3 files (57.1% reduction)                                                                                                                  |
 | initialization-protocol-tokens  | pending | program-plus-maintainer     | This gate requires exact, versioned tokenizer counts for both onboarding protocols.                                                             |
 | metadata-writes                 | pending | program-plus-maintainer     | This gate requires integrated task transcripts with task-time metadata writes.                                                                  |

@@ -13,6 +13,8 @@ knowledge, and distributed-skill evolution. Release eligibility is recorded in
 
 - Clarified harness-neutral task continuity, project-wiki lifecycle, conflict
   handling, stale-source review, and No-Negative-Echo writing rules.
+- Added evidence-granularity guidance so bounded answers preserve verified
+  conclusions without introducing unsupported causes, caveats, or alternatives.
 - Added Codex, Claude Code, and OpenCode integration guidance with explicit
   adapter capability states and manual fallbacks.
 - Added independent public memory evaluation profiles with LongMemEval cleaned
