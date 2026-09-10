@@ -478,6 +478,8 @@ class Endpoint:
         headers = {"Authorization": f"Bearer {self.api_key}"}
         last_error: Exception | None = None
         async with self.semaphore:
+            request_started_at = utc_now()
+            request_started_clock = time.perf_counter()
             for attempt in range(5):
                 try:
                     response = await self.client.post(
@@ -495,6 +497,11 @@ class Endpoint:
                         "response_id": value.get("id"),
                         "response_model": value.get("model"),
                         "usage": value.get("usage"),
+                        "request_started_at": request_started_at,
+                        "request_ended_at": utc_now(),
+                        "request_duration_ms": round(
+                            (time.perf_counter() - request_started_clock) * 1000
+                        ),
                     }
                 except Exception as error:  # noqa: BLE001 - preserve retry evidence
                     last_error = error
@@ -744,14 +751,10 @@ async def run_predictions(
             except (OSError, ValueError, json.JSONDecodeError):
                 pass
         selected = contexts[question_id]
-        started = utc_now()
-        start_clock = time.perf_counter()
         response = await endpoint.chat(
             prediction_messages(benchmark, skill_texts[arm], item, selected),
             max_tokens=1024,
         )
-        ended = utc_now()
-        duration_ms = round((time.perf_counter() - start_clock) * 1000)
         prediction = {
             "schema_version": "public-prediction/1",
             "question_id": question_id,
@@ -771,20 +774,34 @@ async def run_predictions(
             "subject_sha256": subjects[arm]["subject_sha256"],
             "protocol_sha256": protocol_ref["sha256"],
             "prediction_sha256": sha256_file(prediction_path),
-            "started_at": started,
-            "ended_at": ended,
-            "observed_duration_ms": duration_ms,
+            "started_at": response["request_started_at"],
+            "ended_at": response["request_ended_at"],
+            "observed_duration_ms": response["request_duration_ms"],
+            "latency_scope": "endpoint-request-and-retries",
             "selected_context": selected,
         }
         write_json(trace_path, trace)
 
-    tasks = [one(arm, item) for item in questions for arm in ("baseline", "candidate")]
+    async def pair(item: dict[str, Any]) -> None:
+        question_id = item.get("question_id") or item["id"]
+        arms = (
+            ("baseline", "candidate")
+            if int(hashlib.sha256(question_id.encode()).hexdigest()[:2], 16) % 2 == 0
+            else ("candidate", "baseline")
+        )
+        for arm in arms:
+            await one(arm, item)
+
+    tasks = [pair(item) for item in questions]
     completed = 0
     for future in asyncio.as_completed(tasks):
         await future
         completed += 1
-        if completed % 50 == 0:
-            print(f"{benchmark} predictions: {completed}/{len(tasks)}", flush=True)
+        if completed % 25 == 0:
+            print(
+                f"{benchmark} paired predictions: {completed}/{len(tasks)}",
+                flush=True,
+            )
 
 
 async def run_judges(
@@ -1001,6 +1018,7 @@ def prepare_protocols(
             "max_context_chars": MAX_V2_CONTEXT_CHARS,
             "max_state_chars": MAX_V2_STATE_CHARS,
         },
+        "latency_scope": "endpoint request and in-request retries; semaphore queue excluded",
     }
     prompt_path = args.campaign_root / "protocols" / "prompt-contract.json"
     write_json(prompt_path, prompt_contract)
@@ -1030,6 +1048,7 @@ def prepare_protocols(
                 "max_completion_tokens": 1024,
                 "reasoning_effort": args.reasoning_effort,
                 "v2_max_selected_context_chars": MAX_V2_CONTEXT_CHARS,
+                "latency_scope": "endpoint-request-and-retries",
             },
             "harness": {"name": RUNNER_REVISION, "revision": args.runner_revision},
             "environment": {
