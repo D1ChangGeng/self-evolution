@@ -32,7 +32,7 @@ V2_DATA_REVISION = "f152293e235517d504809563c833d7190b8c713b"
 V2_REPOSITORY_COMMIT = "2cc8c540bdb87fe6761629b585e727e1c4704520"
 LONGMEMEVAL_REPOSITORY_COMMIT = "9e0b455f4ef0e2ab8f2e582289761153549043fc"
 RUNNER_REVISION = "self-evolution-public-runner/1"
-JUDGE_RUNNER_REVISION = "self-evolution-public-judge/2"
+JUDGE_RUNNER_REVISION = "self-evolution-public-judge/3"
 MAX_V2_CONTEXT_CHARS = 40_000
 MAX_V2_STATE_CHARS = 5_000
 V2_TOP_TRAJECTORIES = 12
@@ -575,6 +575,21 @@ def cleaned_judge_messages(item: dict[str, Any], prediction: str) -> list[dict[s
     return [{"role": "user", "content": prompt}]
 
 
+def cleaned_paired_judge_messages(
+    item: dict[str, Any], baseline_prediction: str, candidate_prediction: str
+) -> list[dict[str, str]]:
+    instruction = CLEANED_PROMPTS[item["question_type"]]
+    prompt = (
+        f"{instruction}\n\nJudge each neutral response independently under the same rubric.\n\n"
+        f"Question: {item['question']}\n\nCorrect Answer: {item['answer']}\n\n"
+        f"Response A: {baseline_prediction}\n\nResponse B: {candidate_prediction}\n\n"
+        "Output JSON only: "
+        '{"A":{"label":0 or 1,"reason":"short rationale"},'
+        '"B":{"label":0 or 1,"reason":"short rationale"}}'
+    )
+    return [{"role": "user", "content": prompt}]
+
+
 def v2_llm_judge_messages(item: dict[str, Any], prediction: str) -> list[dict[str, str]]:
     parsed = parse_boxed(prediction)
     if item["eval_function"].startswith("llm_abstention_checker"):
@@ -599,6 +614,36 @@ def v2_llm_judge_messages(item: dict[str, Any], prediction: str) -> list[dict[st
     return [{"role": "system", "content": system}, {"role": "user", "content": user}]
 
 
+def v2_paired_llm_judge_messages(
+    item: dict[str, Any], baseline_prediction: str, candidate_prediction: str
+) -> list[dict[str, str]]:
+    baseline_parsed = parse_boxed(baseline_prediction)
+    candidate_parsed = parse_boxed(candidate_prediction)
+    if item["eval_function"].startswith("llm_abstention_checker"):
+        system = V2_ABSTENTION_SYSTEM
+        rubric = (
+            "Label 1 only if the response clearly identifies the flawed premise and reaches a "
+            "conclusion equivalent to the reference answer. Label 0 for a premise-following "
+            "concrete answer, generic UNKNOWN, or contradiction."
+        )
+    else:
+        system = V2_GOTCHAS_SYSTEM
+        rubric = (
+            "Label 1 if the response includes at least one correct reference insight and "
+            "contradicts none. Label 0 for wrong direction, contradiction, or generic text."
+        )
+    user = (
+        f"Question:\n{item['question']}\n\nReference answer:\n{item['answer']}\n\n"
+        f"Response A full text:\n{baseline_prediction}\n\nResponse A extracted answer:\n{baseline_parsed}\n\n"
+        f"Response B full text:\n{candidate_prediction}\n\nResponse B extracted answer:\n{candidate_parsed}\n\n"
+        f"Scoring rubric:\n{rubric}\n\nJudge each neutral response independently under the same rubric. "
+        "Output JSON only: "
+        '{"A":{"label":0 or 1,"reason":"short rationale"},'
+        '"B":{"label":0 or 1,"reason":"short rationale"}}'
+    )
+    return [{"role": "system", "content": system}, {"role": "user", "content": user}]
+
+
 def parse_binary_judge(text: str) -> tuple[bool, str]:
     match = re.search(r"\{.*\}", text, flags=re.DOTALL)
     if match:
@@ -618,6 +663,23 @@ def parse_binary_judge(text: str) -> tuple[bool, str]:
     if label:
         return label.group(1) == "1", text.strip()
     raise ValueError(f"cannot parse judge response: {text!r}")
+
+
+def parse_paired_judge(text: str) -> dict[str, tuple[bool, str]]:
+    without_thinking = re.sub(
+        r"<think>.*?</think>", "", text, flags=re.IGNORECASE | re.DOTALL
+    ).strip()
+    match = re.search(r"\{.*\}", without_thinking, flags=re.DOTALL)
+    if not match:
+        raise ValueError(f"cannot parse paired judge response: {text!r}")
+    payload = json.loads(match.group(0))
+    result: dict[str, tuple[bool, str]] = {}
+    for arm in ("A", "B"):
+        value = payload.get(arm)
+        if not isinstance(value, dict) or value.get("label") not in {0, 1, "0", "1"}:
+            raise ValueError(f"paired judge response is missing a valid {arm} label")
+        result[arm] = (bool(int(value["label"])), str(value.get("reason", "")))
+    return result
 
 
 def load_cleaned(path: Path) -> list[dict[str, Any]]:
@@ -715,66 +777,103 @@ async def run_judges(
     protocol_ref: dict[str, str],
     evaluator: dict[str, str],
 ) -> None:
-    async def one(arm: str, item: dict[str, Any]) -> None:
+    async def one(item: dict[str, Any]) -> None:
         question_id = item.get("question_id") or item["id"]
-        prediction_path = campaign_root / "artifacts" / benchmark / arm / "predictions" / f"{question_id}.json"
-        judge_path = campaign_root / "artifacts" / benchmark / arm / "judges" / f"{question_id}.json"
-        prediction = read_json(prediction_path)["answer"]
-        if judge_path.exists():
+        prediction_paths = {
+            arm: campaign_root / "artifacts" / benchmark / arm / "predictions" / f"{question_id}.json"
+            for arm in ("baseline", "candidate")
+        }
+        judge_paths = {
+            arm: campaign_root / "artifacts" / benchmark / arm / "judges" / f"{question_id}.json"
+            for arm in ("baseline", "candidate")
+        }
+        predictions = {
+            arm: read_json(prediction_paths[arm])["answer"]
+            for arm in ("baseline", "candidate")
+        }
+        reusable = True
+        for arm in ("baseline", "candidate"):
+            if not judge_paths[arm].exists():
+                reusable = False
+                break
             try:
-                existing = read_json(judge_path)
-                if (
+                existing = read_json(judge_paths[arm])
+                if not (
                     existing.get("protocol_sha256") == protocol_ref["sha256"]
                     and existing.get("subject_sha256")
                     == subjects[arm]["subject_sha256"]
                     and existing.get("prediction_sha256")
-                    == sha256_file(prediction_path)
+                    == sha256_file(prediction_paths[arm])
                     and existing.get("evaluator", {}).get("config_sha256")
                     == evaluator["config_sha256"]
                 ):
-                    return
+                    reusable = False
+                    break
             except (OSError, ValueError, json.JSONDecodeError):
-                pass
-        raw_response: str | None = None
-        reason = "official deterministic evaluator"
-        if benchmark == "cleaned":
-            response = await endpoint.chat(cleaned_judge_messages(item, prediction), max_tokens=128)
-            raw_response = response["answer"]
-            correct, reason = parse_binary_judge(raw_response)
-        else:
-            deterministic = deterministic_v2_judge(
-                item["eval_function"], prediction, item["answer"]
-            )
-            if deterministic is None:
-                response = await endpoint.chat(v2_llm_judge_messages(item, prediction), max_tokens=256)
-                raw_response = response["answer"]
-                correct, reason = parse_binary_judge(raw_response)
-            else:
-                correct = deterministic
-        judge = {
-            "schema_version": "public-judge/1",
-            "question_id": question_id,
-            "arm": arm,
-            "subject_sha256": subjects[arm]["subject_sha256"],
-            "protocol_sha256": protocol_ref["sha256"],
-            "prediction_sha256": sha256_file(prediction_path),
-            "evaluator": evaluator,
-            "verdict": "correct" if correct else "incorrect",
-            "question": item["question"],
-            "reference_answer": item["answer"],
-            "eval_function": item.get("eval_function", "longmemeval-official-llm-judge"),
-            "judge_response": raw_response,
-            "judge_reason": reason,
-        }
-        write_json(judge_path, judge)
+                reusable = False
+                break
+        if reusable:
+            return
 
-    tasks = [one(arm, item) for item in questions for arm in ("baseline", "candidate")]
+        raw_response: str | None = None
+        labels: dict[str, tuple[bool, str]] = {}
+        deterministic = (
+            benchmark == "v2"
+            and deterministic_v2_judge(
+                item["eval_function"], predictions["baseline"], item["answer"]
+            )
+            is not None
+        )
+        if deterministic:
+            for arm in ("baseline", "candidate"):
+                value = deterministic_v2_judge(
+                    item["eval_function"], predictions[arm], item["answer"]
+                )
+                labels[arm] = (bool(value), "official deterministic evaluator")
+        else:
+            messages = (
+                cleaned_paired_judge_messages(
+                    item, predictions["baseline"], predictions["candidate"]
+                )
+                if benchmark == "cleaned"
+                else v2_paired_llm_judge_messages(
+                    item, predictions["baseline"], predictions["candidate"]
+                )
+            )
+            response = await endpoint.chat(messages, max_tokens=384)
+            raw_response = response["answer"]
+            parsed = parse_paired_judge(raw_response)
+            labels = {"baseline": parsed["A"], "candidate": parsed["B"]}
+
+        for arm, blind_arm in (("baseline", "A"), ("candidate", "B")):
+            correct, reason = labels[arm]
+            judge = {
+                "schema_version": "public-judge/1",
+                "question_id": question_id,
+                "arm": arm,
+                "blind_arm": blind_arm,
+                "subject_sha256": subjects[arm]["subject_sha256"],
+                "protocol_sha256": protocol_ref["sha256"],
+                "prediction_sha256": sha256_file(prediction_paths[arm]),
+                "evaluator": evaluator,
+                "verdict": "correct" if correct else "incorrect",
+                "question": item["question"],
+                "reference_answer": item["answer"],
+                "eval_function": item.get(
+                    "eval_function", "longmemeval-official-paired-llm-judge"
+                ),
+                "judge_response": raw_response,
+                "judge_reason": reason,
+            }
+            write_json(judge_paths[arm], judge)
+
+    tasks = [one(item) for item in questions]
     completed = 0
     for future in asyncio.as_completed(tasks):
         await future
         completed += 1
         if completed % 50 == 0:
-            print(f"{benchmark} judges: {completed}/{len(tasks)}", flush=True)
+            print(f"{benchmark} paired judges: {completed}/{len(tasks)}", flush=True)
 
 
 def build_results(
@@ -1015,6 +1114,7 @@ async def main_async(args: argparse.Namespace) -> None:
     judge_config = {
         "runner_revision": JUDGE_RUNNER_REVISION,
         "runner_source_sha256": sha256_file(Path(__file__).resolve()),
+        "pairing": "neutral-A-B-same-request",
         "longmemeval_commit": LONGMEMEVAL_REPOSITORY_COMMIT,
         "longmemeval_v2_commit": V2_REPOSITORY_COMMIT,
         "model": args.model,
