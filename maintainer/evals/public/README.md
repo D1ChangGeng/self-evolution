@@ -19,9 +19,9 @@ public/
 ```
 
 A campaign runner should invoke the upstream LongMemEval cleaned evaluator from
-a frozen dataset revision. For core changes it additionally runs all 451
-questions from the pinned LongMemEval-V2 pilot with its official `small`
-100-trajectory haystacks. The manifest contains:
+a frozen dataset revision. Core changes require three complete paired runs and
+additionally run all 451 questions from the pinned LongMemEval-V2 pilot with its
+official `small` 100-trajectory haystacks. The manifest contains:
 
 - one or both benchmark declarations: cleaned requires dataset revision and
   V2 requires repository commit `2cc8c540bdb87fe6761629b585e727e1c4704520`;
@@ -81,6 +81,21 @@ node maintainer/evals/public/validate_evidence.mjs \
 
 The command prints only derived summaries; the evaluator still reads and hashes
 every referenced per-question artifact.
+
+After all attempts finish, merge them under one artifact root:
+
+```text
+python maintainer/evals/public/merge_campaigns.py \
+  --artifact-root <campaign-parent-directory> \
+  --campaign public-20260911-01 \
+  --campaign public-20260911-02 \
+  --campaign public-20260911-03 \
+  --campaign-id public-20260911-aggregate \
+  --output <campaign-parent-directory>/evidence.json
+```
+
+Every nested artifact path is prefixed with its source campaign directory; the
+individual manifests and raw evidence remain unchanged.
 
 Until then, use the checked-in host receipt and keep all unavailable metrics
 explicitly `not-measured`.

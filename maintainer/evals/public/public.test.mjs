@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import test from "node:test";
 import {
+  aggregateMetrics,
   benchmarkRequirements,
   evaluatePublicEvidence,
   officialCatalogQuestionIds,
@@ -12,6 +13,46 @@ import {
   PUBLIC_POLICY,
   validatePublicEvidence,
 } from "./public.mjs";
+
+test("core aggregation pools question observations across runs", () => {
+  const pairs = [
+    [true, false],
+    [true, true],
+    [false, true],
+  ].map(([baselineCorrect, candidateCorrect], index) => ({
+    baselineMetrics: {
+      rows: [
+        {
+          question_id: `q${index}`,
+          ability: "errors-gotchas",
+          domain: "web",
+          correct: baselineCorrect,
+          latency_ms: 100 + index,
+          context_bytes: 1000,
+        },
+      ],
+    },
+    candidateMetrics: {
+      rows: [
+        {
+          question_id: `q${index}`,
+          ability: "errors-gotchas",
+          domain: "web",
+          correct: candidateCorrect,
+          latency_ms: 110 + index,
+          context_bytes: 1000,
+        },
+      ],
+    },
+  }));
+  const baseline = aggregateMetrics(pairs, "baseline");
+  const candidate = aggregateMetrics(pairs, "candidate");
+  assert.equal(baseline.question_count, 3);
+  assert.equal(candidate.question_count, 3);
+  assert.equal(baseline.overall_accuracy, 2 / 3);
+  assert.equal(candidate.overall_accuracy, 2 / 3);
+  assert.equal(candidate.p95_latency_ms, 112);
+});
 
 function shellEvidence(overrides = {}) {
   return {
@@ -270,9 +311,14 @@ async function addEngineeringEvidence(evidence, root, verdict = "pass") {
 }
 
 test("core policy requires cleaned full and V2 small", () => {
+  const requirements = benchmarkRequirements("core");
   assert.deepEqual(
-    benchmarkRequirements("core").map((item) => `${item.id}/${item.tier}`),
+    requirements.map((item) => `${item.id}/${item.tier}`),
     ["longmemeval-cleaned/full", "longmemeval-v2/small"],
+  );
+  assert.deepEqual(
+    requirements.map((item) => item.min_runs),
+    [3, 3],
   );
 });
 

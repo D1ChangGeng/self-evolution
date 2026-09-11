@@ -66,11 +66,11 @@ export const PUBLIC_POLICY = Object.freeze({
       { id: "longmemeval-cleaned", tier: "stratified", min_runs: 1 },
     ]),
     core: Object.freeze([
-      Object.freeze({ id: "longmemeval-cleaned", tier: "full", min_runs: 1 }),
+      Object.freeze({ id: "longmemeval-cleaned", tier: "full", min_runs: 3 }),
       Object.freeze({
         id: "longmemeval-v2",
         tier: "small",
-        min_runs: 1,
+        min_runs: 3,
         domains: ["web", "enterprise"],
       }),
     ]),
@@ -718,6 +718,10 @@ async function deriveMetrics(results, manifest, benchmarkId, arm, root, name) {
   }
   if (seen.size !== expected.size || [...expected].some((id) => !seen.has(id)))
     fail(`${name}.questions must exactly match official manifest IDs`);
+  return metricsFromRows(rows);
+}
+
+function metricsFromRows(rows) {
   const byAbility = {};
   for (const row of rows) {
     const bucket = byAbility[row.ability] ?? { correct: 0, total: 0 };
@@ -742,6 +746,16 @@ async function deriveMetrics(results, manifest, benchmarkId, arm, root, name) {
       rows.reduce((sum, row) => sum + row.context_bytes, 0) / rows.length,
     question_count: rows.length,
   };
+}
+
+export function aggregateMetrics(pairs, arm) {
+  return metricsFromRows(
+    pairs.flatMap((item) =>
+      arm === "baseline"
+        ? item.baselineMetrics.rows
+        : item.candidateMetrics.rows,
+    ),
+  );
 }
 
 function comparePair(pair, baselineMetrics, candidateMetrics, threshold) {
@@ -1237,20 +1251,25 @@ export function evaluatePublicEvidence(evidence) {
         continue;
       }
     }
-    const results = pairs.map((item) =>
-      comparePair(
-        item.pair,
-        item.baselineMetrics,
-        item.candidateMetrics,
-        threshold,
-      ),
+    const runDiagnostics = pairs.map((item) => ({
+      pair_id: item.pair.pair_id,
+      baseline: item.baselineMetrics,
+      candidate: item.candidateMetrics,
+    }));
+    const aggregate = comparePair(
+      { pair_id: `aggregate:${requirement.id}/${requirement.tier}` },
+      aggregateMetrics(pairs, "baseline"),
+      aggregateMetrics(pairs, "candidate"),
+      threshold,
     );
+    aggregate.run_ids = pairs.map((item) => item.pair.pair_id);
     evaluations.push({
       benchmark_id: requirement.id,
       tier: requirement.tier,
-      results,
+      run_diagnostics: runDiagnostics,
+      results: [aggregate],
     });
-    failures.push(...results.flatMap((result) => result.failures));
+    failures.push(...aggregate.failures);
   }
   const status =
     blocked.length > 0 ? "blocked" : failures.length > 0 ? "fail" : "pass";

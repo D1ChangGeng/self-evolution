@@ -127,7 +127,7 @@
       "semantic_judgment_emitted": false
     }
   },
-  "eval_contract_sha256": "00840d5efbee24e88f94685a0ff3721742886b75434e810d4fd39807e8036494",
+  "eval_contract_sha256": "7f146d927714d003878810f2df0ddc68902e3c87aca5d0fbc04549f60ab3f2a2",
   "fixture_contracts": [
     {
       "id": "cross-module-defect",
