@@ -28,23 +28,24 @@ import {
   validateResolvedConfig,
   validateToolchainShimSource,
 } from "../lib/opencode.mjs";
+import { PINNED_WSL_TOOLCHAIN } from "../lib/prepare.mjs";
 
 test("OpenCode isolated runtime avoids the system temporary directory", () => {
   assert.equal(
     isolatedRuntimeParent({
       campaignRoot:
-        "D:/Chatgpt/self-evolution-campaigns/external/external-test",
+        "C:/test-fixtures/self-evolution-campaigns/external/external-test",
       workspaceDir:
-        "D:/Chatgpt/self-evolution-execution/external-test/smoke/workspace",
+        "C:/test-fixtures/self-evolution-execution/external-test/smoke/workspace",
     }),
-    resolve("D:/Chatgpt/self-evolution-campaigns/external"),
+    resolve("C:/test-fixtures/self-evolution-campaigns/external"),
   );
   assert.equal(
     isolatedRuntimeParent({
       workspaceDir:
-        "D:/Chatgpt/self-evolution-execution/external-test/smoke/workspace",
+        "C:/test-fixtures/self-evolution-execution/external-test/smoke/workspace",
     }),
-    resolve("D:/Chatgpt/self-evolution-execution/external-test/smoke"),
+    resolve("C:/test-fixtures/self-evolution-execution/external-test/smoke"),
   );
 });
 
@@ -297,7 +298,9 @@ test("Windows agent-shell shims bind bwrap, the pinned toolchain, and cwd", () =
     "python",
     "python3",
   ]) {
-    const source = toolchainShimSource(tool);
+    const source = toolchainShimSource(tool, undefined, {
+      workspaceDir: "C:/test-fixtures/self-evolution",
+    });
     assert.match(
       source,
       /wsl\.exe --distribution Ubuntu --cd ".+" --exec \/usr\/bin\/bwrap --unshare-user --unshare-pid --unshare-net/,
@@ -312,12 +315,12 @@ test("Windows agent-shell shims bind bwrap, the pinned toolchain, and cwd", () =
     assert.doesNotMatch(source, /--setenv PATH ['"]/);
     assert.match(
       source,
-      /--bind \/mnt\/d\/Chatgpt\/self-evolution \/workspace/,
+      /--bind \/mnt\/c\/test-fixtures\/self-evolution \/workspace/,
     );
     assert.doesNotMatch(source, /--(?:ro-)?bind \/mnt\/c(?:\s|$)/);
     assert.match(
       source,
-      /--ro-bind \/home\/d26fo\/\.local\/share\/self-evolution-toolchains\/node-v22\.13\.1 \/toolchain/,
+      /--ro-bind \/opt\/self-evolution-toolchains\/node-v22\.13\.1 \/toolchain/,
     );
     assert.doesNotThrow(() => validateToolchainShimSource(source, tool));
   }
@@ -346,7 +349,12 @@ test("toolchain shim validation rejects only exact /mnt/c bind endpoints", () =>
 
 test(
   "agent-shell Node, Python, and shell-wrapper canaries cannot reach the network",
-  { skip: process.platform !== "win32", timeout: 30_000 },
+  {
+    skip:
+      process.platform !== "win32" ||
+      !process.env.SELF_EVOLUTION_WSL_TOOLCHAIN_ROOT,
+    timeout: 30_000,
+  },
   async () => {
     const result = await probeAgentShellNetworkIsolation();
     assert.equal(result.status, "passed");
@@ -360,13 +368,16 @@ test(
 
 test(
   "pinned WSL node and npm versions are callable from the Windows workspace",
-  { skip: process.platform !== "win32" },
+  {
+    skip:
+      process.platform !== "win32" ||
+      !process.env.SELF_EVOLUTION_WSL_TOOLCHAIN_ROOT,
+  },
   async () => {
     const { execFile } = await import("node:child_process");
     const { promisify } = await import("node:util");
     const execute = promisify(execFile);
-    const environmentPath =
-      "PATH=/home/d26fo/.local/share/self-evolution-toolchains/node-v22.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+    const environmentPath = `PATH=${PINNED_WSL_TOOLCHAIN.root}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin`;
     const invoke = (tool, argument) =>
       execute(
         "wsl.exe",

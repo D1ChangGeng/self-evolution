@@ -15,11 +15,17 @@ npm run eval:external -- report
 ```
 
 Use `--campaign <id>` to select a campaign and `--output <absolute-dir>` to
-override the default coordinator root
-`D:\Chatgpt\self-evolution-campaigns\external`. Set
+override the default coordinator root, which is derived as
+`<repository-parent>/self-evolution-campaigns/external`. Set
 `SELF_EVOLUTION_EXTERNAL_EXECUTION_ROOT` (or pass the harness execution-root
 option) to place Agent-visible workspaces under a different absolute root; the
-default is `D:\Chatgpt\self-evolution-execution`. `run` and `review` also
+default is `self-evolution-execution` below the host's local application-data
+directory. Set `SELF_EVOLUTION_WSL_TOOLCHAIN_ROOT` to the absolute WSL path of
+the pinned Node toolchain when it is not installed at
+`/opt/self-evolution-toolchains/node-v22.13.1`. Set
+`SELF_EVOLUTION_EXTERNAL_EXECUTION_MODEL` and
+`SELF_EVOLUTION_EXTERNAL_REVIEW_MODEL` to locally configured model identifiers
+before preparing a formal campaign. `run` and `review` also
 accept `--task`, `--attempt`, and `--arm` filters. `run`, `review`, `verify`,
 and `report` require an explicit `--campaign`; implicit selection of the latest
 directory is disabled so an obsolete formal campaign cannot be resumed by

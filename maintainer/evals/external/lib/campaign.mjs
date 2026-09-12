@@ -120,11 +120,14 @@ export const FORMAL_TASK_IDS = Object.freeze([
   "request-primitive-json-error",
 ]);
 
+export const EXECUTION_MODEL_ENV = "SELF_EVOLUTION_EXTERNAL_EXECUTION_MODEL";
+export const REVIEW_MODEL_ENV = "SELF_EVOLUTION_EXTERNAL_REVIEW_MODEL";
+
 export const DEFAULT_CONFIG = Object.freeze({
   schema_version: "1.0",
   opencode_version: "1.17.10",
-  execution_model: "zeo/gpt-5.5-high",
-  review_model: "dev-claude/claude-sonnet-4-6-thinking-high",
+  execution_model: process.env[EXECUTION_MODEL_ENV] ?? "execution-model",
+  review_model: process.env[REVIEW_MODEL_ENV] ?? "review-model",
   attempts: 3,
   onboarding: { max_tool_calls: 90, timeout_ms: 45 * 60 * 1000 },
   repair: { max_tool_calls: 60, timeout_ms: 45 * 60 * 1000 },

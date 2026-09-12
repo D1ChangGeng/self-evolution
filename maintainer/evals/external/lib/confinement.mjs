@@ -41,7 +41,10 @@ export const CONFINEMENT_CONTRACT = Object.freeze({
   credential_transport: "isolated-disk-only",
 });
 
-const DEFAULT_EXECUTION_ROOT = resolve("D:/Chatgpt/self-evolution-execution");
+const DEFAULT_EXECUTION_ROOT = resolve(
+  process.env.LOCALAPPDATA ?? "C:/Temp",
+  "self-evolution-execution",
+);
 const FORBIDDEN_CAMPAIGN_DIRECTORIES = Object.freeze([
   "contracts",
   "prepared",

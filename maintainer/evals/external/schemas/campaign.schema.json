@@ -44,9 +44,15 @@
       "description": "Absolute external execution root for Agent-visible workspaces."
     },
     "opencode_version": { "const": "1.17.10" },
-    "execution_model": { "const": "zeo/gpt-5.5-high" },
+    "execution_model": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Locally configured execution-model identifier."
+    },
     "review_model": {
-      "const": "dev-claude/claude-sonnet-4-6-thinking-high"
+      "type": "string",
+      "minLength": 1,
+      "description": "Locally configured review-model identifier."
     },
     "attempts": { "const": 3 },
     "onboarding": {
@@ -65,11 +71,18 @@
       }
     },
     "toolchain": {
-      "const": {
-        "distro": "Ubuntu",
-        "root": "/home/d26fo/.local/share/self-evolution-toolchains/node-v22.13.1",
-        "node": "22.13.1",
-        "npm": "10.9.2"
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["distro", "root", "node", "npm"],
+      "properties": {
+        "distro": { "const": "Ubuntu" },
+        "root": {
+          "type": "string",
+          "pattern": "^/[^\\r\\n]*$",
+          "description": "Configured absolute WSL path to the pinned toolchain."
+        },
+        "node": { "const": "22.13.1" },
+        "npm": { "const": "10.9.2" }
       }
     },
     "execution_assurance": {

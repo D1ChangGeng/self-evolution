@@ -19,9 +19,12 @@ import { collectWorkspacePatch } from "./collector.mjs";
 
 const exec = promisify(execFile);
 const MAX_BUFFER = 64 * 1024 * 1024;
+export const WSL_TOOLCHAIN_ROOT_ENV = "SELF_EVOLUTION_WSL_TOOLCHAIN_ROOT";
+const DEFAULT_WSL_TOOLCHAIN_ROOT =
+  "/opt/self-evolution-toolchains/node-v22.13.1";
 export const PINNED_WSL_TOOLCHAIN = Object.freeze({
   distro: "Ubuntu",
-  root: "/home/d26fo/.local/share/self-evolution-toolchains/node-v22.13.1",
+  root: process.env[WSL_TOOLCHAIN_ROOT_ENV] ?? DEFAULT_WSL_TOOLCHAIN_ROOT,
   node: "22.13.1",
   npm: "10.9.2",
 });

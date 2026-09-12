@@ -126,17 +126,17 @@ function addedFilePatch(path, content) {
 
 test("subject mount is nested and runtime instructions are arm-neutral", () => {
   const source = toolchainShimSource("node", undefined, {
-    workspaceDir: "D:\\Chatgpt\\fixture",
-    subjectDir: "D:\\Chatgpt\\copied-subject",
+    workspaceDir: "C:\\test-fixtures\\fixture",
+    subjectDir: "C:\\test-fixtures\\copied-subject",
   });
   assert.match(source, /--dir \/subject/);
   assert.match(
     source,
-    /--ro-bind \/mnt\/d\/Chatgpt\/copied-subject \/subject\/self-evolution/,
+    /--ro-bind \/mnt\/c\/test-fixtures\/copied-subject \/subject\/self-evolution/,
   );
   assert.doesNotMatch(
     source,
-    /--ro-bind \/mnt\/d\/Chatgpt\/copied-subject \/subject\s/,
+    /--ro-bind \/mnt\/c\/test-fixtures\/copied-subject \/subject\s/,
   );
   assert.match(RUNTIME_INSTRUCTIONS_SOURCE, /\/workspace/);
   assert.match(RUNTIME_INSTRUCTIONS_SOURCE, /\/subject\/self-evolution/);
@@ -233,8 +233,8 @@ test("workspace-edit invocation accepts exactly one opaque base64url token", () 
 
 test("shell wrapper wires gateway, read-only subject, git metadata and receipts", () => {
   const source = shellWrapperSource({
-    workspaceDir: "D:\\Chatgpt\\fixture",
-    subjectDir: "D:\\Chatgpt\\subject",
+    workspaceDir: "C:\\test-fixtures\\fixture",
+    subjectDir: "C:\\test-fixtures\\subject",
     receiptPath: "D:\\temp\\args.txt",
     workspaceEdit: {
       command: WORKSPACE_EDIT_RUNTIME_COMMAND,
@@ -342,7 +342,12 @@ test(
 
 test(
   "real Windows shell wrapper applies a gateway patch and writes a receipt",
-  { skip: process.platform !== "win32", timeout: 90_000 },
+  {
+    skip:
+      process.platform !== "win32" ||
+      !process.env.SELF_EVOLUTION_WSL_TOOLCHAIN_ROOT,
+    timeout: 90_000,
+  },
   async () => {
     const root = await mkdtemp(resolve(tmpdir(), "workspace-edit-wrapper-"));
     try {
@@ -487,7 +492,12 @@ test("resolved config accepts runtime instructions followed by project AGENTS", 
 
 test(
   "real Windows/WSL v1 and v2 entrypoints are readable and subjects are read-only",
-  { skip: process.platform !== "win32", timeout: 60_000 },
+  {
+    skip:
+      process.platform !== "win32" ||
+      !process.env.SELF_EVOLUTION_WSL_TOOLCHAIN_ROOT,
+    timeout: 60_000,
+  },
   async () => {
     const [v1, v2] = await Promise.all([
       probeFrozenSubjectRuntime({

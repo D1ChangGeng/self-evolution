@@ -41,15 +41,10 @@ import {
   verifyWindowsConfinement,
   WINDOWS_CONFINEMENT,
 } from "./confinement.mjs";
+import { PINNED_WSL_TOOLCHAIN } from "./prepare.mjs";
 
 export { collectRunEvidence, createBlindBundle, runBlindReview };
 
-const PINNED_WSL_TOOLCHAIN = Object.freeze({
-  distro: "Ubuntu",
-  root: "/home/d26fo/.local/share/self-evolution-toolchains/node-v22.13.1",
-  node: "22.13.1",
-  npm: "10.9.2",
-});
 export const NETWORK_ENFORCEMENT =
   "windows-restricted-token+wsl-bwrap-user-net+deny-first-command-allowlist";
 export const NETWORK_NAMESPACE = "wsl-bwrap-unshare-user-net";
@@ -1026,7 +1021,7 @@ const SHELL_NETWORK_CANARY = [
 ].join("; ");
 const INTEROP_CANARY = [
   "test ! -e /mnt/c",
-  "test ! -e /home/d26fo",
+  "test ! -e /home/host-user",
   "test ! -x /mnt/c/Windows/System32/cmd.exe",
 ].join(" && ");
 

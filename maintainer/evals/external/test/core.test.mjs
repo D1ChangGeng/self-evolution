@@ -2042,14 +2042,14 @@ test("model smoke gate binds both models, usage, and artifact hash", async () =>
     results: [
       {
         role: "execution",
-        model: "zeo/gpt-5.5-high",
+        model: "execution-model",
         status: "passed",
         response_count: 1,
         response_usage: [{ input_tokens: 1, output_tokens: 1 }],
       },
       {
         role: "review",
-        model: "dev-claude/claude-sonnet-4-6-thinking-high",
+        model: "review-model",
         status: "passed",
         response_count: 1,
         response_usage: [{ input_tokens: 1, output_tokens: 1 }],
@@ -2156,8 +2156,8 @@ test("model smoke gate binds both models, usage, and artifact hash", async () =>
   };
   const files = {
     campaign: {
-      execution_model: "zeo/gpt-5.5-high",
-      review_model: "dev-claude/claude-sonnet-4-6-thinking-high",
+      execution_model: "execution-model",
+      review_model: "review-model",
       execution_assurance: {
         ...environment.assurance,
         credential_transport: "isolated-disk-only",
@@ -2249,8 +2249,12 @@ test("model smoke gate binds both models, usage, and artifact hash", async () =>
   );
 });
 
-test("pinned WSL toolchain is exactly Node 22.13.1 and npm 10.9.2", async () => {
-  const actual = await verifyPinnedToolchain();
-  assert.equal(actual.node, PINNED_WSL_TOOLCHAIN.node);
-  assert.equal(actual.npm, PINNED_WSL_TOOLCHAIN.npm);
-});
+test(
+  "configured WSL toolchain is exactly Node 22.13.1 and npm 10.9.2",
+  { skip: !process.env.SELF_EVOLUTION_WSL_TOOLCHAIN_ROOT },
+  async () => {
+    const actual = await verifyPinnedToolchain();
+    assert.equal(actual.node, PINNED_WSL_TOOLCHAIN.node);
+    assert.equal(actual.npm, PINNED_WSL_TOOLCHAIN.npm);
+  },
+);
