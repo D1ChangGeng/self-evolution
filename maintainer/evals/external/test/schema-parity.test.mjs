@@ -179,10 +179,27 @@ test("campaign schema isolation constants match source declarations exactly", as
     property(schema, "toolchain_shim_enforcement").const,
     campaign.DEFAULT_CONFIG.toolchain_shim_enforcement,
   );
-  assert.deepEqual(
-    property(schema, "toolchain").const,
-    campaign.DEFAULT_CONFIG.toolchain,
+  for (const name of ["execution_model", "review_model"]) {
+    const model = property(schema, name);
+    assert.equal(model.type, "string");
+    assert.equal(model.minLength, 1);
+  }
+  const toolchain = property(schema, "toolchain");
+  assert.deepEqual(toolchain.required, ["distro", "root", "node", "npm"]);
+  assert.equal(
+    toolchain.properties.distro.const,
+    campaign.DEFAULT_CONFIG.toolchain.distro,
   );
+  assert.equal(
+    toolchain.properties.node.const,
+    campaign.DEFAULT_CONFIG.toolchain.node,
+  );
+  assert.equal(
+    toolchain.properties.npm.const,
+    campaign.DEFAULT_CONFIG.toolchain.npm,
+  );
+  assert.match(campaign.DEFAULT_CONFIG.toolchain.root, /^\/[^\r\n]*$/);
+  assert.equal(toolchain.properties.root.pattern, "^/[^\\r\\n]*$");
   for (const [key, value] of Object.entries(environment)) {
     assert.match(opencode, new RegExp(`${key}[^\\n]*${value}`));
   }

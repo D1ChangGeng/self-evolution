@@ -41,15 +41,10 @@ import {
   verifyWindowsConfinement,
   WINDOWS_CONFINEMENT,
 } from "./confinement.mjs";
+import { PINNED_WSL_TOOLCHAIN } from "./prepare.mjs";
 
 export { collectRunEvidence, createBlindBundle, runBlindReview };
 
-const PINNED_WSL_TOOLCHAIN = Object.freeze({
-  distro: "Ubuntu",
-  root: "/home/host-user/.local/share/self-evolution-toolchains/node-v22.13.1",
-  node: "22.13.1",
-  npm: "10.9.2",
-});
 export const NETWORK_ENFORCEMENT =
   "windows-restricted-token+wsl-bwrap-user-net+deny-first-command-allowlist";
 export const NETWORK_NAMESPACE = "wsl-bwrap-unshare-user-net";

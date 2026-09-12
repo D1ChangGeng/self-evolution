@@ -2249,8 +2249,12 @@ test("model smoke gate binds both models, usage, and artifact hash", async () =>
   );
 });
 
-test("pinned WSL toolchain is exactly Node 22.13.1 and npm 10.9.2", async () => {
-  const actual = await verifyPinnedToolchain();
-  assert.equal(actual.node, PINNED_WSL_TOOLCHAIN.node);
-  assert.equal(actual.npm, PINNED_WSL_TOOLCHAIN.npm);
-});
+test(
+  "configured WSL toolchain is exactly Node 22.13.1 and npm 10.9.2",
+  { skip: !process.env.SELF_EVOLUTION_WSL_TOOLCHAIN_ROOT },
+  async () => {
+    const actual = await verifyPinnedToolchain();
+    assert.equal(actual.node, PINNED_WSL_TOOLCHAIN.node);
+    assert.equal(actual.npm, PINNED_WSL_TOOLCHAIN.npm);
+  },
+);
