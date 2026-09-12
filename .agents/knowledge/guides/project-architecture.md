@@ -13,9 +13,9 @@ review_when:
   - "the filesystem contract, data model, CLI boundary, or migration architecture changes"
 sources:
   - path: "docs/ARCHITECTURE.md"
-    checked_at: "git:693a705a9a4dc663adea4d388c05633417448fd2"
+    checked_at: "git:5705b6ddfd6a16ff25f2be3fc2f307d49605f4a2"
   - path: "skills/self-evolution/references/data-model.md"
-    checked_at: "git:693a705a9a4dc663adea4d388c05633417448fd2"
+    checked_at: "git:5705b6ddfd6a16ff25f2be3fc2f307d49605f4a2"
   - path: "tools/kb/src/**"
     checked_at: "git:693a705a9a4dc663adea4d388c05633417448fd2"
 ---
