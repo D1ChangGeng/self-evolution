@@ -32,14 +32,13 @@ V2_DATA_REVISION = "f152293e235517d504809563c833d7190b8c713b"
 V2_REPOSITORY_COMMIT = "2cc8c540bdb87fe6761629b585e727e1c4704520"
 LONGMEMEVAL_REPOSITORY_COMMIT = "9e0b455f4ef0e2ab8f2e582289761153549043fc"
 RUNNER_REVISION = "self-evolution-public-runner/1"
-JUDGE_RUNNER_REVISION = "self-evolution-public-judge/3"
+JUDGE_RUNNER_REVISION = "self-evolution-public-judge/4"
 MAX_V2_CONTEXT_CHARS = 40_000
 MAX_V2_STATE_CHARS = 5_000
 V2_TOP_TRAJECTORIES = 12
 V2_TOP_STATES = 10
 
 TOKEN_RE = re.compile(r"[a-zA-Z][a-zA-Z0-9_-]{2,}|\d+")
-BOXED_RE = re.compile(r"\\boxed\{([^{}]*)\}", re.DOTALL)
 STOPWORDS = {
     "about",
     "after",
@@ -403,9 +402,17 @@ def prediction_messages(
     question: dict[str, Any],
     selected_context: list[dict[str, str]],
 ) -> list[dict[str, str]]:
+    evidence_rule = (
+        "Use supplied evidence as authority for remembered user facts. You may introduce a "
+        "general-knowledge recommendation as a proposal when it satisfies those preferences; "
+        "mark time-sensitive external details for verification. "
+        if benchmark == "cleaned" and question["question_type"] == "single-session-preference"
+        else "Use only the supplied current evidence. "
+    )
     system = (
         "You are the language-intelligence component of a project-wiki memory system. "
-        "Follow the evaluated skill instructions below. Use only the supplied current evidence, "
+        "Follow the evaluated skill instructions below. "
+        f"{evidence_rule}"
         "resolve updates and temporal order carefully, and say UNKNOWN when evidence is insufficient. "
         "Return only the concise final answer requested by the question.\n\n"
         "EVALUATED SKILL:\n"
@@ -512,8 +519,28 @@ class Endpoint:
 
 
 def parse_boxed(text: str) -> str:
-    matches = BOXED_RE.findall(text)
-    return matches[-1].strip() if matches else text.strip()
+    marker = "\\boxed{"
+    index = text.rfind(marker)
+    if index == -1:
+        return text.strip()
+    index += len(marker)
+    depth = 1
+    output: list[str] = []
+    while index < len(text) and depth > 0:
+        character = text[index]
+        if character == "{":
+            depth += 1
+            output.append(character)
+        elif character == "}":
+            depth -= 1
+            if depth == 0:
+                break
+            output.append(character)
+        else:
+            output.append(character)
+        index += 1
+    parsed = "".join(output).strip()
+    return parsed if parsed else text.strip()
 
 
 def normalize_phrase(text: str) -> str:
@@ -1020,9 +1047,23 @@ def prepare_protocols(
         },
         "latency_scope": "endpoint request and in-request retries; semaphore queue excluded",
     }
-    prompt_path = args.campaign_root / "protocols" / "prompt-contract.json"
-    write_json(prompt_path, prompt_contract)
-    prompt_sha = sha256_file(prompt_path)
+    prompt_contracts = {
+        "v2": prompt_contract,
+        "cleaned": {
+            **prompt_contract,
+            "cleaned_preference_recommendations": (
+                "remembered facts require supplied evidence; a matching general-knowledge "
+                "candidate may be proposed with current external details marked for verification"
+            ),
+        },
+    }
+    prompt_shas = {}
+    for benchmark, contract in prompt_contracts.items():
+        prompt_path = (
+            args.campaign_root / "protocols" / f"prompt-contract-{benchmark}.json"
+        )
+        write_json(prompt_path, contract)
+        prompt_shas[benchmark] = sha256_file(prompt_path)
 
     protocols: dict[str, dict[str, Any]] = {}
     for benchmark, benchmark_id, tier in (
@@ -1043,7 +1084,7 @@ def prepare_protocols(
                 "revision": datasets[benchmark]["revision"],
                 "sha256": datasets[benchmark]["data_sha256"],
             },
-            "prompt_sha256": prompt_sha,
+            "prompt_sha256": prompt_shas[benchmark],
             "budget": {
                 "max_completion_tokens": 1024,
                 "reasoning_effort": args.reasoning_effort,

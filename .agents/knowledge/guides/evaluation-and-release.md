@@ -9,7 +9,7 @@ use_when:
   - "changing evaluation contracts, evidence derivation, CI, or release gates"
   - "running or interpreting external real-task campaigns"
 review_when:
-  - "the integrated evidence schema, external harness, frozen baseline, or release process changes"
+  - "the public or integrated evidence schema, external harness, frozen baseline, or release process changes"
 sources:
   - path: "maintainer/evals/**"
     checked_at: "git:693a705a9a4dc663adea4d388c05633417448fd2"
@@ -32,9 +32,11 @@ boundaries.
 
 The deterministic suite establishes artifact and safety facts such as file
 counts, hashes, schema validity, source-change signals, migration integrity,
-idempotency, and adapter defaults. Model behavior, retrieval quality, Capture
-value, and task outcomes require the versioned multi-run and blinded-review
-evidence described by `maintainer/evals/SPEC.md`.
+idempotency, and adapter defaults. The standard profile adds the public
+benchmark and small cross-harness engineering campaign under
+`maintainer/evals/public/`. The historical integrated campaign remains a
+separate, optional private profile. Read `maintainer/evals/SPEC.md` and the
+current `maintainer/evals/public/RESULTS-1302-1.md` for exact scope and status.
 
 Every numeric integrated result is derived from referenced, hashed raw
 artifacts. Cached totals are checked against that derivation. Missing or
@@ -44,9 +46,20 @@ to zero.
 ## Formal Release Gates
 
 `maintainer/evals/results/v2-current.json` is the current machine-readable
-record. `pending` is an explicit evidence state, and `release_ready` becomes
-true only when every configured gate passes. Structural savings cannot offset
-a correctness or task-quality regression.
+record. Select the actual change class and release profile before running
+`node maintainer/evals/run.mjs --release`. `release_ready` becomes true only
+when every gate required by that profile passes. The standard/core profile
+requires deterministic safety, three paired public runs on each required
+benchmark, and the six cross-harness execution/review samples. Historical
+integrated gates retain their `pending` status until their evidence exists;
+they are required only by the private profile. Structural savings cannot offset
+a measured task-quality regression.
+
+The checked-in `evidence.bundle.tar.gz` is bound by
+`evidence.bundle.json`. The evaluator extracts it temporarily, checks raw
+artifact hashes, and derives the benchmark result rather than trusting supplied
+totals. The model endpoint alias is not an immutable build, so record its
+observed revision and repeat paired runs as specified by the public policy.
 
 The frozen v1 baseline is bound by `maintainer/evals/baseline/v1.json`. The
 evaluator compares the archive with its source commit, so CI uses a full-history
@@ -92,5 +105,7 @@ recorded states, and verify the pushed commit with both CI platforms.
 
 ## Uncertainties
 
-Real v1/v2 task quality remains unresolved until the prescribed paired model
-runs and blind reviews are completed for the current frozen subject.
+The public benchmark and six engineering samples cover selected memory and
+harness behaviors, not every project-wiki use case. The private integrated
+v1/v2 task-quality campaign remains pending and must not be reported as a
+passing standard-profile measurement.

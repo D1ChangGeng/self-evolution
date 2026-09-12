@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -24,6 +25,14 @@ def write_json(path: Path, value: Any) -> None:
     temporary.replace(path)
 
 
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def prefix_artifact_refs(value: Any, prefix: str) -> Any:
     if isinstance(value, list):
         return [prefix_artifact_refs(item, prefix) for item in value]
@@ -38,6 +47,30 @@ def prefix_artifact_refs(value: Any, prefix: str) -> Any:
     ):
         output["path"] = f"{prefix}/{output['path']}"
     return output
+
+
+def rebase_json_ref(
+    ref: dict[str, str],
+    source_root: Path,
+    artifact_root: Path,
+    prefix: str,
+) -> dict[str, str]:
+    relative_source = Path(ref["path"])
+    if relative_source.is_absolute() or ".." in relative_source.parts:
+        raise RuntimeError(f"unsafe artifact path: {ref['path']}")
+    source = (source_root / relative_source).resolve()
+    if not source.is_relative_to(source_root.resolve()):
+        raise RuntimeError(f"artifact path escapes campaign: {ref['path']}")
+    if sha256_file(source) != ref["sha256"]:
+        raise RuntimeError(f"artifact hash mismatch: {source}")
+    content = prefix_artifact_refs(read_json(source), prefix)
+    relative = Path("_aggregate") / prefix / relative_source
+    destination = artifact_root / relative
+    write_json(destination, content)
+    return {
+        "path": relative.as_posix(),
+        "sha256": sha256_file(destination),
+    }
 
 
 def main() -> None:
@@ -80,13 +113,34 @@ def main() -> None:
             if pair_id in seen_pairs:
                 raise RuntimeError(f"duplicate pair_id: {pair_id}")
             seen_pairs.add(pair_id)
-            merged["runs"].append(prefix_artifact_refs(run, campaign_name))
+            rebased = prefix_artifact_refs(run, campaign_name)
+            for arm in ("baseline", "candidate"):
+                rebased[arm]["results"] = rebase_json_ref(
+                    run[arm]["results"],
+                    args.artifact_root / campaign_name,
+                    args.artifact_root,
+                    campaign_name,
+                )
+            merged["runs"].append(rebased)
 
     if args.engineering:
-        merged["engineering"] = prefix_artifact_refs(
-            read_json(args.engineering),
-            args.engineering.parent.relative_to(args.artifact_root).as_posix(),
+        engineering = read_json(args.engineering)
+        engineering_prefix = args.engineering.parent.relative_to(
+            args.artifact_root
+        ).as_posix()
+        rebased_engineering = prefix_artifact_refs(
+            engineering,
+            engineering_prefix,
         )
+        for section in ("harnesses", "samples"):
+            for index, item in enumerate(engineering[section]):
+                rebased_engineering[section][index]["review"] = rebase_json_ref(
+                    item["review"],
+                    args.engineering.parent,
+                    args.artifact_root,
+                    engineering_prefix,
+                )
+        merged["engineering"] = rebased_engineering
     write_json(args.output, merged)
 
 

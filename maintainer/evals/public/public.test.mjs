@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import test from "node:test";
@@ -14,7 +15,7 @@ import {
   validatePublicEvidence,
 } from "./public.mjs";
 
-test("core aggregation pools question observations across runs", () => {
+test("core aggregation preserves distinct question observations", () => {
   const pairs = [
     [true, false],
     [true, true],
@@ -52,6 +53,29 @@ test("core aggregation pools question observations across runs", () => {
   assert.equal(baseline.overall_accuracy, 2 / 3);
   assert.equal(candidate.overall_accuracy, 2 / 3);
   assert.equal(candidate.p95_latency_ms, 112);
+});
+
+test("core aggregation uses one majority result per repeated question", () => {
+  const pairs = [true, false, true].map((correct, index) => ({
+    baselineMetrics: {
+      rows: [
+        {
+          question_id: "same-question",
+          ability: "errors-gotchas",
+          domain: "web",
+          correct,
+          latency_ms: [300, 100, 200][index],
+          context_bytes: 900,
+        },
+      ],
+    },
+    candidateMetrics: { rows: [] },
+  }));
+  const result = aggregateMetrics(pairs, "baseline");
+  assert.equal(result.question_count, 1);
+  assert.equal(result.overall_accuracy, 1);
+  assert.equal(result.p95_latency_ms, 200);
+  assert.equal(result.rows[0].observation_count, 3);
 });
 
 function shellEvidence(overrides = {}) {
@@ -244,6 +268,7 @@ async function validSmallEvidence(root, overrides = {}) {
 }
 
 async function addEngineeringEvidence(evidence, root, verdict = "pass") {
+  const engineeringCampaignId = `${evidence.campaign_id}-engineering`;
   const harnesses = [];
   const samples = [];
   const harnessNames = ["codex", "claude-code", "opencode"];
@@ -255,7 +280,7 @@ async function addEngineeringEvidence(evidence, root, verdict = "pass") {
       status: "completed",
       host: "1302-1",
       exit_code: 0,
-      campaign_id: evidence.campaign_id,
+      campaign_id: engineeringCampaignId,
       task_id: taskId,
       harness: { name: harness, revision: "test-harness-1" },
       executor_id: `${id}-executor`,
@@ -276,7 +301,7 @@ async function addEngineeringEvidence(evidence, root, verdict = "pass") {
       schema_version: "public-engineering-review/1",
       verdict,
       host: "1302-1",
-      campaign_id: evidence.campaign_id,
+      campaign_id: engineeringCampaignId,
       task_id: taskId,
       harness,
       reviewer_id: `${id}-reviewer`,
@@ -306,7 +331,11 @@ async function addEngineeringEvidence(evidence, root, verdict = "pass") {
       review: pair.review,
     });
   }
-  evidence.engineering = { harnesses, samples };
+  evidence.engineering = {
+    campaign_id: engineeringCampaignId,
+    harnesses,
+    samples,
+  };
   return evidence;
 }
 
@@ -405,6 +434,50 @@ test("a complete paired run derives metrics from raw artifacts and keeps missing
   );
   assert.equal(result.sample.status, "blocked");
   assert.match(result.sample.reason, /engineering evidence is missing/);
+});
+
+test("campaign merge rebases result-internal artifact references", async () => {
+  const root = await mkdtemp(resolve(tmpdir(), "self-evolution-public-merge-"));
+  for (const [name, pairId] of [
+    ["campaign-1", "pair-1"],
+    ["campaign-2", "pair-2"],
+  ]) {
+    const campaignRoot = resolve(root, name);
+    await mkdir(campaignRoot, { recursive: true });
+    const evidence = await validSmallEvidence(campaignRoot, {
+      artifact_root: ".",
+    });
+    evidence.runs[0].pair_id = pairId;
+    await writeFile(
+      resolve(campaignRoot, "evidence.json"),
+      JSON.stringify(evidence),
+      "utf8",
+    );
+  }
+  const output = resolve(root, "evidence.json");
+  const merge = spawnSync(
+    process.env.PYTHON || "python",
+    [
+      resolve(import.meta.dirname, "merge_campaigns.py"),
+      "--artifact-root",
+      root,
+      "--campaign",
+      "campaign-1",
+      "--campaign",
+      "campaign-2",
+      "--campaign-id",
+      "aggregate-test",
+      "--output",
+      output,
+    ],
+    { encoding: "utf8" },
+  );
+  assert.equal(merge.status, 0, merge.stderr);
+  const result = await loadPublicEvidence(output, {
+    baselineSubjectSha256: TEST_BASELINE_SUBJECT,
+    subjectSha256: TEST_CANDIDATE_SUBJECT,
+  });
+  assert.equal(result.evaluation.status, "pass", result.evaluation.reason);
 });
 
 test("internal validation fields and aggregate or per-question self-reported metrics are rejected", async () => {
