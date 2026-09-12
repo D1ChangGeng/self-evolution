@@ -12,9 +12,9 @@ review_when:
   - "the public or integrated evidence schema, external harness, frozen baseline, or release process changes"
 sources:
   - path: "maintainer/evals/**"
-    checked_at: "git:693a705a9a4dc663adea4d388c05633417448fd2"
+    checked_at: "git:5705b6ddfd6a16ff25f2be3fc2f307d49605f4a2"
   - path: ".github/workflows/**"
-    checked_at: "git:693a705a9a4dc663adea4d388c05633417448fd2"
+    checked_at: "git:5705b6ddfd6a16ff25f2be3fc2f307d49605f4a2"
   - path: "legacy/v1/**"
     checked_at: "git:693a705a9a4dc663adea4d388c05633417448fd2"
 ---
