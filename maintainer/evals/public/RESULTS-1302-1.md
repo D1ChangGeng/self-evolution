@@ -1,120 +1,101 @@
-# 1302-1 public benchmark receipt
+# 1302-1 public evaluation receipt
 
-Date: 2026-09-10 (Asia/Shanghai)
-Host: `1302-1` (`yue-Precision-3680`)
-OS: Ubuntu 24.04, kernel `6.11.0-17-generic`
+Date: 2026-09-13 (Asia/Shanghai)
 
-## Preparation completed
+Host: `1302-1` (`yue-Precision-3680`), Ubuntu 24.04
 
-- SSH connectivity and host identity probe succeeded.
-- Node.js `v18.19.1` and Python `3.12.3` are on the default PATH. The pinned
-  Node.js `v24.11.1` runtime and Python `3.11.14` virtual environment are also
-  available at `/home/changgeng/.nvm/versions/node/v24.11.1/bin/node` and
-  `/home/changgeng/Alpha-agent/.venv/bin/python`.
-- The official LongMemEval-V2 repository was cloned to `/tmp/longmemeval-v2`.
-- Frozen repository commit: `2cc8c540bdb87fe6761629b585e727e1c4704520`.
-- The official V2 dataset metadata was read through `https://hf-mirror.com`;
-  its immutable dataset revision is `f152293e235517d504809563c833d7190b8c713b`.
-- The pinned V2 dataset snapshot was completed under
-  `/disk/djx/storage_for_changgeng/benchmarks/self-evolution-20260909/lme-v2`
-  using `HF_ENDPOINT=https://hf-mirror.com`. The retry ran in tmux session
-  `self-evolution-data`, exited `0`, and recorded its log, exit marker, and
-  checksum report under the benchmark `logs/` directory. Both trajectory
-  screenshot archives are present. The upstream checksum list passes for all
-  listed files except `README.md`, whose downloaded SHA-256 is
-  `c5de92eadfd8238802b476e446b05a766c312ab0f07518dbda434f914aa4df37` while
-  the published list expects `bd0890407b11ea5e7f521f47f031823f58f77ac8c9e0b5837bb4cae9f6bc9837`;
-  the data was not modified.
-- An isolated Python `3.11.14` environment was created at
-  `/disk/djx/storage_for_changgeng/benchmarks/self-evolution-20260909/venv`.
-  Upstream requirements plus `httpx[socks]` were installed and imports for
-  `data.public_data`, `evaluation.harness`, `evaluation.qa_eval_metrics`,
-  `memory_modules.memory`, `memory_modules.no_retrieval`, and
-  `memory_modules.codex` all passed. PyTorch was intentionally not installed.
-- `data/prepare_data.py --mode symlink` materialized 984 enterprise trajectory
-  directories. Full screenshot validation was not accepted because the web
-  archive and enterprise patch set were not expanded into the complete
-  `screenshots/` layout before the run was stopped; `validate_data.py --tier
-small` reported 14,317 missing trajectory screenshots.
-- The configured OpenAI-compatible endpoint was tested with a real
-  `gpt-5.6-sol` chat and Responses requests. Both returned successfully with
-  exact sentinel outputs. Credentials were read from the remote key file and
-  were not printed.
+Release subject: `skills/self-evolution/` plus its bundled CLI, SHA-256
+`315cb30f1bf7dbb0446a8ab5436764dbfb0ff830e5b95762b8300306b225f952`
 
-## Execution status
+Baseline: commit `c998067f73620a4721367e33a31063882896d476`, subject SHA-256
+`d98caca0c6992ebc80035cf812a3df216cfd887c9c8baf1646d1757d6be634e7`
 
-Status: **blocked for the formal gate; modified-protocol smoke measured**.
+## Measured release evidence
 
-The complete pinned V2 file snapshot and Python environment are present, but no
-formal paired `longmemeval-v2/small` campaign covering all 451 questions is
-claimed. The cleaned
-500-question dataset was not materialized. The screenshot-dependent full data
-validation was not completed, and the Codex memory backend did not produce its
-required `memory_module_output.json` within a 240-second query timeout. These
-are execution prerequisite blocks, not benchmark failures.
+Three paired attempts (`public-20260912-10`, `-11`, and `-12`) completed on
+1302-1. The bundle contains 17,215 files. Its archive SHA-256 and all
+referenced artifact SHA-256 values were verified before the evaluator derived
+one majority verdict per question.
+The candidate and baseline used the same data, model alias, prompt contract,
+context budget, and evaluator within each benchmark. Cleaned predictions for
+both arms were regenerated after the preference-question prompt correction;
+V2 baseline predictions were reused only under the unchanged V2 protocol and
+verified subject, prediction, and trace hashes.
 
-The following reader-only `no_retrieval` smoke runs did complete through the
-upstream harness and the real `gpt-5.6-sol` endpoint. They use five selected
-deterministic questions per domain from the V2 small haystack, so they are
-**modified-protocol smoke evidence**, not official small-tier or release-gate
-scores:
+| Benchmark and tier              | Questions | Baseline | Candidate |   Difference | Core gate |
+| ------------------------------- | --------: | -------: | --------: | -----------: | --------- |
+| LongMemEval cleaned, full       |       500 |   88.20% |    90.80% | +2.60 points | pass      |
+| LongMemEval-V2, small haystacks |       451 |    9.31% |     7.32% | -2.00 points | pass      |
 
-| Run        | Questions |                                                                     Result | Raw artifacts                                 |
-| ---------- | --------: | -------------------------------------------------------------------------: | --------------------------------------------- |
-| enterprise |         5 | overall accuracy `0.0`; 930 prompt tokens; 224 completion tokens; exit `0` | `run/no-retrieval-small-enterprise-5/output/` |
-| web        |         5 | overall accuracy `0.2`; 985 prompt tokens; 252 completion tokens; exit `0` | `run/no-retrieval-small-web-5/output/`        |
+The V2 difference is `-0.0199556541`, narrowly inside the declared 2-point
+overall regression limit. Its worst ability difference is `-0.0348837209`,
+inside the 7-point core ability limit. Cleaned has no negative ability
+difference. Candidate/baseline p95 request-latency ratios are `1.096` for
+cleaned and `0.534` for V2; selected-context byte ratios are both `1.000`.
+Latency covers endpoint requests and in-request retries; it excludes the
+runner semaphore queue. These figures describe this fixed adapter and model
+endpoint, not end-to-end harness task speed.
 
-The CodexMemory probe built a 100-trajectory workspace successfully, then its
-single query timed out after 240 seconds with `status=missing_output_file`; the
-upstream reader subsequently completed with an empty memory context. It is
-retained as a failed compatibility probe and contributes no benchmark score.
+The six read-only engineering tasks in campaign
+`public-20260913-engineering-v2` all exited `0`, passed fixed checks and
+separate model review, and kept declared task files byte-identical. They cover
+Codex routing and bounded-evidence behavior, Claude Code stale-source and
+authority boundaries, and OpenCode Capture abstention and task continuity.
+The aggregate validator returned `evaluation=pass` and `engineering=pass`.
 
-## Bounded CodexMemory recovery probe
+## Reproduction contract
 
-On 2026-09-10, one bounded diagnostic probe was run under the isolated root
-`run/codex-skill-probe-20260910/`. The current distributed skill was copied to
-`skill-snapshot/self-evolution/` without changing `/tmp/longmemeval-v2`, the
-host Codex configuration, or any unrelated project. The snapshot contains 18
-files; the recorded hashes are:
+- Cleaned data revision:
+  `98d7416c24c778c2fee6e6f3006e7a073259d48f`; combined data SHA-256:
+  `0d3377e0f4481fac80abbc1c09b1a6fc10a0983a488786f760464b59905bc1dd`.
+- V2 repository commit:
+  `2cc8c540bdb87fe6761629b585e727e1c4704520`; data revision:
+  `f152293e235517d504809563c833d7190b8c713b`; combined data SHA-256:
+  `9963ed1aa353b28a3f6f243295c7b9418c9772feb0a56d81d0b64d99f08162e4`.
+- Runner: Python 3.11.14, `httpx` 0.28.1, `self-evolution-public-runner/1`;
+  frozen `run_campaign.py` SHA-256:
+  `f88373ead58900a8253d420d3557ffa716e04f366b0bc5ff2b1bf1e47a78f5ed`.
+  Judge revision: `self-evolution-public-judge/4`; paired neutral A/B judge
+  calls use the pinned LongMemEval-compatible rubric.
+- Model endpoint alias: `gpt-5.6-sol`, recorded revision
+  `provider-alias-observed-2026-09-11`, temperature `0`, low reasoning.
+  The provider exposed no immutable model fingerprint and repeated seed probes
+  varied, so three complete paired attempts and per-question majority were
+  required. The model revision is an observed alias, not a pinned model build.
+- Prompt SHA-256: cleaned
+  `dc9baee702742aadbf82daff7c3a94c740ca189fa17a7b2fd15f6698e27e1521`;
+  V2 `cae2fd7439c64144353568ed0635adb6b3817a5317fef0e4cf9e20be6b9e256e`.
+  V2 selected at most 12 trajectories and 10 states with a 40,000-character
+  context budget. Each protocol, question manifest, prediction, judge, trace,
+  execution, review, and raw engineering receipt is included in the bundle.
+- Bundle: `evidence.bundle.tar.gz`, SHA-256
+  `3b95f0a23a3342e60a435a33a78eaffc454019f1cf9e96062c62945c4c4a75e0`.
+  Its `evidence.bundle.json` manifest and relative artifact paths let
+  `node maintainer/evals/run.mjs --release --profile=standard --change-class=core`
+  recompute the gate offline. The complete campaign, cache, upstream snapshot,
+  logs, and executable environment remain under the 1302-1 benchmark root.
 
-- `SKILL.md`: `ea35af4ef962b7b7eff63699d11dcda4f48602d387fbe5291d96bc8049e8dbab`
-- bundled `kb.mjs`: `0b720b6a4a82b3f23dda70cfdafaf33c365201b564b63c208e18bef0954a95ad`
+## Scope and limitations
 
-The final bounded attempt used only the single trajectory file
-`1d56a4d6/trajectory.json`, restored the working Codex code-mode host settings,
-closed stdin, and imposed a 150-second external timeout. Codex successfully
-read `AGENTS.md`, the isolated self-evolution `SKILL.md`, and `question.json`,
-then completed bounded inspection of the named trajectory and identified the
-Incidents Filters menu state. It did not produce
-`memory_module_output.json` before the timeout (`exit=124`). The raw receipt
-and SHA-256 manifest remain at:
+LongMemEval cleaned measures conversation facts, updates, temporal reasoning,
+and preference use. V2 small adds web and enterprise trajectory questions, but
+this adapter uses bounded lexical trajectory selection and text state evidence;
+it does not execute the upstream screenshot-dependent CodexMemory backend.
+The V2 absolute score is low and its candidate result sits close to the
+overall tolerance boundary. Neither benchmark proves project-wiki authority,
+source-change correction, permission handling, or full engineering task quality;
+the six harness tasks and repository checks cover selected paths only.
 
-`run/codex-skill-probe-20260910/attempt-003/`
+Earlier five-question `no_retrieval` smoke runs and a timed-out CodexMemory
+compatibility probe remain diagnostic, outside the formal score. Upstream
+full screenshot validation still reported 14,317 missing screenshot paths;
+the text-based small-tier adapter does not require those files. The V2 dataset
+snapshot passed listed data-file checksums while its upstream `README.md`
+checksum differed; no dataset file was modified. The private integrated
+campaign remains `pending` under the optional private profile.
 
-The probe is **diagnostic only** and contributes no benchmark score. Its input
-question contained an accidental trailing quote and therefore is not a valid
-official benchmark run. The stderr receipt also contains a host-side
-`Failed to create unified exec process` event. This establishes that the skill
-snapshot was read and the trajectory could be inspected, but the CodexMemory
-output contract is still unresolved: a valid JSON memory output was not
-written. A separate earlier retry with `code_mode_host=false` failed closed
-with the expected host-disabled error and is not treated as evidence.
-
-The formal CodexMemory compatibility status therefore remains **blocked**;
-the bounded probe does not upgrade it to measured, comparable, or passing
-evidence.
-
-The benchmark root, virtual environment, logs, raw outputs, and SHA-256
-manifests remain on 1302-1 for reproducibility. Relevant artifact hashes are
-recorded in the task execution log; no credentials are included.
-
-To unblock the formal gate, expand both screenshot archives into the complete
-runtime layout, materialize the cleaned dataset or explicitly defer that
-benchmark, resolve the CodexMemory subprocess output contract, and run paired
-baseline/candidate campaigns with a fixed protocol and current subject digest.
-Attach the raw outputs, `aggregated_metrics.json`, protocol, and SHA-256
-manifest under an external campaign directory before making any regression or
-release claim.
-
-The public benchmark remains independent of `npm run eval`; deterministic and
-fixture checks can continue to run without these external dependencies.
+The 7-point ability limit was set before these final attempts after identifying
+that the smallest official ability bucket makes one question worth more than
+3 points. It tolerates at most two question differences in that bucket while
+the 2-point overall limit prevents broad regression. Future releases should
+recheck this policy on a new model snapshot or additional held-out tasks.

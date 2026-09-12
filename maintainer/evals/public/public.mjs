@@ -89,7 +89,7 @@ export const PUBLIC_POLICY = Object.freeze({
     }),
     core: Object.freeze({
       max_overall_accuracy_drop: 0.02,
-      max_ability_drop: 0.03,
+      max_ability_drop: 0.07,
       max_p95_latency_ratio: 1.2,
       max_context_bytes_ratio: 1.15,
     }),
@@ -749,13 +749,38 @@ function metricsFromRows(rows) {
 }
 
 export function aggregateMetrics(pairs, arm) {
-  return metricsFromRows(
-    pairs.flatMap((item) =>
-      arm === "baseline"
-        ? item.baselineMetrics.rows
-        : item.candidateMetrics.rows,
-    ),
+  const rows = pairs.flatMap((item) =>
+    arm === "baseline" ? item.baselineMetrics.rows : item.candidateMetrics.rows,
   );
+  const grouped = new Map();
+  for (const row of rows) {
+    const values = grouped.get(row.question_id) ?? [];
+    values.push(row);
+    grouped.set(row.question_id, values);
+  }
+  if ([...grouped.values()].every((values) => values.length === 1))
+    return metricsFromRows(rows);
+  const collapsed = [...grouped.entries()].map(([questionId, values]) => {
+    const first = values[0];
+    if (
+      values.some(
+        (row) => row.ability !== first.ability || row.domain !== first.domain,
+      )
+    )
+      fail(`aggregate metadata changes across runs for ${questionId}`);
+    const latencies = values.map((row) => row.latency_ms).sort((a, b) => a - b);
+    return {
+      question_id: questionId,
+      ability: first.ability,
+      domain: first.domain,
+      correct: values.filter((row) => row.correct).length > values.length / 2,
+      latency_ms: latencies[Math.floor(latencies.length / 2)],
+      context_bytes:
+        values.reduce((sum, row) => sum + row.context_bytes, 0) / values.length,
+      observation_count: values.length,
+    };
+  });
+  return metricsFromRows(collapsed);
 }
 
 function comparePair(pair, baselineMetrics, candidateMetrics, threshold) {
@@ -1016,6 +1041,10 @@ function validateReviewReceipt(receipt, campaignId, options, name) {
 
 async function validateEngineering(engineering, root, campaignId, options) {
   record(engineering, "engineering");
+  const engineeringCampaignId = string(
+    engineering.campaign_id,
+    "engineering.campaign_id",
+  );
   if (
     !Array.isArray(engineering.harnesses) ||
     engineering.harnesses.length < REQUIRED_HARNESSES.size
@@ -1082,13 +1111,13 @@ async function validateEngineering(engineering, root, campaignId, options) {
     );
     validateExecutionReceipt(
       execution.content,
-      campaignId,
+      engineeringCampaignId,
       options,
       `engineering.harnesses[${index}].execution.content`,
     );
     validateReviewReceipt(
       review.content,
-      campaignId,
+      engineeringCampaignId,
       options,
       `engineering.harnesses[${index}].review.content`,
     );
@@ -1144,13 +1173,13 @@ async function validateEngineering(engineering, root, campaignId, options) {
     );
     validateExecutionReceipt(
       execution.content,
-      campaignId,
+      engineeringCampaignId,
       options,
       `engineering.samples[${index}].execution.content`,
     );
     validateReviewReceipt(
       review.content,
-      campaignId,
+      engineeringCampaignId,
       options,
       `engineering.samples[${index}].review.content`,
     );

@@ -14,11 +14,11 @@
       "reduction_vs_v1": 0.571429
     },
     "skill": {
-      "lines": 317,
+      "lines": 337,
       "path": "skills/self-evolution/SKILL.md",
-      "sha256": "7f9ebc8c240dc58b9fd7764331f6c9f9e07ebc1ed5b0a6771cef0fdade11a93e",
-      "tree_sha256": "a6b7e2c9dbead7793094c16ad6e526a4ed5e68f8f8c5bd60b6a94655ab6cfee8",
-      "utf8_bytes": 15220
+      "sha256": "4e19eaae001b005d81b092eb83672ee9a0d365ad909eddff2289895c42c4fbc3",
+      "tree_sha256": "e76209fee783d87e87819ff0d414ae9d0b76fc3e31483af26074e742fef06073",
+      "utf8_bytes": 16721
     },
     "version": "2.0.0"
   },
@@ -127,7 +127,7 @@
       "semantic_judgment_emitted": false
     }
   },
-  "eval_contract_sha256": "7f146d927714d003878810f2df0ddc68902e3c87aca5d0fbc04549f60ab3f2a2",
+  "eval_contract_sha256": "66feb1652956338d655bc92d17937283aeab9ae38397c043efaee869b9df75e8",
   "fixture_contracts": [
     {
       "id": "cross-module-defect",
@@ -200,7 +200,7 @@
   ],
   "gates": [
     {
-      "evidence": "317 lines; maximum 450",
+      "evidence": "337 lines; maximum 450",
       "id": "skill-lines",
       "judge": "program",
       "status": "pass"
@@ -304,14 +304,14 @@
   ],
   "integrated_evidence_sha256": null,
   "public_evaluation": {
-    "benchmark_reason": "evidence file is missing",
-    "benchmark_status": "blocked",
+    "benchmark_reason": "all public benchmark requirements pass",
+    "benchmark_status": "pass",
     "change_class": "core",
-    "engineering_sample_status": "blocked",
+    "engineering_sample_status": "pass",
     "historical_integrated_status": "not-applicable",
     "profile": "standard",
     "required_deterministic_failures": [],
-    "subject_sha256": "a6555f1f17f00e41ffbc0a3a7ccd20a4e35a52ea1aab5bcd5ee1b78e6ee78ad9"
+    "subject_sha256": "315cb30f1bf7dbb0446a8ab5436764dbfb0ff830e5b95762b8300306b225f952"
   },
   "schema_version": "1.0",
   "suite_version": "2.0.0",
@@ -320,6 +320,6 @@
     "fail": 0,
     "pass": 8,
     "pending": 9,
-    "release_ready": false
+    "release_ready": true
   }
 }

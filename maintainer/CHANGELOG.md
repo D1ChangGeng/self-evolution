@@ -5,7 +5,7 @@ recorded here. Versions follow semantic versioning.
 
 ## [Unreleased]
 
-## [2.0.0] - 2026-09-09
+## [2.0.0] - 2026-09-13
 
 The v2 project-wiki contract now separates task continuity, durable project
 knowledge, and distributed-skill evolution. Release eligibility is recorded in
@@ -21,6 +21,11 @@ knowledge, and distributed-skill evolution. Release eligibility is recorded in
   as the primary benchmark and pinned LongMemEval-V2 as a core-change pilot;
   the historical private campaign is no longer an implicit prerequisite for
   every release.
+- Recorded three paired public runs and six Codex, Claude Code, and OpenCode
+  engineering checks on 1302-1. The standard/core release profile now derives
+  its decision from a hash-bound offline evidence bundle.
+- Calibrated repeated-run aggregation to per-question majority results and
+  aligned preference-question prompting with evidence-based recommendations.
 - Established the root README as the v1-to-v2 migration entry point and
   `docs/MIGRATION.md` as the authoritative procedure.
 - Defined the runtime Skill around Onboard, Retrieve, Capture or Correct,

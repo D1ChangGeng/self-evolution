@@ -5,7 +5,7 @@ upstream sources, environment probes, commands, raw outputs, and derived
 metrics; it is not loaded by `skills/self-evolution/SKILL.md` and is not part of
 project initialization.
 
-## Planned layout
+## Layout
 
 ```text
 public/
@@ -14,14 +14,19 @@ public/
   public.mjs                 # independent evidence validator
   public.test.mjs            # validator regression tests
   run_campaign.py            # resumable paired public benchmark runner
-  evidence.json              # optional checked-in run manifest
+  run_engineering.py         # harness execution and review runner
+  merge_campaigns.py        # aggregate three paired attempts
+  pack_evidence.py          # offline release evidence archive
+  evidence.bundle.json       # checked-in archive digest and schema
+  evidence.bundle.tar.gz     # hash-bound raw run and engineering artifacts
   campaigns/<id>/             # ignored or external raw benchmark outputs
 ```
 
-A campaign runner should invoke the upstream LongMemEval cleaned evaluator from
-a frozen dataset revision. Core changes require three complete paired runs and
-additionally run all 451 questions from the pinned LongMemEval-V2 pilot with its
-official `small` 100-trajectory haystacks. The manifest contains:
+The runner translates a frozen public dataset into the skill contract and uses
+the pinned upstream-compatible judging rubric. Core changes require three
+complete paired runs and per-question majority aggregation. Each attempt covers
+all 500 cleaned questions and all 451 questions from the pinned LongMemEval-V2
+pilot with its official `small` 100-trajectory haystacks. The manifest contains:
 
 - one or both benchmark declarations: cleaned requires dataset revision and
   V2 requires repository commit `2cc8c540bdb87fe6761629b585e727e1c4704520`;
@@ -40,6 +45,16 @@ installed Codex binary. Maintaining a second runtime here would duplicate host
 harness behavior and distort the skill boundary. The independent validator
 checks the manifest and can be used by a host-specific runner without changing
 the distributed bundle.
+
+For a release, package the final aggregate `evidence.json` and every referenced
+prediction, judge, trace, protocol, question manifest, execution, review, and
+engineering raw receipt in `evidence.bundle.tar.gz`. Set its `artifact_root` to
+`.` inside the archive, record the archive SHA-256 in `evidence.bundle.json`,
+and keep paths relative to the archive root. `run.mjs` verifies the archive hash,
+extracts it to a temporary directory, derives metrics from the raw artifacts,
+and removes the temporary directory. The remote full campaign remains the
+system of record for logs, caches, and upstream data; the checked-in bundle
+contains the evidence needed to reproduce the release gate offline.
 
 ## Run a paired campaign
 
@@ -97,8 +112,45 @@ python maintainer/evals/public/merge_campaigns.py \
 Every nested artifact path is prefixed with its source campaign directory; the
 individual manifests and raw evidence remain unchanged.
 
-Until then, use the checked-in host receipt and keep all unavailable metrics
-explicitly `not-measured`.
+Run the engineering complement after the benchmark endpoint is idle:
+
+```text
+python maintainer/evals/public/run_engineering.py \
+  --campaign-id <engineering-campaign-id> \
+  --output-root <engineering-campaign-directory> \
+  --subject <frozen-candidate-skill-directory> \
+  --subject-sha256 <candidate-subject-sha256> \
+  --codex-home-source <isolated-codex-config-directory> \
+  --codex-bin <codex-binary> \
+  --claude-bin <claude-code-binary> \
+  --opencode-bin <opencode-binary> \
+  --node-bin <node-binary> \
+  --api-key-file <host-local-key-file> \
+  --base-url <openai-compatible-base-url> \
+  --anthropic-base-url <anthropic-compatible-base-url>
+```
+
+The six read-only tasks exercise both instruction loading and changed behavior
+through Codex, Claude Code, and OpenCode. Each execution is checked against a
+fixed rubric and reviewed by a separate model call; raw output and review
+receipts remain hash-bound. Use `--task <id>` for a bounded diagnostic run.
+
+Run the merge again with `--engineering <engineering-campaign>/engineering.json`
+to attach the six execution/review pairs. Validate the aggregate manifest with
+`validate_evidence.mjs`, then package the referenced artifacts:
+
+```text
+python maintainer/evals/public/pack_evidence.py \
+  --evidence <campaign-parent-directory>/evidence.json \
+  --archive <release-staging-directory>/evidence.bundle.tar.gz \
+  --manifest <release-staging-directory>/evidence.bundle.json \
+  --sensitive-value-file <host-local-key-file>
+```
+
+The packer checks every referenced digest and scans included bytes for the
+provided sensitive value. The generated archive and manifest are release
+artifacts to copy into `maintainer/evals/public/`; the remote campaign retains
+logs, caches, and source data.
 
 ## Evidence shape
 
@@ -123,11 +175,12 @@ both declarations for a core change. A minimal core manifest has this shape
       "id": "longmemeval-v2",
       "repository": "xiaowu0162/LongMemEval-V2",
       "commit": "2cc8c540bdb87fe6761629b585e727e1c4704520",
+      "data_revision": "<HF revision>",
       "data_sha256": "<64 hex chars>"
     }
   ],
   "host": "1302-1",
-  "artifact_root": "<campaign artifact directory>",
+  "artifact_root": ".",
   "runs": [
     {
       "benchmark_id": "longmemeval-cleaned",

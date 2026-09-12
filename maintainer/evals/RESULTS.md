@@ -3,14 +3,14 @@
 Artifact: `2.0.0`
 Bundle SHA-256: `96ad0fde0c34535f29115199f24440e16fa74506dea47c120e3df37bb9b84daf`
 Fixtures: 13/13
-Release ready: **no**
+Release ready: **yes**
 Public profile: `standard` / `core`
-Public benchmark: **blocked** — evidence file is missing
-Engineering sample: **blocked**; historical integrated: **not-applicable**
+Public benchmark: **pass** — all public benchmark requirements pass
+Engineering sample: **pass**; historical integrated: **not-applicable**
 
 | Gate                            | State   | Judge                       | Evidence                                                                                                                                        |
 | ------------------------------- | ------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| skill-lines                     | pass    | program                     | 317 lines; maximum 450                                                                                                                          |
+| skill-lines                     | pass    | program                     | 337 lines; maximum 450                                                                                                                          |
 | initialized-file-count          | pass    | program                     | 7 -> 3 files (57.1% reduction)                                                                                                                  |
 | initialization-protocol-tokens  | pending | program-plus-maintainer     | This gate requires exact, versioned tokenizer counts for both onboarding protocols.                                                             |
 | metadata-writes                 | pending | program-plus-maintainer     | This gate requires integrated task transcripts with task-time metadata writes.                                                                  |
@@ -30,6 +30,7 @@ Engineering sample: **blocked**; historical integrated: **not-applicable**
 
 ## Interpretation
 
-Deterministic probes establish artifact and safety facts. Outcome gates
-use the frozen three-run v1/v2 task evidence and blinded judgments defined
-in `README.md`; each gate advances when its evidence is complete.
+Deterministic probes establish artifact and safety facts. The selected
+profile combines them with its required public benchmark, engineering,
+and historical integrated evidence. Pending historical gates retain their
+status when they are outside the selected profile.

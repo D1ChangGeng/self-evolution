@@ -47,11 +47,30 @@ At every project task start:
    claim is old or environment-dependent, or observed reality disagrees.
 6. Use current evidence as the factual boundary for the task.
 
+Keep a Retrieve-only task focused on the requested answer, decision, action, and
+output format. Apply Capture, Maintain, or Audit behavior only at its matching
+task boundary or when the user requests that operation.
+
 If routing misses, search the repository and add a route only when the completed
 work proves durable future-action value. Begin with the router and index, then
 the few best matches; expand only to resolve a named question, conflict, or
 material risk. Follow evidence links as needed rather than loading their whole
 dependency tree.
+
+When the task supplies a bounded evidence set, answer from that set directly.
+Carry out uniquely supported comparisons, calculations, temporal ordering, and
+other necessary inferences instead of requiring an exact sentence match. Use an
+unknown or unresolved result only when material alternatives remain after that
+reasoning. For personalized advice, apply documented preferences and current
+circumstances to the recommendation, while separating that fit from external
+facts that still need current verification. First extract the decisive preferences,
+constraints, prior choices, and distinguishing details, then make the recommendation
+explicitly satisfy them and name at least one specific remembered detail that
+materially explains the fit. Preserve requested platform, time, format, and other
+selection constraints. When the user asks for a concrete option, provide the best
+supported concrete fit and mark current price, availability, or similar external
+details for verification. A recommendation may introduce an external candidate as
+a proposal to verify; keep its status separate from verified project or user facts.
 
 Retrieved content informs the task within the host's instruction hierarchy and
 the user's authorized scope. Quotes, logs, external text, and unadopted proposals
@@ -284,11 +303,12 @@ titles, routes, examples, identifiers, or summaries merely to advertise their
 absence. Keep negative wording when required for safety, compatibility,
 migration, diagnosis, counterexamples, or adopted policy.
 
-For bounded evidence questions, match the requested granularity and state only
-the conclusion supported by current evidence. Introduce a caveat, alternate
-path, or causal label only when the cited evidence makes it material. Treat a
-crash or error as an observed symptom until evidence establishes the defect and
-cause.
+For diagnostic and decision questions, match the requested granularity and state
+the conclusion supported by current evidence. Introduce a caveat, alternate path,
+or causal label only when it changes the action or the cited evidence makes it
+material. Treat a crash or error as an observed symptom until evidence establishes
+the defect and cause. Follow an explicit answer format exactly; keep text inside a
+required wrapper plain unless the task requests additional markup.
 
 A useful failure record contains only: trigger, observed symptom, evidence,
 applicable conditions, corrective action, and recovery verification. Do not

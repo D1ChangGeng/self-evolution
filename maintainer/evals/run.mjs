@@ -23,6 +23,7 @@ import {
   loadPublicEvidence,
   PUBLIC_RELEASE_PROFILES,
 } from "./public/public.mjs";
+import { loadBundledPublicEvidence } from "./public/evidence-bundle.mjs";
 
 const exec = promisify(execFile);
 const repoRoot = resolve(import.meta.dirname, "../..");
@@ -36,6 +37,10 @@ const integratedEvidencePath = resolve(
   "evidence/integrated-gates.json",
 );
 const publicEvidencePath = resolve(import.meta.dirname, "public/evidence.json");
+const publicBundlePath = resolve(
+  import.meta.dirname,
+  "public/evidence.bundle.json",
+);
 const resultPath = resolve(import.meta.dirname, "results/v2-current.json");
 const reportPath = resolve(import.meta.dirname, "RESULTS.md");
 const bundlePath = resolve(
@@ -56,6 +61,12 @@ const evalPolicyPaths = [
   "public/PUBLIC-BENCHMARKS.md",
   "public/README.md",
   "public/public.mjs",
+  "public/evidence-bundle.mjs",
+  "public/run_campaign.py",
+  "public/run_engineering.py",
+  "public/merge_campaigns.py",
+  "public/pack_evidence.py",
+  "public/validate_evidence.mjs",
 ];
 const mode = process.argv[2] ?? "--verify";
 const profileArg = process.argv.find((arg) => arg.startsWith("--profile="));
@@ -1237,11 +1248,14 @@ async function buildResult() {
     migration_input_changed: await migrationInputChangedProbe(),
     migration_malformed: await malformedMigrationProbe(),
   };
-  const publicEvidence = await loadPublicEvidence(publicEvidencePath, {
+  const publicOptions = {
     baselineSubjectSha256,
     subjectSha256: publicSubjectSha256,
     changeClass: publicChangeClass,
-  });
+  };
+  const publicEvidence = await ((await exists(publicBundlePath))
+    ? loadBundledPublicEvidence(publicBundlePath, publicOptions)
+    : loadPublicEvidence(publicEvidencePath, publicOptions));
   const artifact = await artifactFacts(baseline, probes);
   const gates = buildGates(baseline, artifact, probes, integratedEvidence);
   const v1InitGate = gates.find((item) => item.id === "initialized-file-count");
@@ -1337,9 +1351,10 @@ function markdown(result) {
     "",
     "## Interpretation",
     "",
-    "Deterministic probes establish artifact and safety facts. Outcome gates",
-    "use the frozen three-run v1/v2 task evidence and blinded judgments defined",
-    "in `README.md`; each gate advances when its evidence is complete.",
+    "Deterministic probes establish artifact and safety facts. The selected",
+    "profile combines them with its required public benchmark, engineering,",
+    "and historical integrated evidence. Pending historical gates retain their",
+    "status when they are outside the selected profile.",
     "",
   ];
   return lines.join("\n");

@@ -18,7 +18,7 @@
     "format:check": "prettier --check tools/kb maintainer/evals package.json tsconfig.json .github",
     "test": "vitest run",
     "test:coverage": "vitest run",
-    "eval": "node --test maintainer/evals/contract-check.mjs maintainer/evals/evidence-check.mjs maintainer/evals/public/public.test.mjs && node maintainer/evals/run.mjs --verify",
+    "eval": "node --test maintainer/evals/contract-check.mjs maintainer/evals/evidence-check.mjs maintainer/evals/public/public.test.mjs maintainer/evals/public/evidence-bundle.test.mjs && node maintainer/evals/run.mjs --verify",
     "eval:record": "node maintainer/evals/run.mjs --record",
     "eval:release": "node maintainer/evals/run.mjs --release",
     "eval:external": "node maintainer/evals/external/cli.mjs",
