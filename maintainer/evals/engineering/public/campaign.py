@@ -40,6 +40,14 @@ def main():
                 record={'task':task,'arm':arm,'attempt':n,'execution_exit':proc.returncode}
                 if (attempt/'attempt.json').exists():
                     data=json.loads((attempt/'attempt.json').read_text())
+                    valid_inference = all(s.get('status') == 'completed' and s.get('usage') is not None for s in data.get('sessions', [])) and bool(data.get('sessions')) and (attempt/'model.patch').stat().st_size > 0
+                    if not valid_inference:
+                        record['classification'] = 'infrastructure-or-model-availability-failure'
+                        record['reason'] = 'No completed model inference with a non-empty generated patch; official task scoring is not comparable.'
+                        records.append(record)
+                        (out/'progress.json').write_text(json.dumps({'records':records,'totals':totals,'updated_at':time.time()},indent=2))
+                        print(json.dumps(record),flush=True)
+                        continue
                     for session in data['sessions']:
                         usage=session.get('usage') or {}
                         for k in totals:

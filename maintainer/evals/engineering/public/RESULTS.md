@@ -20,6 +20,10 @@ SWE-ContextBench source pairs are frozen in `CONTINUITY-SOURCES.md`, but its exp
 
 This pilot does not establish broad engineering effectiveness, architecture correctness, permission safety, or cross-harness continuity. Architecture and permission outcomes are reported only from bound sandbox probes and workspace snapshots. LongMemEval remains auxiliary diagnostic evidence.
 
+Attempts where the provider returned a capacity error before any model response
+are classified as infrastructure or model availability failures. They remain in
+campaign denominators and are not converted into empty patch task results.
+
 ## Release interpretation
 
 The implementation, deterministic checks, public-source provenance, and measured pilot are publishable as a release candidate. Stable `release_ready=false` remains until the required paired repetitions, controls, independent review and continuity evidence are complete.
