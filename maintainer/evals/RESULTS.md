@@ -1,16 +1,17 @@
 # Current v2 Evaluation Results
 
-Artifact: `2.0.0`
-Bundle SHA-256: `96ad0fde0c34535f29115199f24440e16fa74506dea47c120e3df37bb9b84daf`
+Artifact: `2.1.0-rc.1`
+Bundle SHA-256: `c5fa634e8937deadc68c3234567bfe2dd75e68848b0e33d045573fad443a540b`
 Fixtures: 13/13
-Release ready: **yes**
+Release ready: **no**
 Public profile: `standard` / `core`
-Public benchmark: **pass** — all public benchmark requirements pass
-Engineering sample: **pass**; historical integrated: **not-applicable**
+Public benchmark: **not-comparable** — Public benchmark evidence: runs.public-20260912-10-cleaned.candidate.subject.sha256 must equal c9edfbac462224e71acf9e6dd7612f30742844d3e4714ffc0106d4c0baa2eebf
+Engineering sample: **not-comparable**; historical integrated: **not-applicable**
+Engineering continuity: **pending** — Fresh paired real-model engineering evidence is not recorded.
 
 | Gate                            | State   | Judge                       | Evidence                                                                                                                                        |
 | ------------------------------- | ------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| skill-lines                     | pass    | program                     | 337 lines; maximum 450                                                                                                                          |
+| skill-lines                     | pass    | program                     | 329 lines; maximum 450                                                                                                                          |
 | initialized-file-count          | pass    | program                     | 7 -> 3 files (57.1% reduction)                                                                                                                  |
 | initialization-protocol-tokens  | pending | program-plus-maintainer     | This gate requires exact, versioned tokenizer counts for both onboarding protocols.                                                             |
 | metadata-writes                 | pending | program-plus-maintainer     | This gate requires integrated task transcripts with task-time metadata writes.                                                                  |

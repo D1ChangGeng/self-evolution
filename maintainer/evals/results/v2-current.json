@@ -2,7 +2,7 @@
   "artifact": {
     "bundle": {
       "path": "skills/self-evolution/references/bin/kb.mjs",
-      "sha256": "96ad0fde0c34535f29115199f24440e16fa74506dea47c120e3df37bb9b84daf"
+      "sha256": "c5fa634e8937deadc68c3234567bfe2dd75e68848b0e33d045573fad443a540b"
     },
     "empty_init": {
       "created_file_count": 3,
@@ -14,13 +14,13 @@
       "reduction_vs_v1": 0.571429
     },
     "skill": {
-      "lines": 337,
+      "lines": 329,
       "path": "skills/self-evolution/SKILL.md",
-      "sha256": "4e19eaae001b005d81b092eb83672ee9a0d365ad909eddff2289895c42c4fbc3",
-      "tree_sha256": "e76209fee783d87e87819ff0d414ae9d0b76fc3e31483af26074e742fef06073",
-      "utf8_bytes": 16721
+      "sha256": "c0993a3bb0269b7b0d2fade94886eb6b110eb9b518f4cb82d2d686db8fa91293",
+      "tree_sha256": "6fad1a86a5d5fb6230a6d0064c088e4d0485e71c54f85b6222b4fa23d6f4913e",
+      "utf8_bytes": 15973
     },
-    "version": "2.0.0"
+    "version": "2.1.0-rc.1"
   },
   "deterministic_probes": {
     "adapter": {
@@ -127,43 +127,43 @@
       "semantic_judgment_emitted": false
     }
   },
-  "eval_contract_sha256": "66feb1652956338d655bc92d17937283aeab9ae38397c043efaee869b9df75e8",
+  "eval_contract_sha256": "9dee1f73276acc7de225085505b10ad70631dcb38a981e6b14b3d8f9be969ed0",
   "fixture_contracts": [
     {
       "id": "cross-module-defect",
-      "sha256": "4c4e4d81c489cf22da65367c04266472d71feffd6d08e9cf9db297ac8c48b3fe"
+      "sha256": "902ccb5b8a8555688d4bf8219801f37d20033e5703c90ee966c6cfa6f56875cd"
     },
     {
       "id": "decision-constrained-feature",
-      "sha256": "55c8abd65b771eba31a1658afd5b34658a53996d6332140df8522da08953b6d5"
+      "sha256": "d748c5725c4f6635d9f4b0ccc6968bfa57bc9706da2795a8df87caf21d159d87"
     },
     {
       "id": "migration-runbook",
-      "sha256": "38d2b99a29e2f6476c57f8e1f058515dab52ea7253b698cf60fd9766ce1ebad7"
+      "sha256": "d3b98167e6b2256107fd0d6d1bcf7dcfb35ae69372ba158224698de151f9a160"
     },
     {
       "id": "tests-pass-behavior-wrong",
-      "sha256": "45334edf9bad756fb6e6c9eaea79bbe9de049cea3c728bba2ba52e0d08446864"
+      "sha256": "d52584b92c477dc7501878dc8e743ed5c8c134d4e6def9cd39b8c46f61e55894"
     },
     {
       "id": "docs-reality-conflict",
-      "sha256": "6612840776d00a882f77be5b543e65025779bee6a979d2440ea1427329caba35"
+      "sha256": "76f856482458256f5942b92c6f08cb5fcac09651042cfaf7f74fa44b7394fbe2"
     },
     {
       "id": "source-changing-refactor",
-      "sha256": "3cff1177a3ac64bf4b2be5075e0078265e2387646c2511e43fdfd3b717ab48ff"
+      "sha256": "dd779948a04918546d92c9721e65e031d35ea95852265e1face7551fc67d52f0"
     },
     {
       "id": "context-recovery",
-      "sha256": "4239b9b08ac18fc6855ed8592515e5828304da3a9046d92e940900adf9d43c87"
+      "sha256": "ec4af261ae79d9eb8be2040ea21a845fc6edb3477837b114a679ee483c4f4eb5"
     },
     {
       "id": "uncovered-scope",
-      "sha256": "4811aeba70cc6dd6cdbd44098a062f57cc1a08811db0889ea45fd47b7603ddbf"
+      "sha256": "ed977fdd5c9eb3f12845b5a63bbf89060dbdf4c23906cb79e39c59f17f120f47"
     },
     {
       "id": "wrong-knowledge",
-      "sha256": "c7b76d1b96f928b56b4ea868d7b3697bc0ae493bbe62add3f5c8e27621a8b8dd"
+      "sha256": "95574e86ef6f76eaca44a4aef738d3c561c4cc751a9b4e544113baf40ac51a5a"
     },
     {
       "id": "brownfield-onboarding",
@@ -200,7 +200,7 @@
   ],
   "gates": [
     {
-      "evidence": "337 lines; maximum 450",
+      "evidence": "329 lines; maximum 450",
       "id": "skill-lines",
       "judge": "program",
       "status": "pass"
@@ -303,23 +303,36 @@
     }
   ],
   "integrated_evidence_sha256": null,
+  "prerelease_publication": {
+    "effect_evidence": "pending",
+    "ready": true,
+    "required_additional_checks": [
+      "npm run ci",
+      "checked commit distribution package and checksum verification"
+    ],
+    "stable_release_ready": false,
+    "version": "2.1.0-rc.1"
+  },
   "public_evaluation": {
-    "benchmark_reason": "all public benchmark requirements pass",
-    "benchmark_status": "pass",
+    "benchmark_reason": "Public benchmark evidence: runs.public-20260912-10-cleaned.candidate.subject.sha256 must equal c9edfbac462224e71acf9e6dd7612f30742844d3e4714ffc0106d4c0baa2eebf",
+    "benchmark_status": "not-comparable",
     "change_class": "core",
-    "engineering_sample_status": "pass",
+    "engineering_continuity_reason": "Fresh paired real-model engineering evidence is not recorded.",
+    "engineering_continuity_status": "pending",
+    "engineering_policy_version": "engineering-policy/1.0.0",
+    "engineering_sample_status": "not-comparable",
     "historical_integrated_status": "not-applicable",
     "profile": "standard",
     "required_deterministic_failures": [],
-    "subject_sha256": "315cb30f1bf7dbb0446a8ab5436764dbfb0ff830e5b95762b8300306b225f952"
+    "subject_sha256": "c9edfbac462224e71acf9e6dd7612f30742844d3e4714ffc0106d4c0baa2eebf"
   },
   "schema_version": "1.0",
-  "suite_version": "2.0.0",
+  "suite_version": "2.1.0-rc.1",
   "summary": {
     "blocked": 0,
     "fail": 0,
     "pass": 8,
     "pending": 9,
-    "release_ready": true
+    "release_ready": false
   }
 }

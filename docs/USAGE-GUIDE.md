@@ -218,3 +218,33 @@ sample. The strict historical v1/v2 campaign remains available as the
 `--profile` and `--change-class` as described in the maintainer evaluation
 guide. Missing benchmark data, dependencies, credentials, or a host capability
 are `blocked`/`not-measured`; they are never converted to a passing result.
+
+`--profile=continuity` requires deterministic safety and current paired
+engineering outcomes, while public QA remains diagnostic. It can only be ready
+after the required model, isolation, control-slice and independent review evidence
+exists. `npm run eval:engineering:test` and `campaign.mjs offline` exercise the
+evaluator with deterministic fake CLI processes and make no model quality claim.
+
+## Optional continuation and controlled edits
+
+For a new process, first reuse an existing task plan, Issue or PR. Where needed,
+use the [continuation template](../skills/self-evolution/references/templates/continuation.md)
+and follow the [transfer and conflict procedure](../skills/self-evolution/references/continuation.md).
+This is task state, outside the long-term index. A digest identifies bytes; the
+actual authorized patch and required untracked files are needed to restore them.
+
+For two participating CLI writers, read the document and record its SHA-256,
+prepare a separate proposal in the project, then run:
+
+```text
+node skills/self-evolution/references/bin/kb.mjs write .agents/knowledge/guides/cache.md proposal.md <expected-sha256> --project-root .
+node skills/self-evolution/references/bin/kb.mjs index --project-root .
+node skills/self-evolution/references/bin/kb.mjs check --project-root .
+```
+
+Use `absent` instead of a digest for a new document. `CONCURRENT_WRITE` exits 3
+and preserves both files; reread and merge rather than overwriting. The proposal
+remains task-owned and may be removed after review. Direct editors use normal
+Git merge practices. Source diagnostics list the specific changed paths (up to
+32, with omission count), baseline, body links and review limits; only semantic
+revalidation warrants updating `checked_at`.

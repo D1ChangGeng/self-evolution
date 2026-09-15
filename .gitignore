@@ -13,6 +13,8 @@ Thumbs.db
 /tmp/
 /coverage/
 /.cache/
+# Local upgrade delivery records; publish curated release notes separately.
+/maintainer/upgrades/
 *.tsbuildinfo
 __pycache__/
 *.pyc

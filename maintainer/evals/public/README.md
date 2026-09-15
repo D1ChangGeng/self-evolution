@@ -266,3 +266,17 @@ For a core release, add a second run with `benchmark_id:
 and `enterprise` domains.
 Do not use zero placeholders in a real manifest; unavailable values must leave
 the run blocked or not-measured until raw evidence exists.
+
+# Smoke evidence classification
+
+`run_engineering.py` retains six read-only explicit-activation smoke tasks. It
+snapshots the entire controlled tree (including additions, deletions and file
+types), records actual executable version/hash, and treats answer correctness
+and workspace compliance separately. It does not prove natural instruction
+discovery, code development, model Capture quality or real lifecycle recovery.
+The separate `engineering/` runner provides patch/session/transfer evaluation.
+Python offline snapshot checks run with:
+
+```text
+python -m unittest discover -s maintainer/evals/public -p test_workspace_snapshot.py -v
+```

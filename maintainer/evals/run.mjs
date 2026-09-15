@@ -24,6 +24,7 @@ import {
   PUBLIC_RELEASE_PROFILES,
 } from "./public/public.mjs";
 import { loadBundledPublicEvidence } from "./public/evidence-bundle.mjs";
+import { evaluateEngineeringGate } from "./engineering/policy.mjs";
 
 const exec = promisify(execFile);
 const repoRoot = resolve(import.meta.dirname, "../..");
@@ -86,7 +87,10 @@ if (!["--verify", "--record", "--release"].includes(mode)) {
   );
   process.exit(2);
 }
-if (!Object.hasOwn(PUBLIC_RELEASE_PROFILES, releaseProfile)) {
+if (
+  releaseProfile !== "continuity" &&
+  !Object.hasOwn(PUBLIC_RELEASE_PROFILES, releaseProfile)
+) {
   process.stderr.write(
     `Unknown release profile ${releaseProfile}; expected ${Object.keys(PUBLIC_RELEASE_PROFILES).join(", ")}\n`,
   );
@@ -1264,15 +1268,24 @@ async function buildResult() {
     v1InitGate.evidence =
       "Frozen v1 initializer no longer matches its recorded output and exit behavior.";
   }
-  const profile = PUBLIC_RELEASE_PROFILES[releaseProfile];
+  const profile =
+    releaseProfile === "continuity"
+      ? {
+          ...PUBLIC_RELEASE_PROFILES.standard,
+          require_public_benchmark: false,
+          require_engineering_sample_for: [],
+        }
+      : PUBLIC_RELEASE_PROFILES[releaseProfile];
+  const engineering = await evaluateEngineeringGate();
   const deterministicRequired = new Set(profile.required_deterministic_gates);
   const gateById = new Map(gates.map((item) => [item.id, item]));
   const deterministicFailures = [...deterministicRequired]
     .map((id) => gateById.get(id))
     .filter((item) => !item || item.status !== "pass");
-  const publicStatus = profile.require_public_benchmark
-    ? publicEvidence.evaluation.status
-    : "not-applicable";
+  const publicStatus =
+    profile.require_public_benchmark || releaseProfile === "continuity"
+      ? publicEvidence.evaluation.status
+      : "not-applicable";
   const sampleStatus = profile.require_engineering_sample_for.includes(
     publicChangeClass,
   )
@@ -1291,6 +1304,11 @@ async function buildResult() {
           : "pass"
     : "not-applicable";
   const releaseReady =
+    (!(
+      releaseProfile === "continuity" ||
+      ["core", "routing"].includes(publicChangeClass)
+    ) ||
+      engineering.release_ready) &&
     deterministicFailures.length === 0 &&
     (!profile.require_public_benchmark || publicStatus === "pass") &&
     (!profile.require_engineering_sample_for.includes(publicChangeClass) ||
@@ -1308,6 +1326,9 @@ async function buildResult() {
     integrated_evidence_sha256: integratedEvidence.sha256,
     deterministic_probes: probes,
     public_evaluation: {
+      engineering_continuity_status: engineering.status,
+      engineering_continuity_reason: engineering.reason,
+      engineering_policy_version: engineering.version,
       profile: releaseProfile,
       change_class: publicChangeClass,
       benchmark_status: publicStatus,
@@ -1327,6 +1348,18 @@ async function buildResult() {
       blocked: gates.filter((item) => item.status === "blocked").length,
       release_ready: releaseReady,
     },
+    prerelease_publication: {
+      version: artifactVersion,
+      ready:
+        /^\d+\.\d+\.\d+-rc\.\d+$/.test(artifactVersion) &&
+        deterministicFailures.length === 0,
+      required_additional_checks: [
+        "npm run ci",
+        "checked commit distribution package and checksum verification",
+      ],
+      stable_release_ready: releaseReady,
+      effect_evidence: engineering.status,
+    },
   };
 }
 
@@ -1341,6 +1374,7 @@ function markdown(result) {
     `Public profile: \`${result.public_evaluation.profile}\` / \`${result.public_evaluation.change_class}\``,
     `Public benchmark: **${result.public_evaluation.benchmark_status}** — ${result.public_evaluation.benchmark_reason}`,
     `Engineering sample: **${result.public_evaluation.engineering_sample_status}**; historical integrated: **${result.public_evaluation.historical_integrated_status}**`,
+    `Engineering continuity: **${result.public_evaluation.engineering_continuity_status}** — ${result.public_evaluation.engineering_continuity_reason}`,
     "",
     "| Gate | State | Judge | Evidence |",
     "|---|---|---|---|",

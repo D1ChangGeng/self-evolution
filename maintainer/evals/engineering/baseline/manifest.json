@@ -1,0 +1,10 @@
+{
+  "schema": "engineering-frozen-distribution/1",
+  "commit": "7b608e32412a50a8dcab7f37a89fce4c1ef86548",
+  "subject_sha256": "85afa6e07126f7c815356c9ccb2cda1ff0f72ba0f78848be18cafe945213a512",
+  "bundle_sha256": "96ad0fde0c34535f29115199f24440e16fa74506dea47c120e3df37bb9b84daf",
+  "archive_sha256": "1596350a093bbb4cfce9ec1ad91ae0fb0ace3f1eb344eea3e0edc53886112622",
+  "archive_bytes": 153350,
+  "file_count": 18,
+  "equivalent_public_commit": "2237b5494820d5393fa0f7c160f5c087b0ba68cb"
+}

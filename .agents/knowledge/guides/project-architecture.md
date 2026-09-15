@@ -56,6 +56,13 @@ checks, source-change signals, adapter state, atomic writes, and staged
 migration mechanics. Semantic value, authority, conflict resolution, and
 whether a claim remains correct belong to model or human review.
 
+The continuity upgrade separates archived Decision identity lookup from current
+routes, emits bounded source review details, and provides guarded `kb write`
+plus index locking on Windows/Linux. Optional continuation Markdown remains
+task state and transfers real patches, not just digests. Direct editors and
+other mutation commands retain their existing ownership and Git procedures.
+See `skills/self-evolution/references/continuation.md` for exact coverage.
+
 When v1 artifacts are detected, `kb init` leaves them unchanged and routes the
 work to the repository Migration Guide. Migration uses prepare, semantic
 review, apply, and rollback; exactly one knowledge system is active at a time.

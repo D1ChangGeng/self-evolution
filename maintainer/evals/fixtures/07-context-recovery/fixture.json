@@ -25,17 +25,17 @@
       {
         "path": ".agents/knowledge/guides/payments.md",
         "role": "knowledge",
-        "content": "# Payments\nBefore resuming, verify the refund boundary in current source.\n"
+        "content": "---\nkind: guide\nstatus: active\nscope:\n  - \"src/payments/**\"\nuse_when:\n  - \"resuming payment work\"\n---\n# Payments\nBefore resuming, verify the refund boundary in current source.\n"
       },
       {
         "path": ".agents/knowledge/guides/search.md",
         "role": "knowledge",
-        "content": "# Search\nUnrelated indexing notes.\n"
+        "content": "---\nkind: guide\nstatus: active\nscope:\n  - \"src/search/**\"\nuse_when:\n  - \"changing search indexing\"\n---\n# Search\nUnrelated indexing notes.\n"
       },
       {
         "path": ".agents/knowledge/guides/email.md",
         "role": "knowledge",
-        "content": "# Email\nUnrelated delivery notes.\n"
+        "content": "---\nkind: guide\nstatus: active\nscope:\n  - \"src/email/**\"\nuse_when:\n  - \"changing email delivery\"\n---\n# Email\nUnrelated delivery notes.\n"
       },
       {
         "path": "test/fixture.test.mjs",

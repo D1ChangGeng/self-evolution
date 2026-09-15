@@ -112,3 +112,16 @@ changed behavior. The sample must include, where applicable:
 These checks remain in `maintainer/evals`; benchmark-specific code and data stay
 here or in an external campaign workspace. No benchmark result changes the
 skill's runtime defaults.
+
+# Engineering continuity policy extension
+
+For `engineering-policy/1.0.0`, repository engineering outcomes are the primary
+product-effect evidence. The explicit `continuity` profile uses LongMemEval as
+diagnostic evidence and requires current paired engineering runs. Existing
+standard/private requirements below retain their historical meaning; core and
+routing changes additionally require engineering continuity evidence. A QA
+failure remains a reported failure and requires investigation; it is never
+rewritten as success when measurement priorities change. The six tasks in
+`run_engineering.py` are read-only explicit-activation smoke, including a static
+restored-state example. They do not demonstrate code development, natural
+activation, Capture or multi-process engineering continuation.

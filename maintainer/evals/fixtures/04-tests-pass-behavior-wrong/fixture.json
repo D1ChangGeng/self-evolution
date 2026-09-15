@@ -27,7 +27,7 @@
       {
         "path": ".agents/knowledge/guides/invoice-rounding.md",
         "role": "knowledge",
-        "content": "# Invoice rounding\nRound once at the invoice total, never once per line item.\n"
+        "content": "---\nkind: guide\nstatus: active\nscope:\n  - \"src/invoice/**\"\nuse_when:\n  - \"changing invoice total calculations\"\n---\n# Invoice rounding\nRound once at the invoice total, never once per line item.\n"
       }
     ],
     "assertions": [

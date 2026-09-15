@@ -112,6 +112,11 @@ export async function checkCommand(
   const files = await projectFiles(projectRoot);
 
   for (const document of scanned.documents) {
+    const current =
+      !document.archived &&
+      (document.type === "guide"
+        ? document.data.status === "active"
+        : document.data.status === "accepted");
     if (!document.title)
       diagnostics.push({
         code: "TITLE_MISSING",
@@ -119,7 +124,7 @@ export async function checkCommand(
         message: "Document needs one H1 title.",
         path: document.path,
       });
-    for (const link of markdownLinks(document.body)) {
+    for (const link of current ? markdownLinks(document.body) : []) {
       const target = localLink(link);
       if (!target) continue;
       let absolute: string;
@@ -149,11 +154,12 @@ export async function checkCommand(
     diagnostics.push(
       ...(await checkSources(
         projectRoot,
-        document.data.sources,
+        current ? document.data.sources : undefined,
         document.path,
+        markdownLinks(document.body),
       )),
     );
-    for (const scope of document.data.scope) {
+    for (const scope of current ? document.data.scope : []) {
       let matches: (path: string) => boolean;
       try {
         matches = picomatch(scope, { dot: true, strictBrackets: true });
@@ -174,15 +180,21 @@ export async function checkCommand(
           path: document.path,
         });
       if (document.type === "guide") {
-        const previous = exactScopes.get(scope);
+        const data = document.data as GuideFrontmatter;
+        const route = JSON.stringify([
+          scope,
+          data.kind,
+          [...data.use_when].sort(),
+        ]);
+        const previous = exactScopes.get(route);
         if (previous)
           diagnostics.push({
             code: "DUPLICATE_ROUTING",
-            severity: "error",
-            message: `Exact scope is also routed by ${previous}: ${scope}`,
+            severity: "warning",
+            message: `Same scope, purpose and use_when as ${previous}: ${scope}. Review routing; this does not establish semantic duplication.`,
             path: document.path,
           });
-        else exactScopes.set(scope, document.path);
+        else exactScopes.set(route, document.path);
       }
     }
     if (document.type === "decision") {
@@ -199,9 +211,12 @@ export async function checkCommand(
     }
   }
 
-  for (const document of scanned.documents.filter(
+  const decisions = scanned.documents.filter(
     (item) => item.type === "decision",
-  )) {
+  );
+  const relations = new Map<string, string[]>();
+  const currentReplacements = new Map<string, string>();
+  for (const document of decisions) {
     const decision = document.data as DecisionFrontmatter;
     const references =
       decision.supersedes === null
@@ -209,7 +224,15 @@ export async function checkCommand(
         : Array.isArray(decision.supersedes)
           ? decision.supersedes
           : [decision.supersedes];
-    for (const id of references)
+    relations.set(decision.id, references);
+    if (document.archived && decision.status === "accepted")
+      diagnostics.push({
+        code: "ARCHIVED_DECISION_CURRENT",
+        severity: "error",
+        path: document.path,
+        message: `Accepted Decision ${decision.id} is archived; restore its current route or record its actual lifecycle status.`,
+      });
+    for (const id of references) {
       if (!ids.has(id))
         diagnostics.push({
           code: "SUPERSEDES_MISSING",
@@ -217,15 +240,78 @@ export async function checkCommand(
           message: `Superseded decision does not exist: ${id}`,
           path: document.path,
         });
+      if (id === decision.id)
+        diagnostics.push({
+          code: "SUPERSEDES_SELF",
+          severity: "error",
+          message: `Decision cannot supersede itself: ${id}`,
+          path: document.path,
+        });
+      const target = decisions.find(
+        (item) => (item.data as DecisionFrontmatter).id === id,
+      );
+      if (
+        decision.status === "accepted" &&
+        target &&
+        target.data.status !== "superseded"
+      )
+        diagnostics.push({
+          code: "SUPERSEDES_AUTHORITY_CONFLICT",
+          severity: "error",
+          message: `Accepted replacement ${decision.id} requires ${id} to be superseded; observed ${target.data.status}.`,
+          path: document.path,
+        });
+      if (!document.archived && decision.status === "accepted" && ids.has(id)) {
+        const previous = currentReplacements.get(id);
+        if (previous && previous !== decision.id)
+          diagnostics.push({
+            code: "SUPERSEDES_AUTHORITY_CONFLICT",
+            severity: "error",
+            path: document.path,
+            message: `${id} has two accepted replacements: ${previous} and ${decision.id}. Resolve current authority explicitly.`,
+          });
+        else currentReplacements.set(id, decision.id);
+      }
+    }
   }
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+  function visit(id: string) {
+    if (visiting.has(id)) {
+      diagnostics.push({
+        code: "SUPERSEDES_CYCLE",
+        severity: "error",
+        message: `Supersession cycle includes ${id}.`,
+        path: ids.get(id)!,
+      });
+      return;
+    }
+    if (visited.has(id)) return;
+    visiting.add(id);
+    for (const target of relations.get(id) ?? [])
+      if (target !== id && ids.has(target)) visit(target);
+    visiting.delete(id);
+    visited.add(id);
+  }
+  for (const id of relations.keys()) visit(id);
 
-  const guides = scanned.documents.filter((item) => item.type === "guide");
+  const guides = scanned.documents.filter(
+    (item) =>
+      item.type === "guide" && !item.archived && item.data.status === "active",
+  );
   for (let left = 0; left < guides.length; left += 1) {
     for (let right = left + 1; right < guides.length; right += 1) {
       const a = guides[left]!;
       const b = guides[right]!;
       const aScopes = (a.data as GuideFrontmatter).scope;
       const bScopes = (b.data as GuideFrontmatter).scope;
+      const aData = a.data as GuideFrontmatter;
+      const bData = b.data as GuideFrontmatter;
+      if (
+        aData.kind !== bData.kind ||
+        !aData.use_when.some((condition) => bData.use_when.includes(condition))
+      )
+        continue;
       const overlap = aScopes.some((scope) =>
         bScopes.some((other) => {
           const aPrefix = scope.replace(/[*?].*$/, "");

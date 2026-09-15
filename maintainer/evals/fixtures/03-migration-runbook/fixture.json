@@ -27,7 +27,7 @@
       {
         "path": ".agents/knowledge/guides/customer-id-migration.md",
         "role": "runbook",
-        "content": "# Customer ID migration\nRollback is safe only before marker BACKFILL_COMPLETE. Verify backup and approval before apply.\n"
+        "content": "---\nkind: runbook\nstatus: active\nscope:\n  - \"db/**\"\n  - \"ops/**\"\nuse_when:\n  - \"running the customer ID migration\"\n---\n# Customer ID migration\nRollback is safe only before marker BACKFILL_COMPLETE. Verify backup and approval before apply.\n"
       },
       {
         "path": "test/fixture.test.mjs",

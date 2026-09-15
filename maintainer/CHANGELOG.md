@@ -5,6 +5,26 @@ recorded here. Versions follow semantic versioning.
 
 ## [Unreleased]
 
+## [2.1.0-rc.1] - 2026-09-15
+
+Release candidate for project continuity, lifecycle validation and engineering
+evaluation. Stable-release effectiveness evidence remains pending.
+
+- Separate historical Decision identity from current routes, validate supersession
+  cycles/current authority, and allow same-scope Guides with distinct consumers.
+- Add bounded source review details and a guarded `kb write` command with
+  expected digest, Windows/Linux process locking and interrupted-temp recovery.
+- Add optional portable continuation/1 guidance and templates; keep default
+  three-file initialization, runtime dependencies and adapter defaults unchanged.
+- Remove consumer recommendation and QA-specific standing Skill instructions.
+- Cover full smoke workspaces, executable versions and real schema samples.
+- Add 24 executable engineering scenarios, six arm preparation paths, 8 public
+  history pairs, L3 refactors, process transfer/error tests, raw cost/evidence
+  derivation and the explicit continuity release profile. Model effectiveness
+  and host compatibility remain pending until their real evidence is present.
+- Reject replayed session receipts, mismatched arm identities and incomplete
+  baseline/control executions in engineering release evidence.
+
 ## [2.0.0] - 2026-09-13
 
 The v2 project-wiki contract now separates task continuity, durable project
@@ -22,7 +42,7 @@ knowledge, and distributed-skill evolution. Release eligibility is recorded in
   the historical private campaign is no longer an implicit prerequisite for
   every release.
 - Recorded three paired public runs and six Codex, Claude Code, and OpenCode
-  engineering checks on 1302-1. The standard/core release profile now derives
+  engineering checks on a previously authorized Linux runner. The standard/core release profile now derives
   its decision from a hash-bound offline evidence bundle.
 - Calibrated repeated-run aggregation to per-question majority results and
   aligned preference-question prompting with evidence-based recommendations.

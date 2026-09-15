@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run bounded engineering checks through Codex, Claude Code, and OpenCode."""
+"""Read-only, explicit-activation smoke checks; no engineering outcome claim."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import platform
 import re
 import shutil
 import subprocess
@@ -17,6 +18,7 @@ from typing import Any
 import httpx
 
 from run_campaign import artifact_ref, sha256_file, subject_facts, write_json
+from workspace_snapshot import executable_identity, workspace_compliance, workspace_snapshot
 
 
 TASKS = [
@@ -40,7 +42,7 @@ TASKS = [
         "files": {
             "AGENTS.md": """# Service project\n\n## Where to Look\n\n| Scope | Read |\n|---|---|\n| Service port | `.agents/knowledge/guides/service.md`, then `config/service.yaml` |\n\nCurrent configuration is authoritative for observed behavior.\n""",
             "CLAUDE.md": "@AGENTS.md\n",
-            ".agents/knowledge/guides/service.md": """---\nkind: guide\nstatus: active\nscope: [\"config/service.yaml\"]\nuse_when: [\"checking the service port\"]\nsources:\n  - path: \"config/service.yaml\"\n    checked_at: \"git:old\"\n---\n\nThe service listens on port 8080.\n""",
+            ".agents/knowledge/guides/service.md": """---\nkind: guide\nstatus: active\nscope: [\"config/service.yaml\"]\nuse_when: [\"checking the service port\"]\nsources:\n  - path: \"config/service.yaml\"\n    checked_at: \"sha256:04eeaa6d3c2a66678af8514f5c8777a8889296f351c790bd3fa21ed2f9dd482e\"\n---\n\nThe service listens on port 8080.\n""",
             "config/service.yaml": "port: 9090\n",
         },
         "prompt": "Use $self-evolution. Read CLAUDE.md, AGENTS.md, the self-evolution SKILL.md, the routed guide, and current config. Return concise JSON with current_port, knowledge_status, and evidence path.",
@@ -79,7 +81,7 @@ TASKS = [
             "AGENTS.md": """# Feature service\n\n## Where to Look\n\n| Question | Read |\n|---|---|\n| Runtime behavior | `config/feature.yaml` |\n| Adopted intent | `.agents/knowledge/decisions/feature.md` |\n\nReport observed behavior and adopted intent separately.\n""",
             "CLAUDE.md": "@AGENTS.md\n",
             "config/feature.yaml": "enabled: false\n",
-            ".agents/knowledge/decisions/feature.md": """---\nkind: decision\nstatus: accepted\ndecided_at: 2026-09-01\nscope: [\"config/feature.yaml\"]\nreconsider_when: [\"rollout completes\"]\n---\n\nThe project adopted enabling the feature after rollout validation.\n""",
+            ".agents/knowledge/decisions/feature.md": """---\nkind: decision\nid: adr-feature-rollout\nstatus: accepted\ndate: 2026-09-01\nsupersedes: null\nscope: [\"config/feature.yaml\"]\n---\n# Adopt feature rollout\n\nThe project adopted enabling the feature after rollout validation.\n\nReconsider when rollout completes.\n""",
         },
         "prompt": "Use $self-evolution. Read CLAUDE.md, AGENTS.md, the self-evolution SKILL.md, runtime config, and accepted Decision. Return concise JSON separating observed behavior from adopted intent, with both evidence paths.",
         "required": [r"(?is)(behavior|observed).*(false|off)", r"(?is)(intent|adopted).*(true|on|enabl)", r"config/feature\.yaml", r"decisions/feature\.md"],
@@ -197,9 +199,11 @@ def endpoint_review(
 
 
 def prepare_workspace(root: Path, task: dict[str, Any], subject: Path) -> Path:
+    if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", task["id"]):
+        raise ValueError("unsafe task id")
     workspace = root / "workspaces" / task["id"]
     if workspace.exists():
-        shutil.rmtree(workspace)
+        raise FileExistsError("Use a fresh attempt output root; preserve previous workspace evidence")
     workspace.mkdir(parents=True)
     for relative, content in task["files"].items():
         path = workspace / relative
@@ -214,11 +218,10 @@ def prepare_workspace(root: Path, task: dict[str, Any], subject: Path) -> Path:
     return workspace
 
 
-def task_file_digests(workspace: Path, task: dict[str, Any]) -> dict[str, str]:
-    return {
-        relative: sha256_file(workspace / relative)
-        for relative in sorted(task["files"])
-    }
+def task_file_digests(workspace: Path, task: dict[str, Any]) -> dict[str, Any]:
+    # Compatibility entry point; the entire tree is now covered, including
+    # installed skill files, directories, deletions and link/type changes.
+    return workspace_snapshot(workspace)
 
 
 def run_harness(
@@ -229,7 +232,7 @@ def run_harness(
     api_key: str,
 ) -> tuple[list[str], int, str, str, str]:
     env = dict(os.environ)
-    env["PATH"] = f"{args.node_bin.parent}:{args.opencode_bin.parent}:/usr/local/bin:/usr/bin:/bin"
+    env["PATH"] = os.pathsep.join([str(args.node_bin.parent), str(args.opencode_bin.parent), env.get("PATH", "")])
     if task["harness"] == "codex":
         last_message = args.output_root / "runtime" / f"{task['id']}-last-message.txt"
         last_message.parent.mkdir(parents=True, exist_ok=True)
@@ -239,12 +242,11 @@ def run_harness(
             "exec",
             "--json",
             "--ephemeral",
-            "--ignore-rules",
             "--skip-git-repo-check",
             "-C",
             str(workspace),
             "-s",
-            "danger-full-access",
+            "read-only",
             "-m",
             args.model,
             "-c",
@@ -253,6 +255,7 @@ def run_harness(
             str(last_message),
             task["prompt"],
         ]
+        task["snapshot_before"] = task_file_digests(workspace, task)
         code, stdout, stderr = run_process(command, workspace, env, args.timeout)
         final = last_message.read_text(encoding="utf-8").strip() if last_message.exists() else final_from_json_lines(stdout)
     elif task["harness"] == "claude-code":
@@ -281,6 +284,7 @@ def run_harness(
             "--tools",
             "Read,Glob,Grep",
         ]
+        task["snapshot_before"] = task_file_digests(workspace, task)
         code, stdout, stderr = run_process(command, workspace, env, args.timeout)
         final = final_from_json_lines(stdout)
     else:
@@ -327,6 +331,7 @@ def run_harness(
             "--auto",
             task["prompt"],
         ]
+        task["snapshot_before"] = task_file_digests(workspace, task)
         code, stdout, stderr = run_process(command, workspace, env, args.timeout)
         final = final_from_json_lines(stdout)
     return command, code, stdout, stderr, final
@@ -385,12 +390,19 @@ def main() -> None:
             raise RuntimeError("one or more requested engineering task IDs are unknown")
         for task in selected_tasks:
             workspace = prepare_workspace(args.output_root, task, args.subject)
+            binary = {"codex": args.codex_bin, "claude-code": args.claude_bin, "opencode": args.opencode_bin}[task["harness"]]
+            identity = executable_identity(binary)
             before = task_file_digests(workspace, task)
             started = time.time()
             command, code, stdout, stderr, raw_final = run_harness(
                 args, task, workspace, codex_home, key
             )
             final = answer_text(raw_final)
+            before = task["snapshot_before"]
+            after = task_file_digests(workspace, task)
+            compliance = workspace_compliance(before, after, "read-only")
+            identity_after = executable_identity(binary)
+            toolchain_unchanged = identity == identity_after
             duration_ms = round((time.time() - started) * 1000)
             checks = [
                 {
@@ -409,13 +421,13 @@ def main() -> None:
             ] + [
                 {
                     "kind": "invariant",
-                    "pattern": "declared task files remain byte-identical",
-                    "pass": task_file_digests(workspace, task) == before,
+                    "pattern": "controlled workspace remains unchanged",
+                    "pass": compliance["pass"],
                 }
             ]
             deterministic_pass = code == 0 and bool(final) and all(
                 item["pass"] for item in checks
-            )
+            ) and toolchain_unchanged
             reviewer_pass, reviewer_reason, reviewer_raw = endpoint_review(
                 reviewer,
                 args.base_url,
@@ -431,6 +443,11 @@ def main() -> None:
                 evidence_path,
                 {
                     "task_id": task["id"],
+                    "evidence_class": "read-only-explicit-activation-smoke",
+                    "workspace_before": before,
+                    "workspace_after": after,
+                    "workspace_compliance": compliance,
+                    "toolchain": identity,
                     "harness": task["harness"],
                     "command": command,
                     "exit_code": code,
@@ -449,17 +466,13 @@ def main() -> None:
                 {
                     "schema_version": "public-engineering-execution/1",
                     "status": "completed" if code == 0 else "failed",
-                    "host": "1302-1",
+                    "host": platform.node() or "unavailable",
                     "exit_code": code,
                     "campaign_id": args.campaign_id,
                     "task_id": task["id"],
                     "harness": {
                         "name": task["harness"],
-                        "revision": {
-                            "codex": "0.153.2",
-                            "claude-code": "2.1.268",
-                            "opencode": "1.18.29",
-                        }[task["harness"]],
+                        **identity,
                     },
                     "executor_id": f"{task['harness']}-execution",
                     "subject_sha256": args.subject_sha256,
@@ -482,11 +495,11 @@ def main() -> None:
                 {
                     "schema_version": "public-engineering-review/1",
                     "verdict": "pass" if passed else "fail",
-                    "host": "1302-1",
+                    "host": platform.node() or "unavailable",
                     "campaign_id": args.campaign_id,
                     "task_id": task["id"],
                     "harness": task["harness"],
-                    "reviewer_id": "gpt-5.6-sol-independent-review",
+                    "reviewer_id": f"{args.model}-independent-review",
                     "rationale": (
                         f"deterministic={deterministic_pass}; reviewer={reviewer_pass}; "
                         f"{reviewer_reason}"

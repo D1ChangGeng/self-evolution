@@ -32,7 +32,7 @@
       {
         "path": ".agents/knowledge/guides/billing-boundary.md",
         "role": "knowledge",
-        "content": "# Billing boundary\nThe adapter normalizes currency before the billing calculation.\n"
+        "content": "---\nkind: guide\nstatus: active\nscope:\n  - \"src/api/**\"\nuse_when:\n  - \"changing the billing API boundary\"\n---\n# Billing boundary\nThe adapter normalizes currency before the billing calculation.\n"
       }
     ],
     "assertions": [

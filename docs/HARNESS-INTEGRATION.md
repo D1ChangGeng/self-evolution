@@ -160,6 +160,20 @@ version. Verify actual host behavior when installing or upgrading an adapter.
 
 ## Continuity and feedback
 
+### Portable continuation handoff
+
+When an unfinished task needs another process or host, create a short task-local
+Markdown handoff using `schema: continuation/1`. Include repository identity,
+base commit, branch/worktree, workspace diff digest, objective, accepted
+constraints, verified claims with command evidence, open risks, next action and
+verification, a small knowledge reference list, and recheck conditions. Keep the
+handoff outside `.agents/knowledge/index.yaml`; transfer the actual authorized
+patch and untracked files or state needed to reproduce it. The receiver first
+checks repository/worktree and digest, then reruns stale or missing evidence and
+preserves mismatched work for review. A handoff is task state, not durable wiki
+content. Direct Markdown editors still use Git merge; controlled CLI writes can
+use an expected digest and report a concurrent-write conflict.
+
 Use three distinct records so a long task does not pollute durable knowledge:
 
 1. **Task state** — the host conversation or handoff carries the current goal,
@@ -216,6 +230,21 @@ None of these states changes the validity of the project wiki. They only state
 how much host integration was verified.
 
 ## Source checks
+
+September 15 local documentation verification fetched the official
+[CLI reference](https://developers.openai.com/codex/cli/reference) and
+[AGENTS discovery guide](https://developers.openai.com/codex/guides/agents-md).
+Codex checks `AGENTS.override.md`, then `AGENTS.md`, then configured fallback
+names along the project path; global instructions also depend on `CODEX_HOME`.
+`--ephemeral` suppresses session rollout persistence; it does not by itself
+isolate user rules, credentials, caches or memory. `--ignore-rules` concerns
+execpolicy files and is not an AGENTS discovery probe. Pin these surfaces per
+attempt and validate actual isolation before causal comparison.
+
+Record the selected CLI's version and help output with each integration probe.
+Executable availability and argument support are separate from native knowledge
+discovery, reading, engineering effects, lifecycle callbacks and cross-harness
+transfer; those require their own observed runs.
 
 The host behavior above was checked against public documentation on **September
 9, 2026**. Host versions may change; repeat the compatibility procedure when

@@ -128,3 +128,12 @@ success. Its archived script creates the seven recorded files and then exits 2
 at a historical `printf` error. The runner verifies both the output shape and
 that exit behavior so the structural file-count comparison stays reproducible
 without rewriting history.
+
+## Engineering continuity episodes
+
+[`engineering/episodes.json`](engineering/episodes.json) is the executable offline
+contract for 24 paired C01–C12 variants, six isolated baseline arms, equal-information
+and end-to-end Capture experiments, and protected verifier/evidence boundaries. The
+existing fixture verifier remains the L0 entry point. Real model runs require an
+explicitly authorized endpoint, fixed model, host, and budget; unavailable runs stay
+`pending` or `blocked` and never become scores.

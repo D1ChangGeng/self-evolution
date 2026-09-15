@@ -1,5 +1,9 @@
 # Self-Evolution v2
 
+Current release candidate: **v2.1.0-rc.1**. It includes deterministic lifecycle,
+source-review and continuation checks. Paired model-effectiveness evidence is
+pending; see [release notes](maintainer/releases/v2.1.0-rc.1.md).
+
 Self-Evolution is a lightweight project context skill for coding agents. It
 keeps the small amount of repository-local knowledge that will change a future
 engineering action, routes agents to it at the right time, and requires
@@ -114,6 +118,7 @@ The skill routes deterministic work through its bundled `kb.mjs` executable:
 kb init
 kb index
 kb check
+kb write <knowledge.md> <proposal.md> <expected-sha256|absent>
 kb migrate prepare|apply|rollback
 kb adapter install <tool> [--features context-recovery,post-task-reminder]
 kb adapter status [tool]
@@ -128,6 +133,29 @@ model review judges whether knowledge is correct, valuable, complete, and worth
 retaining, routing, or retiring.
 
 Normal skill use resolves the executable from the installed skill directory.
+
+## Continuing work and reviewing changes
+
+For a new session, use the host's current task state and the smallest relevant
+knowledge set, recheck material claims, implement and test, then correct durable
+knowledge only if the work changes a plausible future action. Existing code,
+tests, types and adopted documentation are the preferred authority locations.
+
+When another process or machine must resume unfinished work, reuse a task plan,
+Issue or PR. If needed, use the optional
+[continuation contract](skills/self-evolution/references/continuation.md) and
+[template](skills/self-evolution/references/templates/continuation.md). Transfer
+the actual authorized patch and required untracked files along with repository,
+revision and digest; verify them before resuming. No handoff file is created by
+default and task state stays outside the knowledge index.
+
+`kb check` now resolves archived Decision IDs while keeping Archive out of
+current routes. Shared scopes with distinct purposes/consumers may coexist;
+route warnings request review rather than declaring semantic conflict. Source
+change diagnostics list affected paths and limits without rewriting policy or
+`checked_at`. `kb write` protects participating knowledge edits using an expected
+digest and a short interprocess lock. A conflict retains both the current file
+and proposal for merging; see the continuation guide for platform boundaries.
 
 ## Optional Adapters
 
@@ -146,15 +174,15 @@ Optional adapters are explicitly enabled and isolated under
 
 ## Documentation
 
-| Document                                       | Purpose                                                             |
-| ---------------------------------------------- | ------------------------------------------------------------------- |
-| [Architecture](docs/ARCHITECTURE.md)           | Runtime layers, data ownership, and boundaries                      |
-| [Usage Guide](docs/USAGE-GUIDE.md)             | Onboard, Retrieve, Capture or Correct, Maintain, Audit, and CLI use |
-| [Migration Guide](docs/MIGRATION.md)           | Reviewable v1 to v2 prepare/apply/rollback workflow                 |
-| [Optional Adapters](docs/OPTIONAL-ADAPTERS.md) | Opt-in tool integration and safety contract                         |
-| [Harness Integration](docs/HARNESS-INTEGRATION.md) | Codex, Claude Code, OpenCode boundaries, continuity, and fallbacks |
-| [Maintainer Design](maintainer/DESIGN.md)      | Accepted v2 product contract                                        |
-| [Evaluation Spec](maintainer/evals/SPEC.md)    | Outcome-based release gates                                         |
+| Document                                           | Purpose                                                             |
+| -------------------------------------------------- | ------------------------------------------------------------------- |
+| [Architecture](docs/ARCHITECTURE.md)               | Runtime layers, data ownership, and boundaries                      |
+| [Usage Guide](docs/USAGE-GUIDE.md)                 | Onboard, Retrieve, Capture or Correct, Maintain, Audit, and CLI use |
+| [Migration Guide](docs/MIGRATION.md)               | Reviewable v1 to v2 prepare/apply/rollback workflow                 |
+| [Optional Adapters](docs/OPTIONAL-ADAPTERS.md)     | Opt-in tool integration and safety contract                         |
+| [Harness Integration](docs/HARNESS-INTEGRATION.md) | Codex, Claude Code, OpenCode boundaries, continuity, and fallbacks  |
+| [Maintainer Design](maintainer/DESIGN.md)          | Accepted v2 product contract                                        |
+| [Evaluation Spec](maintainer/evals/SPEC.md)        | Outcome-based release gates                                         |
 
 ## Design Principles
 

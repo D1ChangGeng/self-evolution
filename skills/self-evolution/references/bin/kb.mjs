@@ -7395,15 +7395,19 @@ var init_types = __esm({
 // tools/kb/src/fs.ts
 var fs_exports = {};
 __export(fs_exports, {
+  assertNoSymlinks: () => assertNoSymlinks,
   atomicWrite: () => atomicWrite,
   copyTree: () => copyTree,
+  guardedAtomicWrite: () => guardedAtomicWrite,
   hashFiles: () => hashFiles,
   listFiles: () => listFiles,
   pathExists: () => pathExists,
   readText: () => readText,
+  recoverInterruptedWrite: () => recoverInterruptedWrite,
   safeResolve: () => safeResolve,
   sha256File: () => sha256File,
   toPosix: () => toPosix,
+  withKnowledgeLock: () => withKnowledgeLock,
   within: () => within,
   writeJson: () => writeJson,
   writeTextUnsafe: () => writeTextUnsafe
@@ -7416,12 +7420,21 @@ import {
   open,
   readFile,
   readdir,
+  realpath,
   rename,
   rm,
   stat,
   writeFile
 } from "node:fs/promises";
-import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
+import {
+  basename,
+  dirname,
+  isAbsolute,
+  relative,
+  resolve,
+  sep
+} from "node:path";
+import { createServer } from "node:net";
 function toPosix(value) {
   return value.split(sep).join("/");
 }
@@ -7464,26 +7477,149 @@ async function atomicWrite(path, content) {
   const temporary = `${path}.tmp-${process.pid}-${createHash("sha256").update(path).digest("hex").slice(0, 8)}-${randomUUID()}`;
   const handle = await open(temporary, "wx");
   try {
-    await handle.writeFile(bytes);
-    await handle.sync();
-  } finally {
-    await handle.close();
-  }
-  try {
-    await rename(temporary, path);
-  } catch (error2) {
-    if (process.platform === "win32" && ["EEXIST", "EPERM"].includes(error2.code ?? "")) {
-      await rm(path, { force: true });
-      await rename(temporary, path);
-    } else {
-      await rm(temporary, { force: true });
-      throw error2;
+    try {
+      await handle.writeFile(bytes);
+      await handle.sync();
+    } finally {
+      await handle.close();
     }
+    for (let attempt = 0; ; attempt++) {
+      try {
+        await rename(temporary, path);
+        break;
+      } catch (error2) {
+        if (process.platform !== "win32" || attempt >= 12 || !["EEXIST", "EPERM", "EBUSY", "EACCES"].includes(
+          error2.code ?? ""
+        ))
+          throw error2;
+        await new Promise((resolve11) => setTimeout(resolve11, 10 * (attempt + 1)));
+      }
+    }
+  } finally {
+    await rm(temporary, { force: true });
   }
   return true;
 }
+async function recoverInterruptedWrite(path) {
+  if (!await pathExists(dirname(path))) return [];
+  const prefix = `${basename(path)}.tmp-`;
+  const key = createHash("sha256").update(path).digest("hex").slice(0, 8);
+  const recovered = [];
+  for (const name of await readdir(dirname(path))) {
+    if (!name.startsWith(prefix)) continue;
+    const parts = new RegExp(
+      `^([1-9][0-9]*)-${key}-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`
+    ).exec(name.slice(prefix.length));
+    if (!parts) continue;
+    try {
+      process.kill(Number(parts[1]), 0);
+    } catch (error2) {
+      if (error2.code !== "ESRCH") continue;
+      const temporary = resolve(dirname(path), name);
+      if ((await lstat(temporary)).isFile()) {
+        await rm(temporary);
+        recovered.push(name);
+      }
+    }
+  }
+  return recovered;
+}
+async function assertNoSymlinks(root, candidate) {
+  const target = safeResolve(root, candidate);
+  let cursor = resolve(root);
+  for (const part of [
+    "",
+    ...relative(root, target).split(sep).filter(Boolean)
+  ]) {
+    cursor = resolve(cursor, part);
+    try {
+      const info = await lstat(cursor);
+      if (info.isSymbolicLink())
+        throw new KbError(
+          `Symlink/reparse path is not a controlled write target: ${cursor}`,
+          3,
+          "UNSAFE_PATH"
+        );
+    } catch (error2) {
+      if (error2.code !== "ENOENT") throw error2;
+    }
+  }
+}
+async function withKnowledgeLock(root, action, timeoutMs = 5e3) {
+  const canonical = await realpath(root);
+  const key = createHash("sha256").update(process.platform === "win32" ? canonical.toLowerCase() : canonical).digest("hex");
+  if (!["win32", "linux"].includes(process.platform))
+    throw new KbError(
+      "Controlled writes currently support Windows named pipes and Linux abstract sockets; use reviewed Git edits on this platform.",
+      3,
+      "WRITE_LOCK_UNAVAILABLE"
+    );
+  const endpoint = process.platform === "win32" ? `\\\\.\\pipe\\self-evolution-${key}` : `\0self-evolution-${key}`;
+  const started = Date.now();
+  while (true) {
+    const server = createServer((socket) => socket.destroy());
+    try {
+      await new Promise((resolve11, reject) => {
+        server.once("error", reject);
+        server.listen(endpoint, () => {
+          server.removeListener("error", reject);
+          resolve11();
+        });
+      });
+    } catch (error2) {
+      server.close();
+      if (!["EADDRINUSE", "EACCES"].includes(
+        error2.code ?? ""
+      ))
+        throw error2;
+      if (Date.now() - started >= timeoutMs)
+        throw new KbError(
+          `Timed out acquiring knowledge write lock: ${canonical}`,
+          3,
+          "WRITE_LOCK_TIMEOUT"
+        );
+      await new Promise((resolve11) => setTimeout(resolve11, 20));
+      continue;
+    }
+    try {
+      return await action();
+    } finally {
+      await new Promise(
+        (resolve11, reject) => server.close((error2) => error2 ? reject(error2) : resolve11())
+      );
+    }
+  }
+}
+async function guardedAtomicWrite(path, content, expectedSha256, timeoutMs = 5e3) {
+  await mkdir(dirname(path), { recursive: true });
+  return withKnowledgeLock(
+    dirname(path),
+    async () => {
+      let actual = null;
+      try {
+        actual = createHash("sha256").update(await readFile(path)).digest("hex");
+      } catch (error2) {
+        if (error2.code !== "ENOENT") throw error2;
+      }
+      if (actual !== expectedSha256)
+        throw new KbError(
+          `Target changed since it was read: ${path}`,
+          3,
+          "CONCURRENT_WRITE"
+        );
+      return await atomicWrite(path, content);
+    },
+    timeoutMs
+  );
+}
 async function listFiles(root) {
   if (!await pathExists(root)) return [];
+  if ((await lstat(root)).isSymbolicLink())
+    throw new KbError(
+      `Directory is a symlink/reparse path: ${root}`,
+      3,
+      "UNSAFE_PATH"
+    );
   const result = [];
   async function walk(directory) {
     const entries = await readdir(directory, { withFileTypes: true });
@@ -7551,7 +7687,7 @@ __export(assets_exports, {
   referencesRoot: () => referencesRoot
 });
 import { fileURLToPath } from "node:url";
-import { basename, dirname as dirname2, resolve as resolve2 } from "node:path";
+import { basename as basename2, dirname as dirname2, resolve as resolve2 } from "node:path";
 function referencesRoot() {
   const current = dirname2(fileURLToPath(import.meta.url));
   const bundledRoot = resolve2(current, "..");
@@ -7559,7 +7695,7 @@ function referencesRoot() {
     current,
     "../../../skills/self-evolution/references"
   );
-  return basename(current) === "src" && basename(dirname2(current)) === "kb" && basename(dirname2(dirname2(current))) === "tools" ? sourceRoot : bundledRoot;
+  return basename2(current) === "src" && basename2(dirname2(current)) === "kb" && basename2(dirname2(dirname2(current))) === "tools" ? sourceRoot : bundledRoot;
 }
 async function loadAsset(relativePath) {
   const path = resolve2(referencesRoot(), relativePath);
@@ -10222,9 +10358,11 @@ function isCurrentDecision(data) {
 // tools/kb/src/documents.ts
 async function readKnowledgeDocuments(projectRoot) {
   const knowledgeRoot = resolve5(projectRoot, ".agents/knowledge");
+  await assertNoSymlinks(projectRoot, knowledgeRoot);
   const files = [
     ...await listFiles(resolve5(knowledgeRoot, "guides")),
-    ...await listFiles(resolve5(knowledgeRoot, "decisions"))
+    ...await listFiles(resolve5(knowledgeRoot, "decisions")),
+    ...await listFiles(resolve5(knowledgeRoot, "archive"))
   ].filter((path) => path.toLowerCase().endsWith(".md"));
   files.sort((left, right) => left.localeCompare(right, "en"));
   const documents = [];
@@ -10232,9 +10370,11 @@ async function readKnowledgeDocuments(projectRoot) {
   for (const absolutePath of files) {
     const path = toPosix(relative3(knowledgeRoot, absolutePath));
     const parsed = parseMarkdown(await readText(absolutePath), path);
+    const archived = path.startsWith("archive/");
+    if (archived && parsed.data.kind !== "decision") continue;
     diagnostics.push(...parsed.diagnostics);
     if (parsed.diagnostics.length > 0) continue;
-    const expected = path.startsWith("decisions/") ? "decision" : "guide";
+    const expected = archived || path.startsWith("decisions/") ? "decision" : "guide";
     if (expected === "decision") {
       const validation = validateDecision(parsed.data, path);
       diagnostics.push(...validation.diagnostics);
@@ -10246,6 +10386,7 @@ async function readKnowledgeDocuments(projectRoot) {
           body: parsed.body,
           data: validation.value,
           type: "decision",
+          ...archived ? { archived: true } : {},
           ...title ? { title } : {}
         });
       }
@@ -10268,7 +10409,7 @@ async function readKnowledgeDocuments(projectRoot) {
   return { documents, diagnostics };
 }
 function buildIndexDocuments(documents) {
-  return documents.filter(
+  return documents.filter((document) => !document.archived).filter(
     (document) => document.type === "guide" ? isCurrentGuide(document.data) : isCurrentDecision(document.data)
   ).map((document) => {
     if (document.type === "decision") {
@@ -10305,126 +10446,149 @@ init_fs();
 // tools/kb/src/source-check.ts
 init_fs();
 import { execFile } from "node:child_process";
+import { lstat as lstat2 } from "node:fs/promises";
 import { promisify } from "node:util";
-var execFileAsync = promisify(execFile);
-function gitPathspec(path, hasGlob) {
-  return hasGlob ? `:(top,glob)${path}` : `:(top,literal)${path}`;
-}
-async function gitPaths(projectRoot, args) {
-  const { stdout } = await execFileAsync("git", args, {
-    cwd: projectRoot,
-    windowsHide: true
+var exec = promisify(execFile);
+var LIMIT = 32;
+var limitation = "Change signals request local review; unchanged baselines do not prove prose correct, and code drift does not override adopted policy. checked_at is never updated by check.";
+async function git(root, args) {
+  const result = await exec("git", args, {
+    cwd: root,
+    windowsHide: true,
+    timeout: 15e3,
+    maxBuffer: 8 * 1024 * 1024
   });
-  return stdout.split(/\r?\n/).filter(Boolean);
+  return result.stdout;
 }
-async function checkSources(projectRoot, sources2, documentPath) {
+async function checkSources(root, sources2, documentPath, verificationRefs = []) {
   const diagnostics = [];
   for (const source of sources2 ?? []) {
-    let absolute;
-    try {
-      absolute = safeResolve(projectRoot, source.path);
-    } catch {
+    const report = (code, message, paths = [], reason) => {
+      const sorted = [...new Set(paths)].sort();
       diagnostics.push({
-        code: "SOURCE_MISSING",
+        code,
         severity: "warning",
-        message: `Source escapes project root: ${source.path}`,
-        path: documentPath
+        path: documentPath,
+        message,
+        details: {
+          source: source.path,
+          baseline: source.checked_at,
+          changed_paths: sorted.slice(0, LIMIT),
+          omitted_count: Math.max(0, sorted.length - LIMIT),
+          verification_refs: verificationRefs.slice(0, LIMIT),
+          verification_refs_omitted: Math.max(
+            0,
+            verificationRefs.length - LIMIT
+          ),
+          review: `Read ${documentPath}, inspect affected sources and its existing verification section.`,
+          limitation,
+          ...reason ? { reason } : {}
+        }
       });
-      continue;
-    }
+    };
     const hasGlob = /[*?\[]/.test(source.path);
-    if (!hasGlob && !await pathExists(absolute)) {
-      diagnostics.push({
-        code: "SOURCE_MISSING",
-        severity: "warning",
-        message: `Source is missing: ${source.path}`,
-        path: documentPath
-      });
-      continue;
-    }
-    if (source.checked_at.startsWith("sha256:")) {
-      if (hasGlob) {
-        diagnostics.push({
-          code: "SOURCE_BASELINE_UNAVAILABLE",
-          severity: "warning",
-          message: `A sha256 baseline requires one concrete file: ${source.path}`,
-          path: documentPath
-        });
+    let missing = false;
+    try {
+      const absolute = safeResolve(root, source.path);
+      await assertNoSymlinks(
+        root,
+        hasGlob ? source.path.split(/[*?\[]/, 1)[0] : absolute
+      );
+      if (!hasGlob) {
+        try {
+          const info = await lstat2(absolute);
+          if (!info.isFile() && !(info.isDirectory() && source.checked_at.startsWith("git:"))) {
+            report(
+              "SOURCE_BASELINE_UNAVAILABLE",
+              `Source is not a regular file: ${source.path}`,
+              [],
+              "unsupported-file-type"
+            );
+            continue;
+          }
+        } catch (error2) {
+          if (error2.code !== "ENOENT") throw error2;
+          missing = true;
+          report("SOURCE_MISSING", `Source is missing: ${source.path}`, [
+            source.path
+          ]);
+        }
+      }
+      if (source.checked_at.startsWith("sha256:")) {
+        if (hasGlob)
+          report(
+            "SOURCE_BASELINE_UNAVAILABLE",
+            `A SHA-256 baseline requires one regular file: ${source.path}`,
+            [],
+            "glob-sha256-unsupported"
+          );
+        else if (!missing && await sha256File(absolute) !== source.checked_at.slice(7))
+          report("SOURCE_CHANGED", `Source content changed: ${source.path}`, [
+            source.path
+          ]);
         continue;
       }
-      const expected = source.checked_at.slice("sha256:".length).toLowerCase();
-      const actual = await sha256File(absolute);
-      if (actual !== expected)
-        diagnostics.push({
-          code: "SOURCE_CHANGED",
-          severity: "warning",
-          message: `Source content changed: ${source.path}`,
-          path: documentPath
-        });
-      continue;
-    }
-    if (source.checked_at.startsWith("git:")) {
-      const commit = source.checked_at.slice("git:".length);
-      try {
-        const relativePath = source.path.replaceAll("\\", "/");
-        const pathspec = gitPathspec(relativePath, hasGlob);
-        await execFileAsync("git", ["cat-file", "-e", `${commit}^{commit}`], {
-          cwd: projectRoot,
-          windowsHide: true
-        });
-        const suffix = ["--", pathspec];
-        const [currentFiles, changedFiles, untrackedFiles, deletedFiles] = await Promise.all([
-          gitPaths(projectRoot, [
-            "ls-files",
-            "--cached",
-            "--others",
-            "--exclude-standard",
-            ...suffix
-          ]),
-          gitPaths(projectRoot, ["diff", "--name-only", commit, ...suffix]),
-          gitPaths(projectRoot, [
-            "ls-files",
-            "--others",
-            "--exclude-standard",
-            ...suffix
-          ]),
-          gitPaths(projectRoot, ["ls-files", "--deleted", ...suffix])
-        ]);
-        const deleted = new Set(deletedFiles);
-        const currentMatches = currentFiles.filter(
-          (path) => !deleted.has(path)
+      if (!source.checked_at.startsWith("git:")) {
+        report(
+          "SOURCE_BASELINE_UNAVAILABLE",
+          `Unsupported source baseline: ${source.checked_at}`,
+          [],
+          "unsupported-baseline"
         );
-        if (currentMatches.length === 0) {
-          diagnostics.push({
-            code: "SOURCE_MISSING",
-            severity: "warning",
-            message: `Git source pathspec does not match any file: ${source.path}`,
-            path: documentPath
-          });
-        } else if (changedFiles.length > 0 || untrackedFiles.length > 0) {
-          diagnostics.push({
-            code: "SOURCE_CHANGED",
-            severity: "warning",
-            message: `Source changed since ${commit}: ${source.path}`,
-            path: documentPath
-          });
-        }
-      } catch {
-        diagnostics.push({
-          code: "SOURCE_BASELINE_UNAVAILABLE",
-          severity: "warning",
-          message: `Git baseline is unavailable: ${source.checked_at}`,
-          path: documentPath
-        });
+        continue;
       }
-      continue;
+      const commit = source.checked_at.slice(4);
+      await git(root, ["cat-file", "-e", `${commit}^{commit}`]);
+      const suffix = ["--", `:(${hasGlob ? "glob" : "literal"})${source.path}`];
+      const split = (s) => s.split("\0").filter(Boolean);
+      const [current, changed, untracked, deleted] = (await Promise.all([
+        git(root, [
+          "ls-files",
+          "-z",
+          "--cached",
+          "--others",
+          "--exclude-standard",
+          ...suffix
+        ]),
+        git(root, [
+          "diff",
+          "--no-renames",
+          "--name-only",
+          "-z",
+          commit,
+          ...suffix
+        ]),
+        git(root, [
+          "ls-files",
+          "-z",
+          "--others",
+          "--exclude-standard",
+          ...suffix
+        ]),
+        git(root, ["ls-files", "-z", "--deleted", ...suffix])
+      ])).map(split);
+      const paths = [...changed, ...untracked, ...deleted];
+      if (!missing && current.filter((p) => !deleted.includes(p)).length === 0)
+        report(
+          "SOURCE_MISSING",
+          `Git source pathspec matches no current file: ${source.path}`,
+          paths
+        );
+      else if (!missing && paths.length)
+        report(
+          "SOURCE_CHANGED",
+          `Source changed since ${commit}: ${source.path}`,
+          paths
+        );
+    } catch (error2) {
+      const code = error2.code;
+      report(
+        "SOURCE_BASELINE_UNAVAILABLE",
+        `Source baseline could not be inspected: ${source.path}`,
+        [],
+        typeof code === "string" ? code : "git-baseline-or-command-unavailable"
+      );
     }
-    diagnostics.push({
-      code: "SOURCE_BASELINE_UNAVAILABLE",
-      severity: "warning",
-      message: `Unsupported source baseline: ${source.checked_at}`,
-      path: documentPath
-    });
   }
   return diagnostics;
 }
@@ -10513,6 +10677,7 @@ async function checkCommand(projectRoot) {
   const exactScopes = /* @__PURE__ */ new Map();
   const files = await projectFiles(projectRoot);
   for (const document of scanned.documents) {
+    const current = !document.archived && (document.type === "guide" ? document.data.status === "active" : document.data.status === "accepted");
     if (!document.title)
       diagnostics.push({
         code: "TITLE_MISSING",
@@ -10520,7 +10685,7 @@ async function checkCommand(projectRoot) {
         message: "Document needs one H1 title.",
         path: document.path
       });
-    for (const link of markdownLinks(document.body)) {
+    for (const link of current ? markdownLinks(document.body) : []) {
       const target = localLink(link);
       if (!target) continue;
       let absolute;
@@ -10547,11 +10712,12 @@ async function checkCommand(projectRoot) {
     diagnostics.push(
       ...await checkSources(
         projectRoot,
-        document.data.sources,
-        document.path
+        current ? document.data.sources : void 0,
+        document.path,
+        markdownLinks(document.body)
       )
     );
-    for (const scope of document.data.scope) {
+    for (const scope of current ? document.data.scope : []) {
       let matches;
       try {
         matches = (0, import_picomatch.default)(scope, { dot: true, strictBrackets: true });
@@ -10572,15 +10738,21 @@ async function checkCommand(projectRoot) {
           path: document.path
         });
       if (document.type === "guide") {
-        const previous = exactScopes.get(scope);
+        const data = document.data;
+        const route = JSON.stringify([
+          scope,
+          data.kind,
+          [...data.use_when].sort()
+        ]);
+        const previous = exactScopes.get(route);
         if (previous)
           diagnostics.push({
             code: "DUPLICATE_ROUTING",
-            severity: "error",
-            message: `Exact scope is also routed by ${previous}: ${scope}`,
+            severity: "warning",
+            message: `Same scope, purpose and use_when as ${previous}: ${scope}. Review routing; this does not establish semantic duplication.`,
             path: document.path
           });
-        else exactScopes.set(scope, document.path);
+        else exactScopes.set(route, document.path);
       }
     }
     if (document.type === "decision") {
@@ -10596,12 +10768,23 @@ async function checkCommand(projectRoot) {
       else ids.set(decision.id, document.path);
     }
   }
-  for (const document of scanned.documents.filter(
+  const decisions = scanned.documents.filter(
     (item) => item.type === "decision"
-  )) {
+  );
+  const relations = /* @__PURE__ */ new Map();
+  const currentReplacements = /* @__PURE__ */ new Map();
+  for (const document of decisions) {
     const decision = document.data;
     const references = decision.supersedes === null ? [] : Array.isArray(decision.supersedes) ? decision.supersedes : [decision.supersedes];
-    for (const id of references)
+    relations.set(decision.id, references);
+    if (document.archived && decision.status === "accepted")
+      diagnostics.push({
+        code: "ARCHIVED_DECISION_CURRENT",
+        severity: "error",
+        path: document.path,
+        message: `Accepted Decision ${decision.id} is archived; restore its current route or record its actual lifecycle status.`
+      });
+    for (const id of references) {
       if (!ids.has(id))
         diagnostics.push({
           code: "SUPERSEDES_MISSING",
@@ -10609,14 +10792,69 @@ async function checkCommand(projectRoot) {
           message: `Superseded decision does not exist: ${id}`,
           path: document.path
         });
+      if (id === decision.id)
+        diagnostics.push({
+          code: "SUPERSEDES_SELF",
+          severity: "error",
+          message: `Decision cannot supersede itself: ${id}`,
+          path: document.path
+        });
+      const target = decisions.find(
+        (item) => item.data.id === id
+      );
+      if (decision.status === "accepted" && target && target.data.status !== "superseded")
+        diagnostics.push({
+          code: "SUPERSEDES_AUTHORITY_CONFLICT",
+          severity: "error",
+          message: `Accepted replacement ${decision.id} requires ${id} to be superseded; observed ${target.data.status}.`,
+          path: document.path
+        });
+      if (!document.archived && decision.status === "accepted" && ids.has(id)) {
+        const previous = currentReplacements.get(id);
+        if (previous && previous !== decision.id)
+          diagnostics.push({
+            code: "SUPERSEDES_AUTHORITY_CONFLICT",
+            severity: "error",
+            path: document.path,
+            message: `${id} has two accepted replacements: ${previous} and ${decision.id}. Resolve current authority explicitly.`
+          });
+        else currentReplacements.set(id, decision.id);
+      }
+    }
   }
-  const guides = scanned.documents.filter((item) => item.type === "guide");
+  const visiting = /* @__PURE__ */ new Set();
+  const visited = /* @__PURE__ */ new Set();
+  function visit(id) {
+    if (visiting.has(id)) {
+      diagnostics.push({
+        code: "SUPERSEDES_CYCLE",
+        severity: "error",
+        message: `Supersession cycle includes ${id}.`,
+        path: ids.get(id)
+      });
+      return;
+    }
+    if (visited.has(id)) return;
+    visiting.add(id);
+    for (const target of relations.get(id) ?? [])
+      if (target !== id && ids.has(target)) visit(target);
+    visiting.delete(id);
+    visited.add(id);
+  }
+  for (const id of relations.keys()) visit(id);
+  const guides = scanned.documents.filter(
+    (item) => item.type === "guide" && !item.archived && item.data.status === "active"
+  );
   for (let left = 0; left < guides.length; left += 1) {
     for (let right = left + 1; right < guides.length; right += 1) {
       const a = guides[left];
       const b = guides[right];
       const aScopes = a.data.scope;
       const bScopes = b.data.scope;
+      const aData = a.data;
+      const bData = b.data;
+      if (aData.kind !== bData.kind || !aData.use_when.some((condition) => bData.use_when.includes(condition)))
+        continue;
       const overlap = aScopes.some(
         (scope) => bScopes.some((other) => {
           const aPrefix = scope.replace(/[*?].*$/, "");
@@ -10738,11 +10976,24 @@ Read \`.agents/knowledge/${document.path}\` before changing files in this scope.
 
 // tools/kb/src/index-command.ts
 async function indexCommand(projectRoot) {
+  if (!["win32", "linux"].includes(process.platform))
+    return buildLockedIndex(projectRoot);
+  return withKnowledgeLock(projectRoot, () => buildLockedIndex(projectRoot));
+}
+async function buildLockedIndex(projectRoot) {
+  await assertNoSymlinks(
+    projectRoot,
+    resolve8(projectRoot, ".agents/knowledge/index.yaml")
+  );
   const scanned = await readKnowledgeDocuments(projectRoot);
   if (scanned.diagnostics.some((item) => item.severity === "error")) {
     return { command: "index", ok: false, diagnostics: scanned.diagnostics };
   }
   const documents = buildIndexDocuments(scanned.documents);
+  if (["win32", "linux"].includes(process.platform))
+    await recoverInterruptedWrite(
+      resolve8(projectRoot, ".agents/knowledge/index.yaml")
+    );
   const changed = await atomicWrite(
     resolve8(projectRoot, ".agents/knowledge/index.yaml"),
     serializeIndex(documents)
@@ -10764,8 +11015,8 @@ async function indexCommand(projectRoot) {
 
 // tools/kb/src/migrate.ts
 var import_yaml6 = __toESM(require_dist(), 1);
-import { lstat as lstat2, mkdir as mkdir3, rename as rename2, rm as rm4 } from "node:fs/promises";
-import { basename as basename2, dirname as dirname5, relative as relative4, resolve as resolve9 } from "node:path";
+import { lstat as lstat3, mkdir as mkdir3, rename as rename2, rm as rm4 } from "node:fs/promises";
+import { basename as basename3, dirname as dirname5, relative as relative4, resolve as resolve9 } from "node:path";
 init_fs();
 init_types();
 init_assets();
@@ -10970,7 +11221,7 @@ function convertKnowledge(content, kind, source) {
   }
   if (kind === "decision") return content.replaceAll("\r\n", "\n");
   const scope = Array.isArray(parsed.data.scope) && parsed.data.scope.length > 0 ? parsed.data.scope : ["**/*"];
-  const title = markdownTitle(parsed.body) ?? basename2(source, ".md");
+  const title = markdownTitle(parsed.body) ?? basename3(source, ".md");
   return serializeMarkdown(
     {
       kind,
@@ -11189,7 +11440,7 @@ async function controlledState(projectRoot) {
       state[path] = null;
       continue;
     }
-    const info = await lstat2(absolute);
+    const info = await lstat3(absolute);
     if (info.isFile()) {
       state[path] = await sha256File(absolute);
       continue;
@@ -11453,12 +11704,72 @@ async function rollbackMigration(projectRoot, runId) {
 
 // tools/kb/src/cli.ts
 init_types();
+
+// tools/kb/src/write-command.ts
+init_fs();
+import { readFile as readFile2 } from "node:fs/promises";
+init_types();
+async function writeCommand(root, target, input, expected) {
+  if (!/^\.agents\/knowledge\/(guides|decisions|observations|archive)\/.+\.md$/.test(
+    target
+  ) || target.includes("\\") || target.split("/").some((part) => !part || part === "." || part === ".."))
+    throw new KbError(
+      "write targets a Markdown knowledge document under an existing v2 category.",
+      2,
+      "USAGE"
+    );
+  if (expected !== "absent" && !/^[a-f0-9]{64}$/.test(expected))
+    throw new KbError(
+      "Expected digest must be sha256 hex or absent.",
+      2,
+      "USAGE"
+    );
+  const destination = safeResolve(root, target);
+  const proposal = safeResolve(root, input);
+  if (destination === proposal)
+    throw new KbError("Proposal must be separate from target.", 2, "USAGE");
+  await assertNoSymlinks(root, proposal);
+  const bytes = await readFile2(proposal);
+  if (target.includes("/guides/") || target.includes("/decisions/")) {
+    const parsed = parseMarkdown(bytes.toString("utf8"), target);
+    const validation = target.includes("/decisions/") ? validateDecision(parsed.data, target) : validateGuide(parsed.data, target);
+    const diagnostics = [...parsed.diagnostics, ...validation.diagnostics];
+    if (diagnostics.length)
+      return { command: "write", ok: false, exitCode: 2, diagnostics };
+  }
+  return withKnowledgeLock(root, async () => {
+    await assertNoSymlinks(root, destination);
+    const recovered = await recoverInterruptedWrite(destination);
+    const actual = await pathExists(destination) ? await sha256File(destination) : "absent";
+    if (actual !== expected)
+      throw new KbError(
+        `Target changed; retain ${input}, reread ${target}, merge and retry with its current digest.`,
+        3,
+        "CONCURRENT_WRITE"
+      );
+    const changed = await atomicWrite(destination, bytes);
+    return {
+      command: "write",
+      ok: true,
+      changed,
+      data: {
+        recovered_temporary_files: recovered,
+        path: target,
+        sha256: await sha256File(destination),
+        index: "Rebuild when routing metadata or membership changed."
+      }
+    };
+  });
+}
+
+// tools/kb/src/cli.ts
 var help = `Usage: kb <command> [options]
 
 Commands:
   init
   index
   check
+  write <knowledge.md> <proposal.md> <expected-sha256|absent>
   migrate prepare
   migrate apply <run-id>
   migrate rollback <run-id>
@@ -11507,10 +11818,13 @@ function textResult(result) {
   const lines = [
     `${result.ok ? "OK" : "FAILED"} ${result.command}${result.changed === void 0 ? "" : result.changed ? " (changed)" : " (unchanged)"}`
   ];
-  for (const diagnostic of result.diagnostics ?? [])
+  for (const diagnostic of result.diagnostics ?? []) {
     lines.push(
       `${diagnostic.severity.toUpperCase()} ${diagnostic.code}${diagnostic.path ? ` ${diagnostic.path}` : ""}: ${diagnostic.message}`
     );
+    if (diagnostic.details)
+      lines.push(JSON.stringify(diagnostic.details, null, 2));
+  }
   if (result.data !== void 0)
     lines.push(JSON.stringify(result.data, null, 2));
   return `${lines.join("\n")}
@@ -11523,6 +11837,8 @@ async function dispatch(args) {
   if (command === "init" && !subcommand) return initCommand(args.projectRoot);
   if (command === "index" && !subcommand) return indexCommand(args.projectRoot);
   if (command === "check" && !subcommand) return checkCommand(args.projectRoot);
+  if (command === "write" && subcommand && value && extra.length === 1)
+    return writeCommand(args.projectRoot, subcommand, value, extra[0]);
   if (command === "migrate" && subcommand === "prepare" && !value)
     return prepareMigration(args.projectRoot);
   if (command === "migrate" && subcommand === "apply" && value && extra.length === 0)

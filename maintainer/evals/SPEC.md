@@ -2,6 +2,17 @@
 
 ## Task Matrix
 
+The September 2026 `engineering-policy/1.0.0` extension adds an explicit
+`continuity` profile and a fresh engineering gate to core/routing changes.
+The executable matrix is `engineering/episodes.json`: 24 real patch scenarios,
+six configurable arms, three-session L3 refactors and an L2 external adapter.
+Use `node maintainer/evals/run.mjs --release --profile=continuity` to require
+L0 plus fresh paired engineering evidence. Public QA is a visible diagnostic in
+that profile. Existing standard/private profiles retain their previous public
+or historical integrated requirements; no historical evidence is relabeled.
+Read `engineering/POLICY.md` before recording a new campaign. A green offline
+suite proves evaluator and product structural behavior, not model effectiveness.
+
 The release suite covers:
 
 1. cross-module defect repair;
@@ -81,7 +92,7 @@ profile's release.
 
 ## Release profiles
 
-The evaluator supports two release profiles so validation cost matches the
+The evaluator supports stable release profiles so validation cost matches the
 change and the project's maturity:
 
 - `standard` (the default) requires all deterministic safety and migration
@@ -93,6 +104,18 @@ change and the project's maturity:
 - `private` is the strict enhancement profile. It retains the complete frozen
   v1/v2 integrated campaign and requires every historical semantic gate to be
   `pass` before release.
+- `continuity` requires deterministic safety plus fresh paired engineering
+  outcomes and independent review. Public memory QA remains diagnostic.
+
+## Release-candidate publication
+
+The owner-authorized `v2.1.0-rc.1` publication distributes the implemented
+candidate for evaluation. It requires all deterministic gates, complete offline
+CI, a checked distribution bundle and an explicit prerelease version. Its
+`prerelease_publication.ready` is distinct from `summary.release_ready`:
+pending model outcomes continue to reject stable release profiles. Publish it
+with GitHub's prerelease flag and retain v2.0.0 as the latest stable release.
+Release-candidate notes must state the missing paired model/native-host evidence.
 
 Use `--change-class=docs|routing|core|migration` to select the impact class;
 the default is `core`. The independent policy in

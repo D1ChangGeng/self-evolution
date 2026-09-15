@@ -27,7 +27,7 @@
       {
         "path": ".agents/knowledge/guides/deployment.md",
         "role": "knowledge",
-        "content": "# Deployment route\nFor staging changes, compare docs/deployment.md with config/staging.yaml and resolve authority explicitly.\n"
+        "content": "---\nkind: guide\nstatus: active\nscope:\n  - \"docs/deployment.md\"\n  - \"config/staging.yaml\"\nuse_when:\n  - \"changing staging deployment behavior\"\n---\n# Deployment route\nFor staging changes, compare docs/deployment.md with config/staging.yaml and resolve authority explicitly.\n"
       },
       {
         "path": "test/fixture.test.mjs",

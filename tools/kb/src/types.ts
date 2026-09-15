@@ -39,6 +39,7 @@ export type Diagnostic = {
   severity: "error" | "warning" | "info";
   message: string;
   path?: string;
+  details?: Record<string, unknown>;
 };
 
 export type CommandResult = {
