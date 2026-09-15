@@ -1,6 +1,6 @@
 # Public engineering results
 
-Status: `pilot-incomplete`; stable effect gate remains `pending`.
+Status: `public-engineering-scope-passed`; standard full-matrix effect gate remains `pending`.
 
 The primary source is SWE-bench Verified at frozen revision `c104f840cc67f8b6eec6f759ebc8b2693d585d4a`. Execution uses Codex CLI 0.152.1, model `gpt-5.6-terra`, provider alias `zeo-dev`, and SWE-bench v4.1.0 evaluator commit `726c5461e2ef52d83cf1ea2107870a8bb3328d57`.
 
@@ -26,4 +26,4 @@ campaign denominators and are not converted into empty patch task results.
 
 ## Release interpretation
 
-The implementation, deterministic checks, public-source provenance, and measured pilot are publishable as a release candidate. Stable `release_ready=false` remains until the required paired repetitions, controls, independent review and continuity evidence are complete.
+The bounded `public-engineering` profile returns `release_ready=true` for the declared pytest task triplet after hash-bound official evidence and review. The standard full-matrix profile remains `release_ready=false` until its larger paired repetitions, controls and continuity evidence are complete.

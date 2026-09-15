@@ -25,6 +25,7 @@ import {
 } from "./public/public.mjs";
 import { loadBundledPublicEvidence } from "./public/evidence-bundle.mjs";
 import { evaluateEngineeringGate } from "./engineering/policy.mjs";
+import { evaluatePublicEngineeringEvidence } from "./engineering/public/gate.mjs";
 
 const exec = promisify(execFile);
 const repoRoot = resolve(import.meta.dirname, "../..");
@@ -1277,6 +1278,7 @@ async function buildResult() {
         }
       : PUBLIC_RELEASE_PROFILES[releaseProfile];
   const engineering = await evaluateEngineeringGate();
+  const publicEngineering = await evaluatePublicEngineeringEvidence();
   const deterministicRequired = new Set(profile.required_deterministic_gates);
   const gateById = new Map(gates.map((item) => [item.id, item]));
   const deterministicFailures = [...deterministicRequired]
@@ -1304,17 +1306,19 @@ async function buildResult() {
           : "pass"
     : "not-applicable";
   const releaseReady =
-    (!(
-      releaseProfile === "continuity" ||
-      ["core", "routing"].includes(publicChangeClass)
-    ) ||
-      engineering.release_ready) &&
-    deterministicFailures.length === 0 &&
-    (!profile.require_public_benchmark || publicStatus === "pass") &&
-    (!profile.require_engineering_sample_for.includes(publicChangeClass) ||
-      sampleStatus === "pass") &&
-    (!profile.historical_integrated_required ||
-      historicalIntegratedStatus === "pass");
+    releaseProfile === "public-engineering"
+      ? publicEngineering.release_ready
+      : (!(
+          releaseProfile === "continuity" ||
+          ["core", "routing"].includes(publicChangeClass)
+        ) ||
+          engineering.release_ready) &&
+        deterministicFailures.length === 0 &&
+        (!profile.require_public_benchmark || publicStatus === "pass") &&
+        (!profile.require_engineering_sample_for.includes(publicChangeClass) ||
+          sampleStatus === "pass") &&
+        (!profile.historical_integrated_required ||
+          historicalIntegratedStatus === "pass");
   return {
     schema_version: "1.0",
     suite_version: suiteVersion,
@@ -1335,6 +1339,9 @@ async function buildResult() {
       benchmark_reason: publicEvidence.evaluation.reason,
       subject_sha256: publicSubjectSha256,
       engineering_sample_status: sampleStatus,
+      public_engineering_status: publicEngineering.status,
+      public_engineering_reason: publicEngineering.reason,
+      public_engineering_effect_status: publicEngineering.effect_status,
       historical_integrated_status: historicalIntegratedStatus,
       required_deterministic_failures: deterministicFailures.map(
         (item) => item?.id ?? "missing",

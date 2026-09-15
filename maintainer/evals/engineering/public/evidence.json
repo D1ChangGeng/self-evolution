@@ -1,0 +1,293 @@
+{
+  "dataset": {
+    "name": "SWE-bench Verified",
+    "revision": "c104f840cc67f8b6eec6f759ebc8b2693d585d4a"
+  },
+  "evaluator": {
+    "commit": "726c5461e2ef52d83cf1ea2107870a8bb3328d57",
+    "name": "SWE-bench",
+    "version": "4.1.0"
+  },
+  "execution": {
+    "codex_version": "0.152.1",
+    "container_network": "none",
+    "harness": "Codex",
+    "model": "gpt-5.6-terra",
+    "provider": "zeo-dev"
+  },
+  "interpretation": "Bounded public engineering evidence is complete for two declared task triplets. Outcomes are mixed and do not claim universal effectiveness or superiority. LongMemEval remains auxiliary.",
+  "raw_artifacts": "retained in authorized private execution storage; hashes above bind this summary",
+  "records": [
+    {
+      "arm": "B0",
+      "attempt": 1,
+      "attempt_manifest_sha256": "57bb8cdfcaa3f57e71f900074e95c95023efacba6b2bbbc4b3aba3ad1bd7fb08",
+      "attempt_sha256": "5b9394cd24746b3060575674d2bfe29d4fe48400916cd12f1d41e2f31b8570c8",
+      "codex_version": "0.152.1",
+      "evaluation_receipt_sha256": "faa2390297e25abbe8326ce72136dcee576707c602d480b47ee420a310d90b2a",
+      "image_id": "sha256:1cae7c4d8f680bda79ab5a557a4478fccc64bc4a1e2dd3771eeead2c39c42ca7",
+      "image_repo_digests": [
+        "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-10081@sha256:58951c0d236ade36cd508d48e87819c488ed28c60abda963f8d4df99d89c030c"
+      ],
+      "model": "gpt-5.6-terra",
+      "official_resolved": true,
+      "patch_bytes": 2133,
+      "patch_sha256": "d4bebb62816abf165edcb51a189b68878a1e3bf40caf8f35e54d469e76477691",
+      "provider": "zeo-dev",
+      "release_assurance": null,
+      "resolved": true,
+      "session_count": 2,
+      "sessions": [
+        {
+          "index": 0,
+          "receipt_sha256": "c6db5de89d2da1e84f32bc81235d2026d23607e09575588f1a6ff2a945a233dc",
+          "sandbox_probe": {
+            "coordinator_not_mounted": true,
+            "docker_socket_not_mounted": true,
+            "external_network_denied": true,
+            "host_mount_not_visible": true,
+            "inference_socket_present": true,
+            "provider_secret_not_in_environment": true,
+            "root_write_denied": true,
+            "workspace_write": true
+          },
+          "status": "completed",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 96000,
+            "input_tokens": 117691,
+            "output_tokens": 1573,
+            "reasoning_output_tokens": 399
+          }
+        },
+        {
+          "index": 1,
+          "receipt_sha256": "e3e4f0802fc92804676bc301522f50ebcebbe320c4eb20064db0c6a9257adb87",
+          "sandbox_probe": {
+            "coordinator_not_mounted": true,
+            "docker_socket_not_mounted": true,
+            "external_network_denied": true,
+            "host_mount_not_visible": true,
+            "inference_socket_present": true,
+            "provider_secret_not_in_environment": true,
+            "root_write_denied": true,
+            "workspace_write": true
+          },
+          "status": "completed",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 112128,
+            "input_tokens": 141246,
+            "output_tokens": 2093,
+            "reasoning_output_tokens": 1158
+          }
+        }
+      ],
+      "subject_sha256": null,
+      "task": "pytest-dev__pytest-10081",
+      "task_success_eligible": null,
+      "test_coverage": null
+    },
+    {
+      "arm": "B4",
+      "attempt": 1,
+      "attempt_manifest_sha256": "04a02b33fc942124ee55d528078359a9000c9784911a823fec6018ed471e90c2",
+      "attempt_sha256": "63aa13d8e722ee3a36ca0200b76797ef1b34728e7b3082b56f0a90e80231a872",
+      "codex_version": "0.152.1",
+      "evaluation_receipt_sha256": "3c0fc6f243bead423328e043661477d6715895d7009ed323f4303aada1023c12",
+      "image_id": "sha256:1cae7c4d8f680bda79ab5a557a4478fccc64bc4a1e2dd3771eeead2c39c42ca7",
+      "image_repo_digests": [
+        "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-10081@sha256:58951c0d236ade36cd508d48e87819c488ed28c60abda963f8d4df99d89c030c"
+      ],
+      "model": "gpt-5.6-terra",
+      "official_resolved": true,
+      "patch_bytes": 2044,
+      "patch_sha256": "ad708d4c1b596459bab8a9e2e8cd105b309f9dbf9cc54a756d9a98bb98a7e0a1",
+      "provider": "zeo-dev",
+      "release_assurance": null,
+      "resolved": true,
+      "session_count": 2,
+      "sessions": [
+        {
+          "index": 0,
+          "receipt_sha256": "6c328dc69aca151d42f875933951cf7959834631290bc68210856232e4281f9b",
+          "sandbox_probe": {
+            "coordinator_not_mounted": true,
+            "docker_socket_not_mounted": true,
+            "external_network_denied": true,
+            "host_mount_not_visible": true,
+            "inference_socket_present": true,
+            "provider_secret_not_in_environment": true,
+            "root_write_denied": true,
+            "workspace_write": true
+          },
+          "status": "completed",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 204800,
+            "input_tokens": 248286,
+            "output_tokens": 3182,
+            "reasoning_output_tokens": 1564
+          }
+        },
+        {
+          "index": 1,
+          "receipt_sha256": "561f868f66f385e91458d6353ef544d16fd6422aa0e2626ca8a6d025ca6a0c16",
+          "sandbox_probe": {
+            "coordinator_not_mounted": true,
+            "docker_socket_not_mounted": true,
+            "external_network_denied": true,
+            "host_mount_not_visible": true,
+            "inference_socket_present": true,
+            "provider_secret_not_in_environment": true,
+            "root_write_denied": true,
+            "workspace_write": true
+          },
+          "status": "completed",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 70912,
+            "input_tokens": 87396,
+            "output_tokens": 1839,
+            "reasoning_output_tokens": 952
+          }
+        }
+      ],
+      "subject_sha256": "85afa6e07126f7c815356c9ccb2cda1ff0f72ba0f78848be18cafe945213a512",
+      "task": "pytest-dev__pytest-10081",
+      "task_success_eligible": null,
+      "test_coverage": null
+    },
+    {
+      "arm": "B5",
+      "attempt": 1,
+      "attempt_manifest_sha256": "693a42a4ae94cce21450b2dc45d9d662d66dcbba99f75f05347718e801cf1c88",
+      "attempt_sha256": "bebf60c5a2d969bf50fad1a58614aea97ed369680f7490846c8d95a9dec33697",
+      "codex_version": "0.152.1",
+      "evaluation_receipt_sha256": "291b2dffbe3f706798f0a83c678f9e0a2e3417c65033b9dba7376940510a7e3f",
+      "image_id": "sha256:1cae7c4d8f680bda79ab5a557a4478fccc64bc4a1e2dd3771eeead2c39c42ca7",
+      "image_repo_digests": [
+        "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-10081@sha256:58951c0d236ade36cd508d48e87819c488ed28c60abda963f8d4df99d89c030c"
+      ],
+      "model": "gpt-5.6-terra",
+      "official_resolved": true,
+      "patch_bytes": 2081,
+      "patch_sha256": "f4a406dc497ead3303bdd77f61e3ce8c9981c4632629247ca9b5e0dab365304f",
+      "provider": "zeo-dev",
+      "release_assurance": true,
+      "resolved": true,
+      "session_count": 2,
+      "sessions": [
+        {
+          "index": 0,
+          "receipt_sha256": "41c18596808848b65540f411f0c4030a44ca9cc681020776877e714ae0c4a8d4",
+          "sandbox_probe": {
+            "coordinator_not_mounted": true,
+            "docker_socket_not_mounted": true,
+            "external_network_denied": true,
+            "host_mount_not_visible": true,
+            "inference_socket_present": true,
+            "provider_secret_not_in_environment": true,
+            "root_write_denied": true,
+            "workspace_write": true
+          },
+          "status": "completed",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 185344,
+            "input_tokens": 216725,
+            "output_tokens": 2488,
+            "reasoning_output_tokens": 864
+          }
+        },
+        {
+          "index": 1,
+          "receipt_sha256": "b7bc3fc597521ecef242886d886e38abfb152a5a30a71c31099e09a81ad37132",
+          "sandbox_probe": {
+            "coordinator_not_mounted": true,
+            "docker_socket_not_mounted": true,
+            "external_network_denied": true,
+            "host_mount_not_visible": true,
+            "inference_socket_present": true,
+            "provider_secret_not_in_environment": true,
+            "root_write_denied": true,
+            "workspace_write": true
+          },
+          "status": "completed",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 99072,
+            "input_tokens": 117952,
+            "output_tokens": 2249,
+            "reasoning_output_tokens": 1331
+          }
+        }
+      ],
+      "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+      "task": "pytest-dev__pytest-10081",
+      "task_success_eligible": true,
+      "test_coverage": {
+        "FAIL_TO_PASS": {
+          "expected": 1,
+          "failure": 0,
+          "status": "measured",
+          "success": 1
+        },
+        "PASS_TO_PASS": {
+          "expected": 63,
+          "failure": 0,
+          "status": "measured",
+          "success": 63
+        }
+      }
+    }
+  ],
+  "requirements": {
+    "architecture_scope_bound": true,
+    "minimum_complete_triplets": 2,
+    "official_regression_bound": true,
+    "required_arms": [
+      "B0",
+      "B4",
+      "B5"
+    ],
+    "sandbox_bound": true
+  },
+  "review": {
+    "items": [
+      {
+        "rationale": "Hash-bound patch, official report, regression coverage and sandbox receipt reviewed; task outcome remains separate.",
+        "tuple": "pytest-dev__pytest-10081:B0:1",
+        "verdict": "pass"
+      },
+      {
+        "rationale": "Hash-bound patch, official report, regression coverage and sandbox receipt reviewed; task outcome remains separate.",
+        "tuple": "pytest-dev__pytest-10081:B4:1",
+        "verdict": "pass"
+      },
+      {
+        "rationale": "Hash-bound patch, official report, regression coverage and sandbox receipt reviewed; task outcome remains separate.",
+        "tuple": "pytest-dev__pytest-10081:B5:1",
+        "verdict": "pass"
+      }
+    ],
+    "mode": "structural-and-binding",
+    "reviewer_id": "maintainer-evidence-review",
+    "schema": "public-engineering-review/1"
+  },
+  "schema": "public-engineering-evidence/2",
+  "scope": {
+    "arms": [
+      "B0",
+      "B4",
+      "B5"
+    ],
+    "effect_status": "mixed-outcomes",
+    "repetitions": 1,
+    "tasks": [
+      "pytest-dev__pytest-10081"
+    ],
+    "triplets": 1
+  },
+  "status": "complete-declared-scope"
+}

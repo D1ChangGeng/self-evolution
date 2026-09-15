@@ -119,6 +119,23 @@ export const PUBLIC_RELEASE_PROFILES = Object.freeze({
     require_engineering_sample_for: Object.freeze(["core"]),
     historical_integrated_required: false,
   }),
+  "public-engineering": Object.freeze({
+    description:
+      "Bounded real public engineering evidence with official regression and permission receipts.",
+    required_deterministic_gates: Object.freeze([
+      "skill-lines",
+      "initialized-file-count",
+      "source-change-detection",
+      "migration-input-accounting",
+      "migration-rollback-identity",
+      "cli-and-adapter-idempotency",
+      "default-adapters-off",
+      "removed-v1-default-mechanisms",
+    ]),
+    require_public_benchmark: false,
+    require_engineering_sample_for: Object.freeze([]),
+    historical_integrated_required: false,
+  }),
   private: Object.freeze({
     description:
       "Strict historical v1/v2 integrated campaign; enhancement profile.",
