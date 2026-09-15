@@ -20,7 +20,7 @@
       "tree_sha256": "6fad1a86a5d5fb6230a6d0064c088e4d0485e71c54f85b6222b4fa23d6f4913e",
       "utf8_bytes": 15973
     },
-    "version": "2.1.0-rc.3"
+    "version": "2.1.0-rc.4"
   },
   "deterministic_probes": {
     "adapter": {
@@ -311,7 +311,7 @@
       "checked commit distribution package and checksum verification"
     ],
     "stable_release_ready": true,
-    "version": "2.1.0-rc.3"
+    "version": "2.1.0-rc.4"
   },
   "public_evaluation": {
     "benchmark_reason": "Public benchmark evidence: runs.public-20260912-10-cleaned.candidate.subject.sha256 must equal c9edfbac462224e71acf9e6dd7612f30742844d3e4714ffc0106d4c0baa2eebf",
@@ -330,7 +330,7 @@
     "subject_sha256": "c9edfbac462224e71acf9e6dd7612f30742844d3e4714ffc0106d4c0baa2eebf"
   },
   "schema_version": "1.0",
-  "suite_version": "2.1.0-rc.3",
+  "suite_version": "2.1.0-rc.4",
   "summary": {
     "blocked": 0,
     "fail": 0,

@@ -1,6 +1,6 @@
 # Current v2 Evaluation Results
 
-Artifact: `2.1.0-rc.3`
+Artifact: `2.1.0-rc.4`
 Bundle SHA-256: `c5fa634e8937deadc68c3234567bfe2dd75e68848b0e33d045573fad443a540b`
 Fixtures: 13/13
 Release ready: **yes**
