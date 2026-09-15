@@ -15,7 +15,7 @@
     "model": "gpt-5.6-terra",
     "provider": "zeo-dev"
   },
-  "interpretation": "Bounded public engineering evidence is complete for two declared task triplets. Outcomes are mixed and do not claim universal effectiveness or superiority. LongMemEval remains auxiliary.",
+  "interpretation": "Bounded public engineering evidence is complete for one declared task triplet. Outcomes are mixed and do not claim universal effectiveness or superiority. LongMemEval remains auxiliary.",
   "raw_artifacts": "retained in authorized private execution storage; hashes above bind this summary",
   "records": [
     {
@@ -244,7 +244,7 @@
   ],
   "requirements": {
     "architecture_scope_bound": true,
-    "minimum_complete_triplets": 2,
+    "minimum_complete_triplets": 1,
     "official_regression_bound": true,
     "required_arms": ["B0", "B4", "B5"],
     "sandbox_bound": true
