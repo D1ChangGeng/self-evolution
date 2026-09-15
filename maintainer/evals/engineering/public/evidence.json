@@ -246,11 +246,7 @@
     "architecture_scope_bound": true,
     "minimum_complete_triplets": 2,
     "official_regression_bound": true,
-    "required_arms": [
-      "B0",
-      "B4",
-      "B5"
-    ],
+    "required_arms": ["B0", "B4", "B5"],
     "sandbox_bound": true
   },
   "review": {
@@ -277,16 +273,10 @@
   },
   "schema": "public-engineering-evidence/2",
   "scope": {
-    "arms": [
-      "B0",
-      "B4",
-      "B5"
-    ],
+    "arms": ["B0", "B4", "B5"],
     "effect_status": "mixed-outcomes",
     "repetitions": 1,
-    "tasks": [
-      "pytest-dev__pytest-10081"
-    ],
+    "tasks": ["pytest-dev__pytest-10081"],
     "triplets": 1
   },
   "status": "complete-declared-scope"
