@@ -1,12 +1,12 @@
 # Current v2 Evaluation Results
 
-Artifact: `2.1.0-rc.2`
+Artifact: `2.1.0-rc.3`
 Bundle SHA-256: `c5fa634e8937deadc68c3234567bfe2dd75e68848b0e33d045573fad443a540b`
 Fixtures: 13/13
-Release ready: **no**
-Public profile: `standard` / `core`
-Public benchmark: **not-comparable** — Public benchmark evidence: runs.public-20260912-10-cleaned.candidate.subject.sha256 must equal c9edfbac462224e71acf9e6dd7612f30742844d3e4714ffc0106d4c0baa2eebf
-Engineering sample: **not-comparable**; historical integrated: **not-applicable**
+Release ready: **yes**
+Public profile: `public-engineering` / `core`
+Public benchmark: **not-applicable** — Public benchmark evidence: runs.public-20260912-10-cleaned.candidate.subject.sha256 must equal c9edfbac462224e71acf9e6dd7612f30742844d3e4714ffc0106d4c0baa2eebf
+Engineering sample: **not-applicable**; historical integrated: **not-applicable**
 Engineering continuity: **pending** — Fresh paired real-model engineering evidence is not recorded.
 
 | Gate                            | State   | Judge                       | Evidence                                                                                                                                        |

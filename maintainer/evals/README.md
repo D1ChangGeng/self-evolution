@@ -20,10 +20,10 @@ node maintainer/evals/run.mjs --release --profile=private
   selected release profile decides whether it blocks release.
 - `--record` updates `results/v2-current.json` and `RESULTS.md` after an
   intentional artifact change.
-- `--release` runs the selected profile. The default `standard` profile uses
-  deterministic safety, the independent public benchmark policy, and a
-  changed-path engineering sample. `--profile=private` retains the strict
-  historical v1/v2 integrated campaign as a later enhancement.
+- `--release` runs the selected profile. The default `public-engineering` profile
+  uses the bounded, hash-bound real SWE-bench engineering evidence scope. Use
+  `--profile=standard` for the larger historical benchmark requirements and
+  `--profile=private` for the strict historical v1/v2 integrated campaign.
 
 All three modes materialize every fixture and execute its declared initial
 verifier before evaluating gates. The direct release command therefore cannot

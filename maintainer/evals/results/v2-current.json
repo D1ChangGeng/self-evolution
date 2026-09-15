@@ -20,7 +20,7 @@
       "tree_sha256": "6fad1a86a5d5fb6230a6d0064c088e4d0485e71c54f85b6222b4fa23d6f4913e",
       "utf8_bytes": 15973
     },
-    "version": "2.1.0-rc.2"
+    "version": "2.1.0-rc.3"
   },
   "deterministic_probes": {
     "adapter": {
@@ -127,7 +127,7 @@
       "semantic_judgment_emitted": false
     }
   },
-  "eval_contract_sha256": "9dee1f73276acc7de225085505b10ad70631dcb38a981e6b14b3d8f9be969ed0",
+  "eval_contract_sha256": "214351fc0302b4a51510829d7f60aeea880a6958d34604979aee5e4a9124dc3d",
   "fixture_contracts": [
     {
       "id": "cross-module-defect",
@@ -310,29 +310,32 @@
       "npm run ci",
       "checked commit distribution package and checksum verification"
     ],
-    "stable_release_ready": false,
-    "version": "2.1.0-rc.2"
+    "stable_release_ready": true,
+    "version": "2.1.0-rc.3"
   },
   "public_evaluation": {
     "benchmark_reason": "Public benchmark evidence: runs.public-20260912-10-cleaned.candidate.subject.sha256 must equal c9edfbac462224e71acf9e6dd7612f30742844d3e4714ffc0106d4c0baa2eebf",
-    "benchmark_status": "not-comparable",
+    "benchmark_status": "not-applicable",
     "change_class": "core",
     "engineering_continuity_reason": "Fresh paired real-model engineering evidence is not recorded.",
     "engineering_continuity_status": "pending",
     "engineering_policy_version": "engineering-policy/1.0.0",
-    "engineering_sample_status": "not-comparable",
+    "engineering_sample_status": "not-applicable",
     "historical_integrated_status": "not-applicable",
-    "profile": "standard",
+    "profile": "public-engineering",
+    "public_engineering_effect_status": "all-declared-tasks-resolved",
+    "public_engineering_reason": "Declared public engineering scope has complete hash-bound Codex, official regression, architecture-scope, permission-boundary and review evidence.",
+    "public_engineering_status": "pass",
     "required_deterministic_failures": [],
     "subject_sha256": "c9edfbac462224e71acf9e6dd7612f30742844d3e4714ffc0106d4c0baa2eebf"
   },
   "schema_version": "1.0",
-  "suite_version": "2.1.0-rc.2",
+  "suite_version": "2.1.0-rc.3",
   "summary": {
     "blocked": 0,
     "fail": 0,
     "pass": 8,
     "pending": 9,
-    "release_ready": false
+    "release_ready": true
   }
 }

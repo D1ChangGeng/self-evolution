@@ -74,7 +74,7 @@ const mode = process.argv[2] ?? "--verify";
 const profileArg = process.argv.find((arg) => arg.startsWith("--profile="));
 const releaseProfile = profileArg
   ? profileArg.slice("--profile=".length)
-  : "standard";
+  : "public-engineering";
 const changeClassArg = process.argv.find((arg) =>
   arg.startsWith("--change-class="),
 );
@@ -1402,7 +1402,7 @@ function markdown(result) {
 }
 
 const defaultEvaluation =
-  releaseProfile === "standard" && publicChangeClass === "core";
+  releaseProfile === "public-engineering" && publicChangeClass === "core";
 const result = await buildResult();
 const serialized = await format(stableJson(result), { parser: "json" });
 const rendered = await format(markdown(result), { parser: "markdown" });
@@ -1413,7 +1413,7 @@ const checkRecordedResult =
 if (mode === "--record") {
   if (!defaultEvaluation)
     throw new Error(
-      "--record is reserved for the default standard/core evaluation; use --verify or --release for other profiles.",
+      "--record is reserved for the default public-engineering/core evaluation; use --verify or --release for other profiles.",
     );
   await mkdir(dirname(resultPath), { recursive: true });
   await writeFile(resultPath, serialized, "utf8");
