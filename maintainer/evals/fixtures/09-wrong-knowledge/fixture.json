@@ -25,7 +25,7 @@
       {
         "path": ".agents/knowledge/guides/rollout.md",
         "role": "knowledge",
-        "content": "---\nstatus: active\n---\n# Rollout\nThe rollout percentage is 90.\n"
+        "content": "---\nkind: guide\nstatus: active\nscope:\n  - \"src/rollout.ts\"\nuse_when:\n  - \"changing rollout behavior\"\n---\n# Rollout\nThe rollout percentage is 90.\n"
       },
       {
         "path": "test/fixture.test.mjs",

@@ -13,6 +13,7 @@ import {
 } from "./migrate.js";
 import type { CommandResult, OutputFormat } from "./types.js";
 import { KbError } from "./types.js";
+import { writeCommand } from "./write-command.js";
 
 type ParsedArgs = {
   positional: string[];
@@ -27,6 +28,7 @@ Commands:
   init
   index
   check
+  write <knowledge.md> <proposal.md> <expected-sha256|absent>
   migrate prepare
   migrate apply <run-id>
   migrate rollback <run-id>
@@ -80,10 +82,13 @@ function textResult(result: CommandResult): string {
   const lines = [
     `${result.ok ? "OK" : "FAILED"} ${result.command}${result.changed === undefined ? "" : result.changed ? " (changed)" : " (unchanged)"}`,
   ];
-  for (const diagnostic of result.diagnostics ?? [])
+  for (const diagnostic of result.diagnostics ?? []) {
     lines.push(
       `${diagnostic.severity.toUpperCase()} ${diagnostic.code}${diagnostic.path ? ` ${diagnostic.path}` : ""}: ${diagnostic.message}`,
     );
+    if (diagnostic.details)
+      lines.push(JSON.stringify(diagnostic.details, null, 2));
+  }
   if (result.data !== undefined)
     lines.push(JSON.stringify(result.data, null, 2));
   return `${lines.join("\n")}\n`;
@@ -96,6 +101,8 @@ async function dispatch(args: ParsedArgs): Promise<CommandResult> {
   if (command === "init" && !subcommand) return initCommand(args.projectRoot);
   if (command === "index" && !subcommand) return indexCommand(args.projectRoot);
   if (command === "check" && !subcommand) return checkCommand(args.projectRoot);
+  if (command === "write" && subcommand && value && extra.length === 1)
+    return writeCommand(args.projectRoot, subcommand, value, extra[0]!);
   if (command === "migrate" && subcommand === "prepare" && !value)
     return prepareMigration(args.projectRoot);
   if (

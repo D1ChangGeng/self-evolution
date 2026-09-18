@@ -30,6 +30,10 @@ Record benefits, costs, risks, and operational implications.
 
 Link the code, tests, runtime results, documents, or approvals supporting the choice.
 
+Name the test, interface or dependency check that enforces this choice and the
+scope where it applies. Record current adoption evidence separately from observed
+implementation. Commands remain subject to the executing host's permissions.
+
 ## Reconsider When
 
 State concrete conditions that should reopen this decision.

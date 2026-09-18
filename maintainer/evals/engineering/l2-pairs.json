@@ -1,0 +1,723 @@
+{
+  "schema": "engineering-l2-pairs/2",
+  "selection_date": "2026-09-15",
+  "status": "selected-provenance-verified-execution-not-tested",
+  "pair_count": 8,
+  "independent_repositories": 3,
+  "clustering": "Report by pair and repository; related pairs share upstream tasks and are not eight independent repositories.",
+  "evidence_boundary": "Fetched GitHub commit, comparison and pinned license metadata; selection is not execution or effectiveness evidence.",
+  "pairs": [
+    {
+      "id": "qs-format-options",
+      "repository": "https://github.com/ljharb/qs.git",
+      "license": {
+        "spdx": "BSD-3-Clause",
+        "path": "LICENSE.md",
+        "at_commit": "a0a81ea2071acce3eff41a040f719ac8f5c4f64c",
+        "sha256": "e7dc37bf662d7f786efcb46c545615e70c1daf458a38385521c63cf6607cdfe1",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/license?ref=a0a81ea2071acce3eff41a040f719ac8f5c4f64c",
+          "sha256": "aaca3f5bc18671f86deda2e85451f5e4f78c4d437d1157aa77f5d7855f50078a",
+          "raw": "ddd5283e5177242840269e43a1732e5c9d19b7540bd66cab5bb72daa9ebb457c.json"
+        }
+      },
+      "experience": {
+        "base_commit": "0c180a40adb8c6703fffc85b2ff06ca209f5c1e0",
+        "fix_commit": "e3062f78f5233b338ceeb8e8dfa5a07dea4b32a8",
+        "date": "2026-04-24T02:54:02Z",
+        "title": "[Fix] `stringify`: apply `formatter` to encoded key under `strictNullHandling`",
+        "url": "https://github.com/ljharb/qs/commit/e3062f78f5233b338ceeb8e8dfa5a07dea4b32a8",
+        "changed_files": [
+          {
+            "path": "lib/stringify.js",
+            "status": "modified",
+            "sha": "39d8cabae2e8511a25b2e691dbe8cd8cd28e3ec3",
+            "patch_sha256": "892bd2cecb2a49d03232903f581551ea673c55f5cbb8f8074d79e4a5972df8ef"
+          },
+          {
+            "path": "test/stringify.js",
+            "status": "modified",
+            "sha": "226fd3b384c05b44090f230aa20f2843bc53c7ac",
+            "patch_sha256": "4521ef7a7ad61f09603f648f7f72b8ab867cc6ff2369a0c35b22dbf58e5188a6"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/commits/e3062f78f5233b338ceeb8e8dfa5a07dea4b32a8",
+          "sha256": "b26fbdd527e0f1bd65e4d3540f81a55af9e5b1a3bca66c81c94da9ea38f03c6f",
+          "raw": "7b016fc0804cfa04f08ba302d076cbe36652f414d565f5c91344d53b6f2968a9.json"
+        }
+      },
+      "followup": {
+        "base_commit": "e3062f78f5233b338ceeb8e8dfa5a07dea4b32a8",
+        "fix_commit": "a0a81ea2071acce3eff41a040f719ac8f5c4f64c",
+        "date": "2026-04-24T06:17:57Z",
+        "title": "[Fix] `stringify`: use configured `delimiter` after `charsetSentinel`",
+        "url": "https://github.com/ljharb/qs/commit/a0a81ea2071acce3eff41a040f719ac8f5c4f64c",
+        "changed_files": [
+          {
+            "path": "lib/stringify.js",
+            "status": "modified",
+            "sha": "72960a957b15048f1f768e57e24efc80f7cacfda",
+            "patch_sha256": "65e6b97487355fb915acaccfb3b62c800509a1dd793614275e03958dd858377e"
+          },
+          {
+            "path": "test/stringify.js",
+            "status": "modified",
+            "sha": "fc3a1a6c305585fc4646d6d281e08d4db1747b8d",
+            "patch_sha256": "0a64aeabb0e744ba56b5a462bb080a6674f5acf3d4cfa0db4282135e7c1037bf"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/commits/a0a81ea2071acce3eff41a040f719ac8f5c4f64c",
+          "sha256": "73cc8144c8f0fecd21fbc6f44dab5929a74493e6ff0d4d4c9329508792d4c9cf",
+          "raw": "a13e53ed5ada6f577e4ea5984618301d12e04a867b322f0be4f324b5dad818e5.json"
+        }
+      },
+      "relation": "Stringify encoding/format options must compose, including null and charset-sentinel paths.",
+      "relation_kind": "distinct-historical-fix",
+      "ancestry": {
+        "status": "identical",
+        "ahead_by": 0,
+        "behind_by": 0,
+        "merge_base_commit": "e3062f78f5233b338ceeb8e8dfa5a07dea4b32a8",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/compare/e3062f78f5233b338ceeb8e8dfa5a07dea4b32a8...e3062f78f5233b338ceeb8e8dfa5a07dea4b32a8",
+          "sha256": "be1ba7a8ca1381a7914076129427690e9498c5181eea0c9935f46346dbdbfaec",
+          "raw": "64904ea33b81d01c2ac0944a5abab1531109cbbe901e58ac9be9782f1ffde517.json"
+        }
+      },
+      "status": "selected-provenance-verified",
+      "execution": "not-tested",
+      "continuity": "Separate tasks at their exact upstream bases; do not accumulate the experience patch over an unrelated future base. Forward only allowed experience knowledge."
+    },
+    {
+      "id": "qs-null-filter",
+      "repository": "https://github.com/ljharb/qs.git",
+      "license": {
+        "spdx": "BSD-3-Clause",
+        "path": "LICENSE.md",
+        "at_commit": "21f80b33e5c8b3f7eba1034fff0da4a4a37a1d41",
+        "sha256": "e7dc37bf662d7f786efcb46c545615e70c1daf458a38385521c63cf6607cdfe1",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/license?ref=21f80b33e5c8b3f7eba1034fff0da4a4a37a1d41",
+          "sha256": "a7ffe917adceed4dc5671e30f4ca689238ee698d451658a3a51f2c62608644ac",
+          "raw": "c7664320dfe0451f81b321fd5a47aacd149fb1fcf3ce174872cb8f865c5ac9f6.json"
+        }
+      },
+      "experience": {
+        "base_commit": "3a8b94aec19bd664720f6f6b1e66c4a0dfe4b656",
+        "fix_commit": "0c180a40adb8c6703fffc85b2ff06ca209f5c1e0",
+        "date": "2026-04-27T05:36:09Z",
+        "title": "[Fix] `stringify`: skip null/undefined filter-array entries instead of crashing in `encoder`",
+        "url": "https://github.com/ljharb/qs/commit/0c180a40adb8c6703fffc85b2ff06ca209f5c1e0",
+        "changed_files": [
+          {
+            "path": "lib/stringify.js",
+            "status": "modified",
+            "sha": "cdfe252f8bc3f7106903d747c87641c58d3e5cdc",
+            "patch_sha256": "b5160e8dd3da15528ccd3b573e509090f3207a22f5c7ca730fab11779f455ee9"
+          },
+          {
+            "path": "test/stringify.js",
+            "status": "modified",
+            "sha": "03a9ef04782f37fd29929e60ff8f1264405fc8ca",
+            "patch_sha256": "4ab60d8e792f584474b8882c95080470a24e70b79a3da180f20d64f7fcad558e"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/commits/0c180a40adb8c6703fffc85b2ff06ca209f5c1e0",
+          "sha256": "5290307fde5ff9426e7fa4c0907f4b3d97c45556256dae70a7af4b82e69d1df8",
+          "raw": "a2f9543ce4e63b02531f43ca01df971e7cdc58aa3672d0eb5b0a3360765baf5e.json"
+        }
+      },
+      "followup": {
+        "base_commit": "a0a81ea2071acce3eff41a040f719ac8f5c4f64c",
+        "fix_commit": "21f80b33e5c8b3f7eba1034fff0da4a4a37a1d41",
+        "date": "2026-05-16T06:15:06Z",
+        "title": "[Fix] `stringify`: skip null/undefined entries in `arrayFormat: 'comma'` + `encodeValuesOnly` instead of crashing in `encoder`",
+        "url": "https://github.com/ljharb/qs/commit/21f80b33e5c8b3f7eba1034fff0da4a4a37a1d41",
+        "changed_files": [
+          {
+            "path": "eslint.config.mjs",
+            "status": "modified",
+            "sha": "5c9fc1f989caebd47abb252d4ea9b12c4c4bafea",
+            "patch_sha256": "386a87826bfeae7f8fa17a5bb5f0f0be9dce2329cc5fd8f85a7f904fa3eb5b81"
+          },
+          {
+            "path": "lib/stringify.js",
+            "status": "modified",
+            "sha": "b6616912ffb7a5903d8b7f87c798879a43a5effe",
+            "patch_sha256": "a5de2127fad7fd775658ae80d064768c1c423c47a8e228078c0c7d4da26200d6"
+          },
+          {
+            "path": "test/stringify.js",
+            "status": "modified",
+            "sha": "07324cf22e0d8084ebedc1ad996a486a189d837a",
+            "patch_sha256": "5979db4637be6eae86fb3a9803762cf1fae9f902e68f38db356267c195dd552c"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/commits/21f80b33e5c8b3f7eba1034fff0da4a4a37a1d41",
+          "sha256": "698267f0da2214a68a46d39edbb8599d97ae5a79bab260bcec39b94fc40c2c35",
+          "raw": "2a4e3dba0aecdc2d1206ab57c20d06bcbaab9f4abd099b6283547af1e9e50c46.json"
+        }
+      },
+      "relation": "Null and undefined values must be filtered before encoder invocation across filter-array and comma serialization.",
+      "relation_kind": "distinct-historical-fix",
+      "ancestry": {
+        "status": "ahead",
+        "ahead_by": 2,
+        "behind_by": 0,
+        "merge_base_commit": "0c180a40adb8c6703fffc85b2ff06ca209f5c1e0",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/compare/0c180a40adb8c6703fffc85b2ff06ca209f5c1e0...a0a81ea2071acce3eff41a040f719ac8f5c4f64c",
+          "sha256": "b01afec9b0b6db7af9f8ac34a058bda3c5f53058f5a51fba96435c66c2ddee75",
+          "raw": "8f860b79c5d96fca75cfded8ea8b4b4eb71ac24c4288803edf88cc4ad6effcd5.json"
+        }
+      },
+      "status": "selected-provenance-verified",
+      "execution": "not-tested",
+      "continuity": "Separate tasks at their exact upstream bases; do not accumulate the experience patch over an unrelated future base. Forward only allowed experience knowledge."
+    },
+    {
+      "id": "qs-encoding-boundaries",
+      "repository": "https://github.com/ljharb/qs.git",
+      "license": {
+        "spdx": "BSD-3-Clause",
+        "path": "LICENSE.md",
+        "at_commit": "708fadedc91d68788cd02dd24803eed3c18427df",
+        "sha256": "e7dc37bf662d7f786efcb46c545615e70c1daf458a38385521c63cf6607cdfe1",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/license?ref=708fadedc91d68788cd02dd24803eed3c18427df",
+          "sha256": "1d452adc2af86d62ecf0b7553782362aba0da507672988eaf60f5a004e1be718",
+          "raw": "34fec8b108ba3668a788209fb49a0d8ef84a7952e823928a53357c70c3368625.json"
+        }
+      },
+      "experience": {
+        "base_commit": "9532969635a4bc96506370b28dd28dcab446e7ee",
+        "fix_commit": "59da434d5de8c3d2564e4d75aeedde2e8af72369",
+        "date": "2026-06-07T12:04:18Z",
+        "title": "[Fix] `utils`: respect encoding of surrogate pairs across chunks",
+        "url": "https://github.com/ljharb/qs/commit/59da434d5de8c3d2564e4d75aeedde2e8af72369",
+        "changed_files": [
+          {
+            "path": "lib/utils.js",
+            "status": "modified",
+            "sha": "4c62fee9c6bd09eefc092456875680813f0e8460",
+            "patch_sha256": "8cb7827571f6fcf657839e2635ec27e78dcd5f07e0939a2598bf650bad14592e"
+          },
+          {
+            "path": "test/utils.js",
+            "status": "modified",
+            "sha": "85781b7c0b0e5b444c1b0720425f798f4910231e",
+            "patch_sha256": "5727c092174b96b1bd2e1eb79adf9d577936196c19e3a33161d31f8595416b41"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/commits/59da434d5de8c3d2564e4d75aeedde2e8af72369",
+          "sha256": "61c319294c35183886a3991bdd1130298a8fdcec007ec12f78386697b166525f",
+          "raw": "e7581ae4924e6518d78e2fda33c341f7956de64ae0351317b33a32936bc04b88.json"
+        }
+      },
+      "followup": {
+        "base_commit": "18d085e919dae70c8f1b200ab99323058edab2c2",
+        "fix_commit": "708fadedc91d68788cd02dd24803eed3c18427df",
+        "date": "2026-06-14T04:59:48Z",
+        "title": "[Fix] `stringify`: encode dots in a top-level key with a primitive value when encodeDotInKeys is set",
+        "url": "https://github.com/ljharb/qs/commit/708fadedc91d68788cd02dd24803eed3c18427df",
+        "changed_files": [
+          {
+            "path": "lib/stringify.js",
+            "status": "modified",
+            "sha": "105c6e94062b0276971ddf40c0c15da513d7d210",
+            "patch_sha256": "2157aa7bdb80a7d4e0039d885548bcae33969d1aee596861048ec8f73f963798"
+          },
+          {
+            "path": "test/stringify.js",
+            "status": "modified",
+            "sha": "3a0c0e717f76facaaedbbf1e15f63436e053e532",
+            "patch_sha256": "d3587176281f1fc9f704dbe28e424342f64f4d688630ce96144ed8a250fda06a"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/commits/708fadedc91d68788cd02dd24803eed3c18427df",
+          "sha256": "48368c6dc499c78bf5db11513338751c9270c98228c6dc4c3a41ee7c8b1eb0d9",
+          "raw": "cd6fdd2e333139a9ba994ae955bf0040675f79da8ceb312d58469d75500b22ed.json"
+        }
+      },
+      "relation": "Encoding edge cases span value chunks and top-level keys; same subsystem, distinct root causes.",
+      "relation_kind": "distinct-historical-fix",
+      "ancestry": {
+        "status": "ahead",
+        "ahead_by": 8,
+        "behind_by": 0,
+        "merge_base_commit": "59da434d5de8c3d2564e4d75aeedde2e8af72369",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/compare/59da434d5de8c3d2564e4d75aeedde2e8af72369...18d085e919dae70c8f1b200ab99323058edab2c2",
+          "sha256": "d0254e43213b3daa55ca481a3a4c88bdaf11705f8c74d6c2f0fbb93a06b5ce15",
+          "raw": "f577cc52a92820b4caca4046ac133d779bce9de072807554201b98e05d544ec0.json"
+        }
+      },
+      "status": "selected-provenance-verified",
+      "execution": "not-tested",
+      "continuity": "Separate tasks at their exact upstream bases; do not accumulate the experience patch over an unrelated future base. Forward only allowed experience knowledge."
+    },
+    {
+      "id": "qs-array-growth",
+      "repository": "https://github.com/ljharb/qs.git",
+      "license": {
+        "spdx": "BSD-3-Clause",
+        "path": "LICENSE.md",
+        "at_commit": "8859c37470e11b42b547b275e4e9bd0bc8cc5464",
+        "sha256": "e7dc37bf662d7f786efcb46c545615e70c1daf458a38385521c63cf6607cdfe1",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/license?ref=8859c37470e11b42b547b275e4e9bd0bc8cc5464",
+          "sha256": "2c07c1f41064e73a8318d5aad3533280a401a5280debe27bc5eaf8bdc01ce177",
+          "raw": "af60de8fbcd1bf58d11d338a0c02922790dea353382aaa03ef1b1706eab0f5c3.json"
+        }
+      },
+      "experience": {
+        "base_commit": "59da434d5de8c3d2564e4d75aeedde2e8af72369",
+        "fix_commit": "963e538c740961a35ecaa0b38ee1f5c16697e208",
+        "date": "2026-06-23T00:48:03Z",
+        "title": "[Fix] `parse`: enforce `throwOnLimitExceeded` for cumulative array growth via `combine`/`merge`",
+        "url": "https://github.com/ljharb/qs/commit/963e538c740961a35ecaa0b38ee1f5c16697e208",
+        "changed_files": [
+          {
+            "path": "lib/parse.js",
+            "status": "modified",
+            "sha": "04fb01570a61ec43eefee5a893767a51f7edd35c",
+            "patch_sha256": "b325825dae0ab8c923c5ed85feefaf2bc46b3403174f8e6491bc3c864ad2fafc"
+          },
+          {
+            "path": "lib/utils.js",
+            "status": "modified",
+            "sha": "690a821fcd86999efff26ef3fae90c00e19f936e",
+            "patch_sha256": "c8cc27fe856e0a6a28388e6ce19b6f63d385b013f2194dfe01bff26173c93719"
+          },
+          {
+            "path": "test/parse.js",
+            "status": "modified",
+            "sha": "093b3614d6f1e2ea06915857fc13173eac192670",
+            "patch_sha256": "effbd13e2dd7b243269abc7f6205bea00f612deb61563c4595a1d9236c52108d"
+          },
+          {
+            "path": "test/utils.js",
+            "status": "modified",
+            "sha": "cbbf42da50649bb3fb2cb36f8b3f1d531aca477a",
+            "patch_sha256": "3b6f0d5f77fb9127fe0add9383950f9752dbf764077e8cc8750a2eadff4e6ef6"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/commits/963e538c740961a35ecaa0b38ee1f5c16697e208",
+          "sha256": "e4e6c52b77321badd1c8ee525f69e52076c875ff9e9f45a0b72f51f8537e8b9c",
+          "raw": "32b2a98f2b4c6b427f46fc8c04020feb23fb734196e279388fb96e56ced7bf3b.json"
+        }
+      },
+      "followup": {
+        "base_commit": "8079adc7e7cf84b8289898d1b18877160de67d40",
+        "fix_commit": "8859c37470e11b42b547b275e4e9bd0bc8cc5464",
+        "date": "2026-08-29T06:04:11Z",
+        "title": "[Fix] `parse`: enforce `arrayLimit` on comma groups under `[]=` when `throwOnLimitExceeded` is set",
+        "url": "https://github.com/ljharb/qs/commit/8859c37470e11b42b547b275e4e9bd0bc8cc5464",
+        "changed_files": [
+          {
+            "path": "lib/parse.js",
+            "status": "modified",
+            "sha": "3c35c3399413eb4f0d26a6b08c9fac2dd0c0172a",
+            "patch_sha256": "0dd15bf1dc4b87302279070ae01a872d31b5adae93b7fa41a1087ac117c2da1c"
+          },
+          {
+            "path": "test/parse.js",
+            "status": "modified",
+            "sha": "b5f02619204505f7ac05bda13f12fe3b254c086f",
+            "patch_sha256": "a287837ea4c6a785fe1aef9077a9e83b0c45a8d9742c2b811664ba1737e0dd99"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/commits/8859c37470e11b42b547b275e4e9bd0bc8cc5464",
+          "sha256": "c0bc649ccb8a23cf48c4b474e57e854f955c64bdd55e72cf9ceffcd560f363f8",
+          "raw": "ba7b55835b5eebeeca399a2b954c6a3d6cc8ac89bde60ecd0b5625b9198d5ba1.json"
+        }
+      },
+      "relation": "Array limits must account for cumulative growth and comma groups, not just individual parsed tokens.",
+      "relation_kind": "distinct-historical-fix",
+      "ancestry": {
+        "status": "ahead",
+        "ahead_by": 20,
+        "behind_by": 0,
+        "merge_base_commit": "963e538c740961a35ecaa0b38ee1f5c16697e208",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/compare/963e538c740961a35ecaa0b38ee1f5c16697e208...8079adc7e7cf84b8289898d1b18877160de67d40",
+          "sha256": "72556a8901f7eb3308eda3b4a36b41a92798f87e6ded5a6fc1f72f6f18010efb",
+          "raw": "4717af68e899b69b18085b86d713419fda55342499ec8650de3e4380f5977670.json"
+        }
+      },
+      "status": "selected-provenance-verified",
+      "execution": "not-tested",
+      "continuity": "Separate tasks at their exact upstream bases; do not accumulate the experience patch over an unrelated future base. Forward only allowed experience knowledge."
+    },
+    {
+      "id": "qs-merge-index",
+      "repository": "https://github.com/ljharb/qs.git",
+      "license": {
+        "spdx": "BSD-3-Clause",
+        "path": "LICENSE.md",
+        "at_commit": "0d415f34f8c6d16cec1497d16538f47152b92da2",
+        "sha256": "e7dc37bf662d7f786efcb46c545615e70c1daf458a38385521c63cf6607cdfe1",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/license?ref=0d415f34f8c6d16cec1497d16538f47152b92da2",
+          "sha256": "0c4a814134f9132a8becb48e4e2f7dfedfd5329b55e37ee2ed6fc949e2960294",
+          "raw": "ba11891e1d0c7651a576647e4a685e30bdfea0a6c0115217882df099f741f0df.json"
+        }
+      },
+      "experience": {
+        "base_commit": "6eb729c1d877948ff0274a84cfbec005a9b1d0a1",
+        "fix_commit": "fc373c91152bff8719746e8287b7ee78ccb48d5d",
+        "date": "2026-09-11T21:10:16Z",
+        "title": "[Fix] `utils`: `merge`: keep a `strictMerge` conflict container's index and `arrayLimit` correct",
+        "url": "https://github.com/ljharb/qs/commit/fc373c91152bff8719746e8287b7ee78ccb48d5d",
+        "changed_files": [
+          {
+            "path": "lib/utils.js",
+            "status": "modified",
+            "sha": "9b140f922ef9414deafb72745c12f919f289dbac",
+            "patch_sha256": "c164d4458e466394acd7bc2b59e2bfbbffaefdbcf34f89f6c6030724ea9dc1e9"
+          },
+          {
+            "path": "test/parse.js",
+            "status": "modified",
+            "sha": "bc503e8e066773095d06266f33b175ee177867d9",
+            "patch_sha256": "076b2eddeb14d43822fbd9b55edb03d9e784de06275d66700e9fc8a8df8526bd"
+          },
+          {
+            "path": "test/utils.js",
+            "status": "modified",
+            "sha": "da8a4fc81d1b1aa417f1d44e997824a38a37781a",
+            "patch_sha256": "b8a86ca165e4a5550c7479f4af4753e0f68792c168e8e893f42276b8da99976b"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/commits/fc373c91152bff8719746e8287b7ee78ccb48d5d",
+          "sha256": "646db16623c26d9d7c1fd87f36ea99796c02de5387a632797b848fabab38c810",
+          "raw": "2d4f9484a2d270a15db66c3cf62a4415d24396ac8bb4c75e0a23e11b62f0330f.json"
+        }
+      },
+      "followup": {
+        "base_commit": "4a310b47a5e80d1d202406b6d10c9dabbda29357",
+        "fix_commit": "0d415f34f8c6d16cec1497d16538f47152b92da2",
+        "date": "2026-09-11T23:22:17Z",
+        "title": "[Fix] `utils`: `merge`: seed an overflow container's index from its own keys, not just the source",
+        "url": "https://github.com/ljharb/qs/commit/0d415f34f8c6d16cec1497d16538f47152b92da2",
+        "changed_files": [
+          {
+            "path": "lib/utils.js",
+            "status": "modified",
+            "sha": "adde8c0ae9177ac1d6a0b44a8c5497dbd9ec7ac0",
+            "patch_sha256": "1e2658bc46719e3413b14dc5dba92f22b2030f9e851af148d1764c1a4fe359fa"
+          },
+          {
+            "path": "test/parse.js",
+            "status": "modified",
+            "sha": "596fa565189b3882b9fea227f1790bf00ed8d364",
+            "patch_sha256": "7358014fd64957e9a47a0c09cfa82a34a9a7342b963a3568d5ae463333c7f341"
+          },
+          {
+            "path": "test/utils.js",
+            "status": "modified",
+            "sha": "d27ad98f09b36b4f6c1cfb35c763e51f54b39c4e",
+            "patch_sha256": "ecc77686fdc4ca4ed3636c63c72fca8a54601dac614435a325a7ac72853f848b"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/commits/0d415f34f8c6d16cec1497d16538f47152b92da2",
+          "sha256": "0e36f092139653b49d5677edf16550d48e110be65d6d0300fe8af060495a5787",
+          "raw": "73319eea0d2d126a4c51d9d801faf3b13d79747746f5cabbe37cbe7e49da3e10.json"
+        }
+      },
+      "relation": "Overflow containers need independent index accounting; follow-up corrects an adjacent merge case.",
+      "relation_kind": "distinct-historical-fix",
+      "ancestry": {
+        "status": "ahead",
+        "ahead_by": 1,
+        "behind_by": 0,
+        "merge_base_commit": "fc373c91152bff8719746e8287b7ee78ccb48d5d",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/ljharb/qs/compare/fc373c91152bff8719746e8287b7ee78ccb48d5d...4a310b47a5e80d1d202406b6d10c9dabbda29357",
+          "sha256": "3378754e7c8af71a4e5a18b363491ed876cc361b9d2dc4cc2a8b7213af04321f",
+          "raw": "c297ea9b912a4544dcff745006fd65629fd4556fdf586330c484f8c6fa0eda59.json"
+        }
+      },
+      "status": "selected-provenance-verified",
+      "execution": "not-tested",
+      "continuity": "Separate tasks at their exact upstream bases; do not accumulate the experience patch over an unrelated future base. Forward only allowed experience knowledge."
+    },
+    {
+      "id": "p-limit-wrapper-lifecycle",
+      "repository": "https://github.com/sindresorhus/p-limit.git",
+      "license": {
+        "spdx": "MIT",
+        "path": "license",
+        "at_commit": "f3e7f9ba364a9357bd912d136367d06c46660917",
+        "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/sindresorhus/p-limit/license?ref=f3e7f9ba364a9357bd912d136367d06c46660917",
+          "sha256": "49d1d35f56864ec0dce2848bad43011620606bce8bbef27300498e750efa280f",
+          "raw": "9e7213862ef85ce51afb0c1777ab1a597a5a4399f4f4b3c896eacbd81ad9037a.json"
+        }
+      },
+      "experience": {
+        "base_commit": "42599ebbbb1228a5bdab381fcf8f4ac20eb8d551",
+        "fix_commit": "ef37eb2f372d385883d113803c98ba0bf3828ad1",
+        "date": "2026-07-20T20:12:34Z",
+        "title": "Fix detached limit.map calls (#108)",
+        "url": "https://github.com/sindresorhus/p-limit/commit/ef37eb2f372d385883d113803c98ba0bf3828ad1",
+        "changed_files": [
+          {
+            "path": "index.js",
+            "status": "modified",
+            "sha": "5ecd39257c623b6dd4df204bbd7c94fbdf0b8d12",
+            "patch_sha256": "edeb6ba0e0416334a8c3d5651306de5d5033bdda8913375b29af0b43bc525eb6"
+          },
+          {
+            "path": "test.js",
+            "status": "modified",
+            "sha": "e303a46c6f9b263089954e13c99dfa32adb27934",
+            "patch_sha256": "555925e55d0e4fadf2e0b73812bad498233695c50d6e2b463ebfee644e9bad47"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/sindresorhus/p-limit/commits/ef37eb2f372d385883d113803c98ba0bf3828ad1",
+          "sha256": "283e464eed29cb6248d0d17c6f2df3cbadc0fe08c953f1ca728ea87c3345d866",
+          "raw": "840370297d0047e93c6a7de1f9bf496197fce951e80101823e8e51727bdafead.json"
+        }
+      },
+      "followup": {
+        "base_commit": "df476048d023ff868cd45b35ee47f5fb0ca2b25a",
+        "fix_commit": "f3e7f9ba364a9357bd912d136367d06c46660917",
+        "date": "2026-08-31T16:47:35Z",
+        "title": "Fix `limitFunction` queue clearing (#109)",
+        "url": "https://github.com/sindresorhus/p-limit/commit/f3e7f9ba364a9357bd912d136367d06c46660917",
+        "changed_files": [
+          {
+            "path": "index.d.ts",
+            "status": "modified",
+            "sha": "1a20857eadff3f14d22cbf94fb740c6e728cb0b8",
+            "patch_sha256": "d83f6c196b23a450217bc4b4169ebf17a13d9e95559520a541b98caddf075b81"
+          },
+          {
+            "path": "index.js",
+            "status": "modified",
+            "sha": "b74d48ab0e37788e657e5ad12d90e281ef1f39d1",
+            "patch_sha256": "194df618b6171630c9b66e1b622e49e0b184ff2b0229a5b6f28fd7ba8efe8352"
+          },
+          {
+            "path": "index.test-d.ts",
+            "status": "modified",
+            "sha": "457778a30d3abf77f9371a2df7e0e20a043ffed1",
+            "patch_sha256": "45abfdff0392b8c2984c35160bed0cc36c5f2ad828e24ac278e154716abe641f"
+          },
+          {
+            "path": "readme.md",
+            "status": "modified",
+            "sha": "64347920c589731fccd568dd3fa4d34e71bee451",
+            "patch_sha256": "d51ccf5dbb2374c783e100371720fd30615961610da1e5cf733b09d40529150b"
+          },
+          {
+            "path": "test.js",
+            "status": "modified",
+            "sha": "356c4d8194eb451df3aa932ab9fc493b51f95833",
+            "patch_sha256": "f5848921ec121d0cbe6329857483c8c59e64d1fe063c44eb3088fdc33f447127"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/sindresorhus/p-limit/commits/f3e7f9ba364a9357bd912d136367d06c46660917",
+          "sha256": "d1a7c10e66484ed68363aa30c171998d7f9b530957d525a685372a69b4339796",
+          "raw": "536dd0483a0ab3c2a807bed6a43f1dac1adc8940f8602e4ce137afa79079e30f.json"
+        }
+      },
+      "relation": "Wrappers must share limiter identity, concurrency and queue lifecycle after destructuring or helper creation.",
+      "relation_kind": "distinct-historical-fix",
+      "ancestry": {
+        "status": "ahead",
+        "ahead_by": 1,
+        "behind_by": 0,
+        "merge_base_commit": "ef37eb2f372d385883d113803c98ba0bf3828ad1",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/sindresorhus/p-limit/compare/ef37eb2f372d385883d113803c98ba0bf3828ad1...df476048d023ff868cd45b35ee47f5fb0ca2b25a",
+          "sha256": "bee20e78e5a0f2c04811c90aaa80d044dd8b2c84b64637cfac63ce0b5a64b152",
+          "raw": "4e387fc201b2c6575cf17fd0f7ea4035df6c2c4f38e4790ce92a9e31038f28ee.json"
+        }
+      },
+      "status": "selected-provenance-verified",
+      "execution": "not-tested",
+      "continuity": "Separate tasks at their exact upstream bases; do not accumulate the experience patch over an unrelated future base. Forward only allowed experience knowledge."
+    },
+    {
+      "id": "octokit-error-shape",
+      "repository": "https://github.com/octokit/request.js.git",
+      "license": {
+        "spdx": "MIT",
+        "path": "LICENSE",
+        "at_commit": "554e1029c40181a73939e6e9c265a72c7cf510ad",
+        "sha256": "511ea01f49c4e15572d1a0dbef3c10f3e26425be79df7ef599c3b65f9bf55281",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/octokit/request.js/license?ref=554e1029c40181a73939e6e9c265a72c7cf510ad",
+          "sha256": "4a04915c68f92d6d04d51f0b036244244156e673425063993b0a3493cdf1ba7d",
+          "raw": "b3026111afd43b95443eb767ec5aa4f71641517e095a623c119b5b1da5fb1301.json"
+        }
+      },
+      "experience": {
+        "base_commit": "f2162d6cea02cf67760d3f4580f0768e5e793844",
+        "fix_commit": "fcc5b25e044a2dd0fb8c1a76390eb6da9aa06d42",
+        "date": "2024-07-14T19:24:47Z",
+        "title": "fix: improve toErrorMessage (#714)",
+        "url": "https://github.com/octokit/request.js/commit/fcc5b25e044a2dd0fb8c1a76390eb6da9aa06d42",
+        "changed_files": [
+          {
+            "path": "src/fetch-wrapper.ts",
+            "status": "modified",
+            "sha": "45cb3610e630f613f4a0da4553029435a0398df0",
+            "patch_sha256": "3a8ec5dd4988f39f3b1c57971b8e34fa6c9aa9775508b50f05657e56ab4fbbec"
+          },
+          {
+            "path": "test/request-native-fetch.test.ts",
+            "status": "modified",
+            "sha": "5b24b80b356889a6add69ce7249822b83055c31e",
+            "patch_sha256": "f35c790ba84bc9ca2c7563487a6584161630230f1c60869d62acea46e63f4670"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/octokit/request.js/commits/fcc5b25e044a2dd0fb8c1a76390eb6da9aa06d42",
+          "sha256": "b8884ad7700dbda46637b532b2f0fbda2064ed49fc9efe658154c12efcefd42f",
+          "raw": "b2a22d420eeef80e169fda1d6eaf32a10948b983fa28d9302f98fc16bf400862.json"
+        }
+      },
+      "followup": {
+        "base_commit": "14cf14444a5032bf0d89b1fd07d88b63860fb77b",
+        "fix_commit": "554e1029c40181a73939e6e9c265a72c7cf510ad",
+        "date": "2026-06-29T22:56:56Z",
+        "title": "fix: handle primitive JSON error bodies without throwing (#820)",
+        "url": "https://github.com/octokit/request.js/commit/554e1029c40181a73939e6e9c265a72c7cf510ad",
+        "changed_files": [
+          {
+            "path": "src/fetch-wrapper.ts",
+            "status": "modified",
+            "sha": "9c010360ab441b1b9991506017289f3afb5a3329",
+            "patch_sha256": "9e883d4cca88cd784ff048dc14249e9d7091fc2455d71a86733e8b9ea9b66b17"
+          },
+          {
+            "path": "test/request.test.ts",
+            "status": "modified",
+            "sha": "dc801a08657a84d3e0be3a2c361d433bba1829de",
+            "patch_sha256": "82953f2aa47859cf706be852a0aec899b88441af4056f062bcd001cf2ca2e62e"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/octokit/request.js/commits/554e1029c40181a73939e6e9c265a72c7cf510ad",
+          "sha256": "38e9bb948ad6444fc93dbfac97080e75ff7bc040f7b6dc1c8b99428dd4001d78",
+          "raw": "7f141c2d43f1c6f8ff9467ffe3f8702a522c1ad427dc6ce189e28145c76b4348.json"
+        }
+      },
+      "relation": "Error-message extraction must respect heterogeneous JSON bodies and preserve HTTP error behavior.",
+      "relation_kind": "distinct-historical-fix",
+      "ancestry": {
+        "status": "ahead",
+        "ahead_by": 64,
+        "behind_by": 0,
+        "merge_base_commit": "fcc5b25e044a2dd0fb8c1a76390eb6da9aa06d42",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/octokit/request.js/compare/fcc5b25e044a2dd0fb8c1a76390eb6da9aa06d42...14cf14444a5032bf0d89b1fd07d88b63860fb77b",
+          "sha256": "1737698d524515ede8876b26d034f98a9bdca85e84f247749224cf4720b566ad",
+          "raw": "0a90ebf40a831c6b047053e2bace8ca93e694ea923257ebfc545612ea441d9bc.json"
+        }
+      },
+      "status": "selected-provenance-verified",
+      "execution": "not-tested",
+      "continuity": "Separate tasks at their exact upstream bases; do not accumulate the experience patch over an unrelated future base. Forward only allowed experience knowledge."
+    },
+    {
+      "id": "octokit-body-dispatch",
+      "repository": "https://github.com/octokit/request.js.git",
+      "license": {
+        "spdx": "MIT",
+        "path": "LICENSE",
+        "at_commit": "facf3cb005675be2f89c59669b65739538697c5e",
+        "sha256": "511ea01f49c4e15572d1a0dbef3c10f3e26425be79df7ef599c3b65f9bf55281",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/octokit/request.js/license?ref=facf3cb005675be2f89c59669b65739538697c5e",
+          "sha256": "a66df23a4815a95d172dae53172bb45cefd32e1e8a0a54f5e356064fd5527687",
+          "raw": "d19039e100c0a80a4fe7f3a6b9983141013cddefb3f2a03e73192bdbf295773e.json"
+        }
+      },
+      "experience": {
+        "base_commit": "14cf14444a5032bf0d89b1fd07d88b63860fb77b",
+        "fix_commit": "554e1029c40181a73939e6e9c265a72c7cf510ad",
+        "date": "2026-06-29T22:56:56Z",
+        "title": "fix: handle primitive JSON error bodies without throwing (#820)",
+        "url": "https://github.com/octokit/request.js/commit/554e1029c40181a73939e6e9c265a72c7cf510ad",
+        "changed_files": [
+          {
+            "path": "src/fetch-wrapper.ts",
+            "status": "modified",
+            "sha": "9c010360ab441b1b9991506017289f3afb5a3329",
+            "patch_sha256": "9e883d4cca88cd784ff048dc14249e9d7091fc2455d71a86733e8b9ea9b66b17"
+          },
+          {
+            "path": "test/request.test.ts",
+            "status": "modified",
+            "sha": "dc801a08657a84d3e0be3a2c361d433bba1829de",
+            "patch_sha256": "82953f2aa47859cf706be852a0aec899b88441af4056f062bcd001cf2ca2e62e"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/octokit/request.js/commits/554e1029c40181a73939e6e9c265a72c7cf510ad",
+          "sha256": "38e9bb948ad6444fc93dbfac97080e75ff7bc040f7b6dc1c8b99428dd4001d78",
+          "raw": "7f141c2d43f1c6f8ff9467ffe3f8702a522c1ad427dc6ce189e28145c76b4348.json"
+        }
+      },
+      "followup": {
+        "base_commit": "554e1029c40181a73939e6e9c265a72c7cf510ad",
+        "fix_commit": "facf3cb005675be2f89c59669b65739538697c5e",
+        "date": "2026-08-01T14:36:00Z",
+        "title": "fix: don't decode application/octet-stream as text when charset is utf-8 (#823)",
+        "url": "https://github.com/octokit/request.js/commit/facf3cb005675be2f89c59669b65739538697c5e",
+        "changed_files": [
+          {
+            "path": "src/fetch-wrapper.ts",
+            "status": "modified",
+            "sha": "14dd0dd9b491743a161a91492ce2dd4d0fac4ba4",
+            "patch_sha256": "ea4d46de4463c39f668e90c18ea474c69f9c77a40f400a9a20353f43cab28dc9"
+          },
+          {
+            "path": "test/request-native-fetch.test.ts",
+            "status": "modified",
+            "sha": "78c0bf644990e69c099680bd564a9cfc97152078",
+            "patch_sha256": "4bd82a945ac1ff900d74030dcac1db4a1028106dc3dccda48676b04547f217a0"
+          }
+        ],
+        "api_evidence": {
+          "url": "https://api.github.com/repos/octokit/request.js/commits/facf3cb005675be2f89c59669b65739538697c5e",
+          "sha256": "9c14432666665df876539ef3e0dbc5c41d6d9d944999bd3b61bc4297a1aec0e7",
+          "raw": "2d4c05f3739865ccdcb6d3b9c5454209af5f765b85aec2d1adae74c52c8bf604.json"
+        }
+      },
+      "relation": "Response-body parsing follows media type and actual body shape; adjacent fixes have distinct causes.",
+      "relation_kind": "distinct-historical-fix",
+      "ancestry": {
+        "status": "identical",
+        "ahead_by": 0,
+        "behind_by": 0,
+        "merge_base_commit": "554e1029c40181a73939e6e9c265a72c7cf510ad",
+        "api_evidence": {
+          "url": "https://api.github.com/repos/octokit/request.js/compare/554e1029c40181a73939e6e9c265a72c7cf510ad...554e1029c40181a73939e6e9c265a72c7cf510ad",
+          "sha256": "eebe6c3d9d0a4848485dd8d7ba76aebb2d83afea4dc1ecb3eec520a78ebef211",
+          "raw": "6d3d43d20316f0fd931f748c4f7ebae309dd551c930ad9e98567cf6fef27843f.json"
+        }
+      },
+      "status": "selected-provenance-verified",
+      "execution": "not-tested",
+      "continuity": "Separate tasks at their exact upstream bases; do not accumulate the experience patch over an unrelated future base. Forward only allowed experience knowledge."
+    }
+  ]
+}

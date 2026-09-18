@@ -25,7 +25,7 @@
       {
         "path": ".agents/knowledge/decisions/adr-014-shared-cache.md",
         "role": "decision",
-        "content": "---\nstatus: accepted\n---\n# Shared cache authority\nCache state is authoritative only in the shared service.\n"
+        "content": "---\nkind: decision\nid: adr-014-shared-cache\nstatus: accepted\ndate: 2026-09-15\nscope:\n  - \"src/cache/**\"\nsupersedes: null\n---\n# Shared cache authority\nCache state is authoritative only in the shared service.\n"
       }
     ],
     "assertions": [

@@ -1,0 +1,80 @@
+{
+  "starting_commit": "7b608e32412a50a8dcab7f37a89fce4c1ef86548",
+  "current_commit": "7b608e32412a50a8dcab7f37a89fce4c1ef86548",
+  "baseline": {
+    "file_count": 18,
+    "skill_lines": 337,
+    "skill_bytes": 16721,
+    "skill_characters": 16721,
+    "skill_tokens": {
+      "status": "not-measured",
+      "value": null
+    },
+    "bundle_bytes": 404558,
+    "sha256": "85afa6e07126f7c815356c9ccb2cda1ff0f72ba0f78848be18cafe945213a512",
+    "files": {
+      "SKILL.md": "4e19eaae001b005d81b092eb83672ee9a0d365ad909eddff2289895c42c4fbc3",
+      "agents/openai.yaml": "4413ee2ae7b9e9dadd03957da9a705e330504e660d7579a29b8492833a8ab3a2",
+      "references/adapters/context-recovery.mjs": "52b5df26b92088a70d73284376b6a6e92ae69e5d15bc0a555ad23926e1a1d58e",
+      "references/adapters/opencode-plugin.mjs": "49b461283467a7a2efdb33f8be2f533a89cef75c35bdf9bcfdada87e6a025d5f",
+      "references/adapters/post-task-reminder.mjs": "f16ec94c26b85d88570e8a7fcbdbcbdb41c6bdb68c733ddf9ac16f05f5eb001b",
+      "references/audit.md": "dd818c43f737deb202339bed601122fa511dd3e58c50fd35f2efbfcecaff690c",
+      "references/bin/kb.mjs": "96ad0fde0c34535f29115199f24440e16fa74506dea47c120e3df37bb9b84daf",
+      "references/data-model.md": "2ee8d03406726f4109732cfdaa25de378f3c5bb94d76c356617cf52f02356766",
+      "references/schemas/decision.schema.json": "ba08ef24333760ace92fc07ff7a2c9f20139ac3eba9812638659429b18e3d814",
+      "references/schemas/guide.schema.json": "e68ed1f7f7a468c01d94da5acf27f9a49f20dcb3ccc5b92a3fd5466395394a59",
+      "references/schemas/index.schema.json": "7e6cd7d7e70c4da9d74aa53b95a524f330cdbe943c47f270dde8dc478ec8e368",
+      "references/schemas/settings.schema.json": "2417b025e1ac284e5c6737b8df8024f9aa78038a4753425539f139f7ed6a7a98",
+      "references/templates/agents.md": "c54f80207950ab974070d5915c0decad871fd2fea80a4809b01b5134c4c2e947",
+      "references/templates/decision.md": "e443a07f4efa0e22fce77d0f14fa895f5d6d9cc5ac88c2cb089ca5d9e6f9dde7",
+      "references/templates/guide.md": "77e4e83e596c718d8953b2a883b84b5667e7f0d8ccc052a66320d445415d7bc2",
+      "references/templates/index.yaml": "fafed291ec91f6430275fbfc7aeeb76159f8585f57affc4c72e8a6dead2c98e4",
+      "references/templates/observation-monthly.md": "84974d4f564ec3fb1473b90b4fe9f2aee947bd7ee593814009ffecd145296b62",
+      "references/templates/settings.yaml": "6f866135226ce9d568c2e535330f2af4ba26cad16ce92ea47b4d5bd70efb093f"
+    }
+  },
+  "candidate": {
+    "file_count": 20,
+    "skill_lines": 329,
+    "skill_bytes": 15973,
+    "skill_characters": 15973,
+    "skill_tokens": {
+      "status": "not-measured",
+      "value": null
+    },
+    "bundle_bytes": 415954,
+    "sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+    "files": {
+      "SKILL.md": "c0993a3bb0269b7b0d2fade94886eb6b110eb9b518f4cb82d2d686db8fa91293",
+      "agents/openai.yaml": "4413ee2ae7b9e9dadd03957da9a705e330504e660d7579a29b8492833a8ab3a2",
+      "references/adapters/context-recovery.mjs": "52b5df26b92088a70d73284376b6a6e92ae69e5d15bc0a555ad23926e1a1d58e",
+      "references/adapters/opencode-plugin.mjs": "49b461283467a7a2efdb33f8be2f533a89cef75c35bdf9bcfdada87e6a025d5f",
+      "references/adapters/post-task-reminder.mjs": "f16ec94c26b85d88570e8a7fcbdbcbdb41c6bdb68c733ddf9ac16f05f5eb001b",
+      "references/audit.md": "dd818c43f737deb202339bed601122fa511dd3e58c50fd35f2efbfcecaff690c",
+      "references/bin/kb.mjs": "c5fa634e8937deadc68c3234567bfe2dd75e68848b0e33d045573fad443a540b",
+      "references/continuation.md": "00a97898f78f3f2b5822cb813be6cde1d2d051f5bdf7e1da59f6d86ed2a4d4b1",
+      "references/data-model.md": "e2212d469adb5acc117bba7641dea00f996d6bb5b55e41494aa6cb1da3c85a71",
+      "references/schemas/decision.schema.json": "ba08ef24333760ace92fc07ff7a2c9f20139ac3eba9812638659429b18e3d814",
+      "references/schemas/guide.schema.json": "e68ed1f7f7a468c01d94da5acf27f9a49f20dcb3ccc5b92a3fd5466395394a59",
+      "references/schemas/index.schema.json": "7e6cd7d7e70c4da9d74aa53b95a524f330cdbe943c47f270dde8dc478ec8e368",
+      "references/schemas/settings.schema.json": "2417b025e1ac284e5c6737b8df8024f9aa78038a4753425539f139f7ed6a7a98",
+      "references/templates/agents.md": "c54f80207950ab974070d5915c0decad871fd2fea80a4809b01b5134c4c2e947",
+      "references/templates/continuation.md": "d2e0fa3efab1b14cb936fb316c4b8d8cf3f2d1e87dcf74ca9b9e2590ea3138f9",
+      "references/templates/decision.md": "7012f095f488913d3a31f7c16ae56fcd9458b816bb9f4e9b29ca3ee99c0d3b10",
+      "references/templates/guide.md": "ef98cee5d0a0783d95e10e45c4d601bbe41750358fb40ce51851cc601cf6208d",
+      "references/templates/index.yaml": "fafed291ec91f6430275fbfc7aeeb76159f8585f57affc4c72e8a6dead2c98e4",
+      "references/templates/observation-monthly.md": "84974d4f564ec3fb1473b90b4fe9f2aee947bd7ee593814009ffecd145296b62",
+      "references/templates/settings.yaml": "6f866135226ce9d568c2e535330f2af4ba26cad16ce92ea47b4d5bd70efb093f"
+    }
+  },
+  "runtime": {
+    "default_files": 3,
+    "adapters_default": 0,
+    "new_runtime_dependencies": 0,
+    "new_services": 0
+  },
+  "validation_environment": {
+    "windows_node": "v24.20.0",
+    "platform": "win32"
+  }
+}

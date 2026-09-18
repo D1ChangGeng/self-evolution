@@ -1,0 +1,1980 @@
+{
+  "aggregate": {
+    "arms": {
+      "B5": {
+        "all_attempts": {
+          "elapsed_ms": {
+            "status": "measured",
+            "unit": "ms",
+            "value": 196895
+          },
+          "input_tokens": {
+            "status": "not-measured",
+            "unit": "tokens",
+            "value": null
+          }
+        },
+        "amortized_per_success_ms": {
+          "status": "measured",
+          "unit": "ms/success",
+          "value": 8203.958333333334
+        },
+        "attempts": 24,
+        "successes": 24
+      }
+    },
+    "inference": "Small samples diagnose regressions; repeated attempts are not independent tasks. Aggregate by episode/pair and repository. No significance or non-inferiority claim follows from these totals.",
+    "paired_both_successful": []
+  },
+  "evidence_class": "fake-cli-orchestration",
+  "plan_sha256": "040e7504a37252846bd67e6ca4fbe50cf319b0918664b60205472dc3dbae3ca9",
+  "policy_sha256": "07255147ebc2990668250bd29b217c9cb2846ca97356f7d8532fabecf60ee8aa",
+  "release_ready": false,
+  "results": [
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 2,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C01-A",
+        "episode_sha256": "7d002a3da4c791f86fad7480f6943bb4de36df0e07a3bf5a3a51348417b54e8e",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "07255147ebc2990668250bd29b217c9cb2846ca97356f7d8532fabecf60ee8aa",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 693
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 9427
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 2
+        }
+      },
+      "episode_id": "C01-A",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "33505189ecef84416178f33fba86cdeb3c3ef83c3cdacff8b8f8a252771e2329",
+      "evidence_path": "C01-A-B5-1/evidence",
+      "session_count": 2,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 2,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C01-B",
+        "episode_sha256": "7ff0dd6eae8890c07b1feb7be901a5b5db5c33b0aba9c20c23c9ed90578047ac",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "07255147ebc2990668250bd29b217c9cb2846ca97356f7d8532fabecf60ee8aa",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 718
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 10467
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 2
+        }
+      },
+      "episode_id": "C01-B",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "1c4f36a080f3fe9b0b0f48499ccdf52aa49e60793d46336fa240d1b87c02e15a",
+      "evidence_path": "C01-B-B5-1/evidence",
+      "session_count": 2,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 1,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C02-A",
+        "episode_sha256": "90d2022c0a4c4e6beecaf52c3cb245b3b982397beb5a99685127c6b9ca64d735",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "07255147ebc2990668250bd29b217c9cb2846ca97356f7d8532fabecf60ee8aa",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 277
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 5097
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 1
+        }
+      },
+      "episode_id": "C02-A",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "9e5d6145ee858c385b1aa72f169feb87a0d7e0d2daa9ba2ea4663f4c1998c010",
+      "evidence_path": "C02-A-B5-1/evidence",
+      "session_count": 1,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 1,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C02-B",
+        "episode_sha256": "d97dede5817516f38bc10147f53bfb4125a83f7916219b905ef28a0227aa5886",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "07255147ebc2990668250bd29b217c9cb2846ca97356f7d8532fabecf60ee8aa",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 381
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 6529
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 1
+        }
+      },
+      "episode_id": "C02-B",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "f04493db95931ff28c7ffb0e0362f81a86f6ab9a5ea11c5a5baeaeba4969aa58",
+      "evidence_path": "C02-B-B5-1/evidence",
+      "session_count": 1,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 1,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C03-A",
+        "episode_sha256": "124dc2b05015c6b352b80e7310300356bf3218fa68a19703379527d9a4b9c26f",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "8b203743eed7c3123223f7c3ebe7e6a6db7d0b7003f0dada27bc172f0d0f5fac",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 740
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 5554
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 1
+        }
+      },
+      "episode_id": "C03-A",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "799b06f08ae9877cf7f5f95ec24d3c488fcb413a904e17ef58d1553e4d76ec01",
+      "evidence_path": "C03-A-B5-1/evidence",
+      "session_count": 1,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 1,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C03-B",
+        "episode_sha256": "af18c627f8eb8209d74f40789cdbe6b612db89f981cbf7b30ad4fa53c7e28588",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 316
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 6480
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 1
+        }
+      },
+      "episode_id": "C03-B",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "1784791975d16c32a8e969b63c936a82527347ce41c5b611543afc4423625041",
+      "evidence_path": "C03-B-B5-1/evidence",
+      "session_count": 1,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 2,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C04-A",
+        "episode_sha256": "1e64abacace833cc32415ef0b171d25f01afb419a8fa0f3e398a1f61c23af132",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 940
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 6738
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 372
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 3
+        }
+      },
+      "episode_id": "C04-A",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "3d1c56698d46f526898563362c2e10ae277c4cd95a528bc7afc2773383f09297",
+      "evidence_path": "C04-A-B5-1/evidence",
+      "session_count": 2,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 1,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C04-B",
+        "episode_sha256": "a62bb0f5ef1e373f898cf511fc075aa44ee5463ec47e535091db34d1e064290c",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 426
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 6687
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 1
+        }
+      },
+      "episode_id": "C04-B",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "1c02dd18f296818add8982736f6f0f5ff773a027c78032d62023f872d685088b",
+      "evidence_path": "C04-B-B5-1/evidence",
+      "session_count": 1,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 1,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C05-A",
+        "episode_sha256": "75d15f333494a315329c9f728dc1fcadc71e8cb48f29ab965d70bb5815ee3da6",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 398
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 6268
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 1
+        }
+      },
+      "episode_id": "C05-A",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "e927ced55aa0fcd4643ec5bd8d99d48bc45a10e4467653b8a8862e40accc7b77",
+      "evidence_path": "C05-A-B5-1/evidence",
+      "session_count": 1,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 1,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C05-B",
+        "episode_sha256": "fe332145b8fda85547a93ec7ceaffbac18aff159bd5e6cc606c427f6facd653d",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 338
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 5927
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 1
+        }
+      },
+      "episode_id": "C05-B",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "332e96729df15f3f07a79d1014ba07945ddbd74b016677f427d2e0f26d5df872",
+      "evidence_path": "C05-B-B5-1/evidence",
+      "session_count": 1,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 3,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C06-A",
+        "episode_sha256": "b50bc5ba4e521d78d1a3106d8cd0d1b0f2f7251d1ee70d31a8569fb993aa4ed0",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 1246
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 11843
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 4
+        }
+      },
+      "episode_id": "C06-A",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "7585bb99f3e6c44bc88b70dd51e444eb8d58f3bf5de160a03d7b9587188c9d03",
+      "evidence_path": "C06-A-B5-1/evidence",
+      "session_count": 3,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 3,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C06-B",
+        "episode_sha256": "6165598f2fab16762c221415433ef7fa61ce94f8a82c9c8fcf8d2611e2b5a1c0",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 3521
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 19435
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 4
+        }
+      },
+      "episode_id": "C06-B",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "5d01b1bd160688ef3d0b9443f1f9c2416e6a91112bfa63a2aaea5686a70b712d",
+      "evidence_path": "C06-B-B5-1/evidence",
+      "session_count": 3,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 2,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C07-A",
+        "episode_sha256": "70d58dd0d8837a786bd1adecfd4d107b889dc575e6dea661f889c80bed68a205",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 1002
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 11144
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 2
+        }
+      },
+      "episode_id": "C07-A",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "a44c510276c92214790db7ed1d809bf368cbdadac15b304d7f6923e1ee309227",
+      "evidence_path": "C07-A-B5-1/evidence",
+      "session_count": 2,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 2,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C07-B",
+        "episode_sha256": "ad2dc2eef14a1300974b9b6b7b6391ab65c72374b36b111df9fe6aaef0c45b31",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 549
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 14002
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 2
+        }
+      },
+      "episode_id": "C07-B",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "4081d206e0af167a6a7c514154ad030ff2d4c57d10d8804e5656103929f3c9c7",
+      "evidence_path": "C07-B-B5-1/evidence",
+      "session_count": 2,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 2,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C08-A",
+        "episode_sha256": "03a6b7764f0400cd3acd33efe267936e9326f1f791170130f9375573816da84f",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 1060
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 12143
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 2
+        }
+      },
+      "episode_id": "C08-A",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "17db7a247dd43f459d040fa9c3b614c034f4f6dd990d0f7f63ab22fa4da4ca70",
+      "evidence_path": "C08-A-B5-1/evidence",
+      "session_count": 2,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 1,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C08-B",
+        "episode_sha256": "4d2c4824d9647e981c5fb28b1728364df61fcf25006c533c9d966ac834e4b6e7",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 392
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 6452
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 1
+        }
+      },
+      "episode_id": "C08-B",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "bfff98a324c645e50a7aee58032f95b36dbf59d65d5899e2d5938d0771ffc8d0",
+      "evidence_path": "C08-B-B5-1/evidence",
+      "session_count": 1,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 1,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C09-A",
+        "episode_sha256": "ac1de6db427653f26f841d7a0c7341031ab1b6887cd6d2ea99512e5f5f19b5e3",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 356
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 5923
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 1
+        }
+      },
+      "episode_id": "C09-A",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "1696acb59fc43ef621806159fecf44ebb38377de3276a2fd769d7e28743f052d",
+      "evidence_path": "C09-A-B5-1/evidence",
+      "session_count": 1,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 1,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C09-B",
+        "episode_sha256": "171c207584040a7eddea3816e4af59b16458669d5fa79be4275dbb76fd63c66b",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 328
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 4491
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 1
+        }
+      },
+      "episode_id": "C09-B",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "92ef6bd09468e34f561506bafdce296daa702c93066d94a7ff0685aae38bb5fc",
+      "evidence_path": "C09-B-B5-1/evidence",
+      "session_count": 1,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 1,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C10-A",
+        "episode_sha256": "eb7a499a04a5284cbf0a304b9eed9ae541a1edb935c18550877fdf76b0510ecb",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 312
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 4817
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 1
+        }
+      },
+      "episode_id": "C10-A",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "253f73658299f6fd195abc7d3471714897dc7e598258d219cbf888edb8d07831",
+      "evidence_path": "C10-A-B5-1/evidence",
+      "session_count": 1,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 2,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C10-B",
+        "episode_sha256": "a648101dbb4c26b66763c5afe0b71f661fc71e6bec8fe6cb8cdc4c20b7972751",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 852
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 11249
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 344
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 3
+        }
+      },
+      "episode_id": "C10-B",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "bc99d8b3130bd1ec411e38b35285153bf329677279f0bae0140e0c479d3fd79f",
+      "evidence_path": "C10-B-B5-1/evidence",
+      "session_count": 2,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 2,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C11-A",
+        "episode_sha256": "16e0f797559dfa0e64e06e24911008f5669c8c80d6d935ef60cb6c26aa24cda6",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 794
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 9900
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 2
+        }
+      },
+      "episode_id": "C11-A",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "e867b7ec584fb169d3bb72d165cdc1324fe9e43a7a47b449c5ceed7cfc6d9df9",
+      "evidence_path": "C11-A-B5-1/evidence",
+      "session_count": 2,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 2,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C11-B",
+        "episode_sha256": "c6e003a1eaa3721b52571ee474474d1614565a5a1d241ef1e4a0e265a2abc081",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 328
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 7930
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 2
+        }
+      },
+      "episode_id": "C11-B",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "5564acadeabfe1fb5faf5e6461c7bf74a53a0d2bed970a2730291f5216c36ca0",
+      "evidence_path": "C11-B-B5-1/evidence",
+      "session_count": 2,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 1,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C12-A",
+        "episode_sha256": "17f798a3c8bc6815fcd180f15afd4015c377cdfbe88fc7195e91af43fdec6bfd",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 166
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 3874
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 1
+        }
+      },
+      "episode_id": "C12-A",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "99b21c70060c71404976327cc72222819c1a2d848df29aecc0091fdcdb717cac",
+      "evidence_path": "C12-A-B5-1/evidence",
+      "session_count": 1,
+      "status": "pass"
+    },
+    {
+      "arm": "B5",
+      "binding": {
+        "arm": "B5",
+        "attempt": 1,
+        "budget": {
+          "max_sessions": 2,
+          "session_timeout_ms": 20000
+        },
+        "episode_id": "C12-B",
+        "episode_sha256": "c35ed044e2fcb9888d1f68fda3ddd6361da1f5b8c425eee7e9d4797c814b1c0f",
+        "evidence_class": "fake-cli-orchestration",
+        "experiment": "equal-information",
+        "harness": "fake",
+        "isolation": "controlled-fake-processes",
+        "model": "not-measured",
+        "policy": "engineering-policy/1.0.0",
+        "policy_sha256": "2883f1a7e4f0215b1e87791bc6db0bd7a8c1159b304c501e2656c6bbe4f2ab18",
+        "schema": "engineering-run-binding/1",
+        "subject_sha256": "8b882927799c35b352b9d18e9f75da29995ada3b6a2a5d7ab7d34a9818003c83",
+        "toolchain_sha256": "e1795780760a50de2c318b2a2e0a1db9262e8d3b217eb970ca44752bfddea352"
+      },
+      "cost": {
+        "cached_input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "duration_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 344
+        },
+        "end_to_end_ms": {
+          "status": "measured",
+          "unit": "ms",
+          "value": 4518
+        },
+        "exploration_repeats": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "input_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "knowledge_bytes_added": {
+          "status": "measured",
+          "unit": "bytes",
+          "value": 0
+        },
+        "output_tokens": {
+          "status": "not-measured",
+          "unit": "tokens",
+          "value": null
+        },
+        "price": {
+          "status": "not-measured",
+          "unit": "currency",
+          "value": null
+        },
+        "rework_events": {
+          "status": "not-measured",
+          "unit": "events",
+          "value": null
+        },
+        "tool_calls": {
+          "status": "measured",
+          "unit": "calls",
+          "value": 2
+        }
+      },
+      "episode_id": "C12-B",
+      "evidence_class": "fake-cli-orchestration",
+      "evidence_manifest_sha256": "94a3a8bcd5aaeaf92e6a8e6738419b73fe5ac9a8c6bac05e1fc439bb350f7f5b",
+      "evidence_path": "C12-B-B5-1/evidence",
+      "session_count": 2,
+      "status": "pass"
+    }
+  ],
+  "schema": "engineering-campaign/1"
+}

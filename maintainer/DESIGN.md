@@ -166,6 +166,13 @@ consumer, read point, decision effect, lifecycle, and deletion rule.
 
 ## Release profiles
 
+`engineering-policy/1.0.0` adds the `continuity` profile: existing deterministic
+safety gates plus fresh paired engineering outcome evidence. LongMemEval remains
+diagnostic in that profile. The standard/private profiles retain historical
+requirements and additionally require engineering continuity on core/routing
+changes. See `evals/engineering/POLICY.md`; offline fixture success never proves
+model-effectiveness or real lifecycle integration.
+
 Release evidence is matched to change impact. The standard profile requires the
 deterministic safety gates plus the independent public benchmark and changed
 path checks selected by `docs`, `routing`, `core`, or `migration`. The private

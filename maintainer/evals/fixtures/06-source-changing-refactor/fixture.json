@@ -22,7 +22,7 @@
       {
         "path": ".agents/knowledge/guides/payments.md",
         "role": "knowledge",
-        "content": "---\nsources:\n  - path: src/payments/index.ts\n    checked_at: sha256:0000000000000000000000000000000000000000000000000000000000000000\n---\n# Payments\nThe limit was 10 at the recorded source baseline.\n"
+        "content": "---\nkind: guide\nstatus: active\nscope:\n  - \"src/payments/**\"\nuse_when:\n  - \"changing payment limits\"\nsources:\n  - path: \"src/payments/index.ts\"\n    checked_at: \"sha256:0000000000000000000000000000000000000000000000000000000000000000\"\n---\n# Payments\nThe limit was 10 at the recorded source baseline.\n"
       },
       {
         "path": "test/fixture.test.mjs",

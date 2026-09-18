@@ -38,6 +38,15 @@ benchmark and small cross-harness engineering campaign under
 separate, optional private profile. Read `maintainer/evals/SPEC.md` and the
 current `maintainer/evals/public/RESULTS-1302-1.md` for exact scope and status.
 
+For the continuity upgrade, `maintainer/evals/engineering/` is the executable
+24-scenario engineering system. The old public six-task campaign is explicitly
+read-only/manual-activation smoke. Use `--profile=continuity` for L0 plus current
+paired engineering evidence; standard/private retain old requirements and add
+engineering continuity for core/routing. Missing real model, native-memory or
+OS isolation evidence keeps the applicable profile pending/blocked. Read the
+versioned engineering policy before preparing a campaign. Existing source
+baselines below are historical review anchors, not evidence for this new tree.
+
 Every numeric integrated result is derived from referenced, hashed raw
 artifacts. Cached totals are checked against that derivation. Missing or
 malformed measurement sources remain `not-measured`; they are never converted
@@ -97,6 +106,7 @@ For repository changes, run:
 npm ci
 npm run ci
 npm run eval:external:test
+npm run eval:engineering:test
 ```
 
 Before publication, inspect the exact staged tree, confirm the current Skill

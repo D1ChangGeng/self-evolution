@@ -2,6 +2,17 @@
 
 ## Task Matrix
 
+The September 2026 `engineering-policy/1.0.0` extension adds an explicit
+`continuity` profile and a fresh engineering gate to core/routing changes.
+The executable matrix is `engineering/episodes.json`: 24 real patch scenarios,
+six configurable arms, three-session L3 refactors and an L2 external adapter.
+Use `node maintainer/evals/run.mjs --release --profile=continuity` to require
+L0 plus fresh paired engineering evidence. Public QA is a visible diagnostic in
+that profile. Existing standard/private profiles retain their previous public
+or historical integrated requirements; no historical evidence is relabeled.
+Read `engineering/POLICY.md` before recording a new campaign. A green offline
+suite proves evaluator and product structural behavior, not model effectiveness.
+
 The release suite covers:
 
 1. cross-module defect repair;

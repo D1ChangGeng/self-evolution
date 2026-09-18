@@ -19,6 +19,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - run: npm install --global npm@10.9.2
       - run: npm ci
       - run: npm run typecheck
@@ -26,6 +29,8 @@ jobs:
       - run: npm run format:check
       - run: npm run test
       - run: npm run check:bundle
+      - run: npm run eval:engineering:test
+      - run: python -m unittest discover -s maintainer/evals/public -p test_workspace_snapshot.py -v
       - run: npm run eval
       - name: Installed skill CLI smoke test
         shell: bash

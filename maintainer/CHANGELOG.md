@@ -5,6 +5,19 @@ recorded here. Versions follow semantic versioning.
 
 ## [Unreleased]
 
+- Separate historical Decision identity from current routes, validate supersession
+  cycles/current authority, and allow same-scope Guides with distinct consumers.
+- Add bounded source review details and a guarded `kb write` command with
+  expected digest, Windows/Linux process locking and interrupted-temp recovery.
+- Add optional portable continuation/1 guidance and templates; keep default
+  three-file initialization, runtime dependencies and adapter defaults unchanged.
+- Remove consumer recommendation and QA-specific standing Skill instructions.
+- Cover full smoke workspaces, executable versions and real schema samples.
+- Add 24 executable engineering scenarios, six arm preparation paths, 8 public
+  history pairs, L3 refactors, process transfer/error tests, raw cost/evidence
+  derivation and the explicit continuity release profile. Model effectiveness
+  and host compatibility remain pending until their real evidence is present.
+
 ## [2.0.0] - 2026-09-13
 
 The v2 project-wiki contract now separates task continuity, durable project

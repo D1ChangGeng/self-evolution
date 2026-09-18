@@ -30,7 +30,7 @@
       {
         "path": ".agents/knowledge/guides/payments.md",
         "role": "knowledge",
-        "content": "# Payments\nOnly applies to src/payments/**.\n"
+        "content": "---\nkind: guide\nstatus: active\nscope:\n  - \"src/payments/**\"\nuse_when:\n  - \"changing payment behavior\"\n---\n# Payments\nOnly applies to src/payments/**.\n"
       }
     ],
     "assertions": [

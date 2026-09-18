@@ -1,6 +1,6 @@
 import { relative, resolve } from "node:path";
 import { stringify } from "yaml";
-import { listFiles, readText, toPosix } from "./fs.js";
+import { assertNoSymlinks, listFiles, readText, toPosix } from "./fs.js";
 import { markdownTitle, parseMarkdown } from "./markdown.js";
 import {
   isCurrentDecision,
@@ -22,6 +22,7 @@ export type KnowledgeDocument = {
   body: string;
   data: GuideFrontmatter | DecisionFrontmatter;
   type: "guide" | "decision";
+  archived?: boolean;
 };
 
 export async function readKnowledgeDocuments(projectRoot: string): Promise<{
@@ -29,9 +30,11 @@ export async function readKnowledgeDocuments(projectRoot: string): Promise<{
   diagnostics: Diagnostic[];
 }> {
   const knowledgeRoot = resolve(projectRoot, ".agents/knowledge");
+  await assertNoSymlinks(projectRoot, knowledgeRoot);
   const files = [
     ...(await listFiles(resolve(knowledgeRoot, "guides"))),
     ...(await listFiles(resolve(knowledgeRoot, "decisions"))),
+    ...(await listFiles(resolve(knowledgeRoot, "archive"))),
   ].filter((path) => path.toLowerCase().endsWith(".md"));
   files.sort((left, right) => left.localeCompare(right, "en"));
   const documents: KnowledgeDocument[] = [];
@@ -40,9 +43,14 @@ export async function readKnowledgeDocuments(projectRoot: string): Promise<{
   for (const absolutePath of files) {
     const path = toPosix(relative(knowledgeRoot, absolutePath));
     const parsed = parseMarkdown(await readText(absolutePath), path);
+    const archived = path.startsWith("archive/");
+    // Archive may also contain unstructured observations. Only structured
+    // Decisions participate in historical identity and relation validation.
+    if (archived && parsed.data.kind !== "decision") continue;
     diagnostics.push(...parsed.diagnostics);
     if (parsed.diagnostics.length > 0) continue;
-    const expected = path.startsWith("decisions/") ? "decision" : "guide";
+    const expected =
+      archived || path.startsWith("decisions/") ? "decision" : "guide";
     if (expected === "decision") {
       const validation = validateDecision(parsed.data, path);
       diagnostics.push(...validation.diagnostics);
@@ -54,6 +62,7 @@ export async function readKnowledgeDocuments(projectRoot: string): Promise<{
           body: parsed.body,
           data: validation.value,
           type: "decision",
+          ...(archived ? { archived: true } : {}),
           ...(title ? { title } : {}),
         });
       }
@@ -80,6 +89,7 @@ export function buildIndexDocuments(
   documents: KnowledgeDocument[],
 ): IndexDocument[] {
   return documents
+    .filter((document) => !document.archived)
     .filter((document) =>
       document.type === "guide"
         ? isCurrentGuide(document.data as GuideFrontmatter)

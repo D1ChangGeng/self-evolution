@@ -1,0 +1,19 @@
+{
+  "schema": "engineering-l3/1",
+  "chains": [
+    {
+      "id": "C06-A",
+      "sessions": 3,
+      "invariant": "sum named/default exports preserved across core extraction, facade replacement and summary feature",
+      "variants": ["C06-A"],
+      "status": "offline-executable"
+    },
+    {
+      "id": "C06-B",
+      "sessions": 3,
+      "invariant": "forced interruption preserves uncommitted extraction; facade and summary resume with original API",
+      "variants": ["C06-B"],
+      "status": "offline-executable-real-model-run-pending"
+    }
+  ]
+}

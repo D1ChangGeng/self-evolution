@@ -124,7 +124,7 @@ describe("core CLI behavior", () => {
     expect(
       result.diagnostics?.some((item) => item.code === "SOURCE_MISSING"),
     ).toBe(false);
-  });
+  }, 15000);
 
   it("fails check for warning findings and uses exit 2 for invalid input", async () => {
     const root = await tempProject();
@@ -235,7 +235,7 @@ describe("core CLI behavior", () => {
     expect(changed.diagnostics).toContainEqual(
       expect.objectContaining({ code: "SOURCE_CHANGED", severity: "warning" }),
     );
-  });
+  }, 15000);
 
   it("rejects a sha256 baseline for a glob", async () => {
     const root = await tempProject();

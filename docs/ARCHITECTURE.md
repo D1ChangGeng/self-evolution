@@ -100,7 +100,7 @@ sources:
 ```
 
 `kind` is one of `guide`, `runbook`, `map`, or `policy`. Current Guide statuses
-are `draft` and `active`; non-current statuses are `superseded` and `retired`.
+include `draft`, `active`, `superseded` and `retired`; only `active` is consumed.
 Scope and use conditions are required because a document without a future
 consumer is maintenance cost, not project context.
 
@@ -138,6 +138,11 @@ retires entries as their future value becomes clear.
 Archive is excluded from current retrieval. It exists for material history,
 audit, and migration traceability. A status change plus archive move must not
 leave current routing pointed at the old document.
+
+Structured archived Decisions remain in the historical ID/relation set. They
+cannot become current index entries. Duplicate IDs, dangling/self/cyclic
+supersession and inconsistent current authority remain deterministic errors.
+Historical scope or source disappearance is not a current routing violation.
 
 ### Generated Index
 
@@ -185,6 +190,12 @@ relevant routes before acting. Short tasks do not need a separate task record.
 The wiki stores cross-task facts and adopted choices, while maintainer files
 store changes to the distributed skill and its evaluation policy.
 
+A portable `continuation/1` Markdown packet is optional task state, produced
+only when existing host/task records cannot serve a handoff. It identifies the
+repository, worktree, base and actual authorized transfer bytes, with verified
+claims, uncertainty and next checks. See the distributed continuation guide.
+Receivers preserve mismatched work and revalidate rather than resetting branches.
+
 Feedback follows `orient -> plan -> execute -> verify -> adjust or roll back ->
 close`. A failed check changes the task plan or local change first. It is
 promoted to project knowledge only when the result has a future consumer and
@@ -227,6 +238,11 @@ The bundled Node.js CLI may:
 - check paths, local links, scopes, IDs, and adapter state;
 - compare declared local source baselines;
 - perform atomic writes and staged migration.
+- protect participating `write` and `index` operations with a short per-worktree
+  OS lock on Windows/Linux. The expected document digest is checked inside the
+  protected write section. Direct editor, migration and adapter mutations retain
+  their separate ownership/Git checks. Other platforms retain ordinary index
+  rebuilding and report guarded writes as unavailable.
 
 It may report `SOURCE_CHANGED`, `SOURCE_MISSING`, or
 `SOURCE_BASELINE_UNAVAILABLE`. Semantic interpretation of correctness, value,

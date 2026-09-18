@@ -25,8 +25,13 @@ Explain the non-obvious model needed to act correctly. Point to primary sources.
 
 ## Known Failure Modes
 
-Describe concrete failures, their mechanism, and how to avoid or detect them.
+Record trigger, applicable conditions, observed symptom, evidence, changed action
+and recovery verification. Keep unconfirmed causes uncertain. Name when changed
+conditions permit reconsideration; a past failure is not a permanent prohibition.
 
 ## Verification
 
-State how to verify material behavior and which boundaries remain unchecked.
+Link the smallest current regression test, type/interface or dependency check
+that enforces the lesson. State the command, expected behavior, applicable
+revision and unchecked boundaries. Put executable constraints in code/tests;
+keep reasons and navigation here. A historical pass needs a new run on a new tree.

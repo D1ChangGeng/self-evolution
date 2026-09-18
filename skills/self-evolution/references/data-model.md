@@ -225,6 +225,29 @@ material.
 
 ## Lifecycle, conflicts, and retirement
 
+The CLI resolves Decision IDs across `decisions/` and structured Decisions in
+`archive/`, including non-current records. Archive never enters the normal index.
+Unstructured historical notes remain unindexed. Accepted Decisions belong in the
+current tree; their accepted replacements require the old status `superseded`.
+Duplicate IDs, dangling relations, self-supersession, cycles and competing
+accepted replacements are errors. Proposed replacements do not retire policy.
+
+Route comparison concerns active Guides only. Same scope with a different
+`kind` or `use_when` is allowed. Identical scope/purpose/consumer metadata emits
+`DUPLICATE_ROUTING` as a review warning; it does not establish semantic conflict.
+Draft, retired, rejected and superseded content is not routine source/scope/link
+review, but its structured metadata and historical relations remain validated.
+
+Source diagnostics retain code, severity, path and message, and add optional
+`details`: source baseline, up to 32 sorted unique changed paths, omitted count,
+existing body links, review direction and limits. Links are supplied navigation,
+not proof that a test was executed. SHA-256 reads regular local files; symlink
+and unavailable Git baselines are reported without following external targets.
+Deletion stays `SOURCE_MISSING`; an unavailable revision can be reported separately.
+
+For guarded edits and optional continuation, see [continuation](continuation.md).
+The three-file init and existing 2.x schema/migration contract remain unchanged.
+
 Keep task-local state in the host harness. Do not create a Guide or Decision for
 an unaccepted plan, temporary experiment, one-off workaround, or ordinary task
 status. Promote a finding only when it has a future consumer, a changed action,
